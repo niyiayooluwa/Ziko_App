@@ -26,13 +26,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ziko.navigation.Screen
-import com.ziko.util.CustomBiggerTopAppBar
+import com.ziko.presentation.CustomBiggerTopAppBar
 
 @Composable
-fun SignUpScreenOne(navController: NavController, viewModel: SignUpViewModel = hiltViewModel()) {
+fun SignUpScreenOne(
+    navController: NavController,
+    viewModel : SignUpViewModel
+) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -43,7 +45,7 @@ fun SignUpScreenOne(navController: NavController, viewModel: SignUpViewModel = h
         topBar = {
             CustomBiggerTopAppBar(
                 title = "Sign Up",
-                onNavigationClick = { navController.popBackStack() } // Go back to previous screen
+                onNavigationClick = { navController.popBackStack() } // Go back to the previous screen (e.g., Login)
             )
         }
     ) { padding ->
@@ -175,7 +177,7 @@ fun SignUpScreenOne(navController: NavController, viewModel: SignUpViewModel = h
                         viewModel.updateFirstName(firstName)
                         viewModel.updateLastName(lastName)
                         if (viewModel.isEmailValid()) {
-                            navController.navigate(Screen.SignupTwo.route)
+                            navController.navigate(Screen.SignTwo.route)
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(56.dp),

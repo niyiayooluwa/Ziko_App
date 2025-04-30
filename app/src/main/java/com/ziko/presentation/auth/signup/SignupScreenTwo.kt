@@ -31,40 +31,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ziko.navigation.Screen
-import com.ziko.util.CustomBiggerTopAppBar
+import com.ziko.presentation.CustomBiggerTopAppBar
 
 @Composable
-fun SignUpScreenTwo(navController: NavController) {
-    val viewModel: SignUpViewModel = hiltViewModel()
+fun SignUpScreenTwo(
+    navController: NavController,
+    viewModel: SignUpViewModel
+) { // Receive ViewModel
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     val signUpState by viewModel.signUpState.collectAsState()
 
-    androidx.compose.runtime.LaunchedEffect(signUpState) {
-        if (signUpState is SignUpState.Success) {
-            navController.navigate(Screen.Home.route) {
-                popUpTo(Screen.SignupOne.route) { inclusive = true }
-                popUpTo(Screen.SignupTwo.route) { inclusive = true }
-            }
-        }
-    }
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             CustomBiggerTopAppBar(
                 title = "Sign Up",
-                onNavigationClick = { navController.popBackStack() } // Go back to previous screen
+                onNavigationClick = { navController.popBackStack() }
             )
         }
     ) { padding ->
@@ -79,7 +70,7 @@ fun SignUpScreenTwo(navController: NavController) {
 
             Text(
                 text = "Create Password",
-                fontWeight = FontWeight.Medium,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
                 fontSize = 22.sp,
                 color = Color(0xFF080E1E)
             )
@@ -186,13 +177,11 @@ fun SignUpScreenTwo(navController: NavController) {
                     onClick = {
                         viewModel.signup(
                             onSuccess = {
-                                // Navigate back to the login screen on successful sign-up
-                                navController.navigate(Screen.Login.route) {
-                                    popUpTo(Screen.SignupOne.route) { inclusive = true }
-                                    popUpTo(Screen.SignupTwo.route) { inclusive = true }
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo("login") { inclusive = true }
                                 }
                             },
-                            onError = { /* Error handling will be done via SignUpState */ }
+                            onError = { /* Error handling via SignUpState */ }
                         )
                     },
                     modifier = Modifier.fillMaxWidth().height(56.dp),

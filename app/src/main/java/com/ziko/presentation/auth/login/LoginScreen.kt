@@ -1,6 +1,7 @@
 package com.ziko.presentation.auth.login
 
 import LineUI
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.navigation.Screen
-import com.ziko.util.CustomBiggerTopAppBar
+import com.ziko.presentation.CustomBiggerTopAppBar
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -271,7 +272,7 @@ fun LoginScreen(navController: NavController) {
                             .size(width = 164.dp, height = 50.dp)
                             .padding(vertical = 12.dp, horizontal = 63.dp)
                     ) {
-                        Icon(
+                        Image(
                             painter = painterResource(R.drawable.facebook),
                             contentDescription = "Sign in with facebook"
                         )
@@ -286,7 +287,7 @@ fun LoginScreen(navController: NavController) {
                         text = "Signup",
                         fontSize = 17.sp,
                         color = Color(0xFF5B7BFE),
-                        modifier = Modifier.clickable { navController.navigate(Screen.SignupOne.route) }
+                        modifier = Modifier.clickable { navController.navigate(Screen.SignOne.route) }
                     )
                 }
             }

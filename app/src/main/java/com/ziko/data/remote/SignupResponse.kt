@@ -1,8 +1,9 @@
 package com.ziko.data.remote
 
 data class SignUpResponse(
-    val success: Boolean,
+    val token: String,
+    val userId: String,
+    val name: String,
     val message: String,
-    val userId: String? = null,
-    val token: String? = null
+    val success: Boolean
 )

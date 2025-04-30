@@ -21,7 +21,7 @@ class SignUpViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
     private val _signUpState = MutableStateFlow<SignUpState>(SignUpState.Idle)
     val signUpState: StateFlow<SignUpState> = _signUpState
 
-    private val authMethod = "email_password"
+    private val authMethod = "password"
 
     fun updateFirstName(firstName: String) {
         signUpData.value.firstName = firstName
@@ -55,6 +55,10 @@ class SignUpViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
         return isValid
     }
 
+    fun returnValues(): String {
+        return "$signUpData"
+    }
+
     private fun arePasswordsMatching(): Boolean {
         val matching = signUpData.value.password == signUpData.value.confirmPassword
         passwordMismatchError.value = !matching
@@ -63,10 +67,9 @@ class SignUpViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
 
     // Function to send sign-up data to the backend
     fun signup(onSuccess: () -> Unit, onError: (String) -> Unit) {
-        println("1difi")
-        //if (!isEmailValid()) return
-        //if (!arePasswordsMatching()) return
-        println("2difi")
+        if (!isEmailValid()) return
+        if (!arePasswordsMatching()) return
+
         viewModelScope.launch {
             _signUpState.value = SignUpState.Loading
 
@@ -78,21 +81,17 @@ class SignUpViewModel @Inject constructor(private val authUseCase: AuthUseCase) 
                 authMethod = authMethod
             )
 
-            println("3difi")
             when (val result = authUseCase.signup(signUpRequest)) {
                 is Resource.Success -> {
                     _signUpState.value = SignUpState.Success
                     onSuccess()
-                    println("4difi")
                 }
                 is Resource.Error -> {
                     _signUpState.value = SignUpState.Error(result.message ?: "Sign-up failed")
                     onError(result.message ?: "Sign-up failed")
-                    println("5difi")
                 }
                 is Resource.Loading -> {
                     // Already set to Loading at the beginning of the function
-                println("6difi")
                 }
             }
         }
