@@ -75,4 +75,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.adapter.rxjava2)
+
+    implementation("me.nikhilchaudhari:composeNeumorphism:1.0.0-alpha02")
 }

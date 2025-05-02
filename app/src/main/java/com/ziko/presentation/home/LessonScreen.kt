@@ -3,23 +3,26 @@ package com.ziko.presentation.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -27,7 +30,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ziko.navigation.Screen
-import com.ziko.presentation.components.BottomNavBar
+import com.ziko.presentation.components.FloatingNavBar
+import com.ziko.data.model.LessonCard
 
 @Composable
 fun LessonScreen(
@@ -37,67 +41,97 @@ fun LessonScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val scrollState = rememberScrollState()
+    val purpleColor = Color(0xFF410FA3)
 
-    Scaffold(
+    // Root Box that contains everything
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
-        bottomBar = {
-            if (currentRoute in listOf(Screen.Home.route, Screen.Assessment.route)) {
-                BottomNavBar(navController = navController, currentRoute = currentRoute ?: "")
-            }
-        },
-    ) { padding ->
+            .background(Color.White)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-                horizontalAlignment = Alignment.Start,
+            Surface(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
+                    .fillMaxWidth()
+                    .background(purpleColor),
+                color = purpleColor
             ) {
-                // Header Section
                 Column(
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 48.dp,
+                            bottom = 16.dp
+                        ),
                 ) {
+                    // Profile picture placeholder
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = userName.first().toString(),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
                     Text(
                         text = "Hello, $userName",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.W600,
-                        color = Color.Black
+                        color = Color.White
                     )
 
                     Text(
                         text = "What would you like to learn today?",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.W400,
-                        color = Color(0xFF656872),
-                        modifier = Modifier.padding(top = 8.dp))
+                        color = Color.White.copy(alpha = 0.8f),
+                    )
                 }
+            }
 
-                // All Lessons Section
+            // Scrollable content
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(
+                        top = 24.dp,
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 70.dp
+                    )
+            ) {
                 Text(
                     text = "All Lessons",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.W600,
                     color = Color.Black,
-                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
                 // Lessons List
                 Column(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
                     lessons.forEach { lesson ->
                         LessonCard(
                             title = lesson.title,
                             description = lesson.description,
+                            color = lesson.color,
                             onClick = {
                                 val lessonId = lesson.id
                                 navController.navigate(Screen.LessonLoading(lessonId).route)
@@ -107,6 +141,20 @@ fun LessonScreen(
                 }
             }
         }
+
+        // Floating Navigation Bar positioned at the bottom center
+        if (currentRoute in listOf(Screen.Home.route, Screen.Assessment.route)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                FloatingNavBar(
+                    navController = navController,
+                    currentRoute = currentRoute ?: Screen.Home.route
+                )
+            }
+        }
     }
 }
 
@@ -114,16 +162,16 @@ fun LessonScreen(
 fun LessonCard(
     title: String,
     description: String,
+    color: Color,
     onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        //elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            containerColor = color
         )
     ) {
         Column(
@@ -148,20 +196,56 @@ fun LessonCard(
     }
 }
 
-// Keep your existing data classes
-data class LessonCard(
-    val title: String,
-    val description: String,
-    val id: String
-)
+
 
 val lessons = listOf(
-    LessonCard("Monophthongs", "Learn the 7 short & 5 long vowel sounds in English pronunciation", "lesson1"),
-    LessonCard("Diphthongs", "Master gliding vowel sounds like /al/, /el/, and /əʊ/", "lesson2"),
-    LessonCard("Triphthongs", "Learn complex sounds formed by combining three vowel sounds in one syllable", "lesson3"),
-    LessonCard("Voiced Consonants", "Explore consonants made with vocal cord vibration like /b/, /d/, /z/", "lesson4"),
-    LessonCard("Voiceless Consonants", "Understand consonants produced without vocal cord vibration like /p/, /t/, /f/", "lesson5"),
-    LessonCard("Intonation", "Learn how pitch rises and falls affect meaning in English speech", "lesson6"),
-    LessonCard("Stress", "Identify syllables that carry more emphasis in words and sentences", "lesson7"),
-    LessonCard("Rhythm", "Speak with the natural rhythm of English by mastering stress timing", "lesson8")
+    LessonCard(
+        "Monophthongs",
+        "Learn the 7 short & 5 long vowel sounds in English pronunciation",
+        "lesson1",
+        Color(0xFFf2f3f3)
+    ),
+    LessonCard(
+        "Diphthongs",
+        "Master gliding vowel sounds like /al/, /el/, and /əʊ/",
+        "lesson2",
+        Color(0xFFdbf6ff)
+    ),
+    LessonCard(
+        "Triphthongs",
+        "Learn complex sounds formed by combining three vowel sounds in one syllable",
+        "lesson3",
+        Color(0xFFfff6eb)
+    ),
+    LessonCard(
+        "Voiced Consonants",
+        "Explore consonants made with vocal cord vibration like /b/, /d/, /z/",
+        "lesson4",
+        Color(0xFFe6f8f7)
+    ),
+
+    LessonCard(
+        "Voiceless Consonants",
+        "Understand consonants produced without vocal cord vibration like /p/, /t/, /f/",
+        "lesson5",
+        Color(0xFFf2f3f3)
+    ),
+    LessonCard(
+        "Intonation",
+        "Learn how pitch rises and falls affect meaning in English speech",
+        "lesson6",
+        Color(0xFFfbe8ef)
+    ),
+    LessonCard(
+        "Stress",
+        "Identify syllables that carry more emphasis in words and sentences",
+        "lesson7",
+        Color(0xFFfff0e6)
+    ),
+    LessonCard(
+        "Rhythm",
+        "Speak with the natural rhythm of English by mastering stress timing",
+        "lesson8",
+        Color(0xFFece7f6)
+    )
 )

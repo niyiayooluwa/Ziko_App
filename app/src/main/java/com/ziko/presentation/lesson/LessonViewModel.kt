@@ -1,12 +1,16 @@
 package com.ziko.presentation.lesson
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.ziko.data.model.LessonCard
 import com.ziko.data.model.LessonDataProvider
+import com.ziko.presentation.home.LessonCard
 import com.ziko.ui.model.LessonScreenContent
 
 class LessonViewModel(
@@ -28,16 +32,32 @@ class LessonViewModel(
     val progress: Float
         get() = if (_screens.value.isEmpty()) 0f else (_currentIndex.intValue + 1).toFloat() / _screens.value.size
 
+    var selectedLesson by mutableStateOf<LessonCard?>(null)
+        private set
+
+    val totalScreens: Int
+        get() = _screens.value.size
+
+
     init {
         _screens.value = LessonDataProvider.getLessonContent(lessonId)
     }
 
+    fun selectLesson(lesson: LessonCard) {
+        selectedLesson = lesson
+    }
 
     fun nextScreen(onFinished: () -> Unit) {
         if (_currentIndex.intValue < _screens.value.lastIndex) {
             _currentIndex.value += 1
         } else {
             onFinished()
+        }
+    }
+
+    fun previousScreen() {
+        if (_currentIndex.intValue > 0) {
+            _currentIndex.value -= 1
         }
     }
 

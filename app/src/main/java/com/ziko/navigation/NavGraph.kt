@@ -18,6 +18,7 @@ import com.ziko.presentation.auth.login.LoginScreen
 import com.ziko.presentation.auth.signup.SignUpScreenOne
 import com.ziko.presentation.auth.signup.SignUpScreenTwo
 import com.ziko.presentation.auth.signup.SignUpViewModel
+import com.ziko.presentation.home.AssessmentScreen
 import com.ziko.presentation.home.LessonScreen
 import com.ziko.presentation.lesson.LessonCompletionScreen
 import com.ziko.presentation.lesson.LessonContent
@@ -61,6 +62,9 @@ fun NavGraph(
         // Home Screen
         composable(Screen.Home.route) { LessonScreen(navController = navController) }
 
+        // Assessment Screen
+        composable(Screen.Assessment.route) { AssessmentScreen(navController = navController) }
+
         // Lesson Loading
         composable(
             Screen.LessonLoading.BASE_ROUTE,
@@ -76,9 +80,22 @@ fun NavGraph(
             arguments = listOf(navArgument("lessonId") { type = NavType.StringType })
         ) { backStackEntry ->
             val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
+            val lessonViewModel: LessonViewModel = viewModel(
+                factory = LessonViewModelFactory(SavedStateHandle(mapOf("lessonId" to lessonId)))
+            )
+            val isFirstScreen = lessonViewModel.currentIndex.value == 0
             LessonIntroScreen(
                 navController, lessonId,
-                onCancel = { navController.navigate(Screen.Home.route) }
+                onCancel = { navController.navigate(Screen.Home.route) },
+                onNavigateBack = {
+                    // If on first screen, go back to Home, otherwise go to previous screen
+                    if (isFirstScreen) {
+                        navController.popBackStack(Screen.Home.route, false)
+                    } else {
+                        lessonViewModel.previousScreen()
+                    }
+                },
+                isFirstScreen = isFirstScreen,
             )
         }
 
@@ -93,14 +110,18 @@ fun NavGraph(
             val lessonViewModel: LessonViewModel = viewModel(
                 factory = LessonViewModelFactory(SavedStateHandle(mapOf("lessonId" to lessonId)))
             )
-
             val content = lessonViewModel.currentScreen
             val progress = lessonViewModel.progress
+            val currentScreen = lessonViewModel.currentIndex.value + 2
+            val totalScreens = lessonViewModel.totalScreens + 1
+            val isFirstScreen = lessonViewModel.currentIndex.value == 0
 
             if (content != null) {
                 LessonContent(
                     content = content,
                     progress = progress,
+                    currentScreen = currentScreen,
+                    totalScreens = totalScreens,
                     onCancel = { navController.popBackStack(Screen.Home.route, false) },
                     onContinue = {
                         lessonViewModel.nextScreen {
@@ -108,7 +129,16 @@ fun NavGraph(
                                 popUpTo(Screen.Home.route)
                             }
                         }
-                    }
+                    },
+                    onNavigateBack = {
+                        // If on first screen, go back to Home, otherwise go to previous screen
+                        if (isFirstScreen) {
+                            navController.popBackStack(Screen.Home.route, false)
+                        } else {
+                            lessonViewModel.previousScreen()
+                        }
+                    },
+                    isFirstScreen = isFirstScreen,
                 )
             } else {
                 // Handle null content case
@@ -128,6 +158,7 @@ fun NavGraph(
         ) { backStackEntry ->
             val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
             LessonCompletionScreen(
+                onPopBackStack = {navController.popBackStack()},
                 onContinuePractice = { /* nav to practice later */ },
                 onBackToHome = {
                     navController.popBackStack(Screen.Home.route, inclusive = false)

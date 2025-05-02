@@ -7,7 +7,8 @@ object LessonIntroContentProvider {
     fun getIntroContent(lessonId: String): LessonIntroContent =
         when (lessonId) {
             "lesson1" -> LessonIntroContent(
-                definitionText = "A monophthong is a pure vowel sound...",
+                definitionTextOne = "Monophthongs",
+                definitionTextTwo = " are single pure vowel sounds that do not change in quality during articulation.",
                 definitionAudio = R.raw.cut_cart,
                 points = listOf(
                     "Point one about the vowel",
@@ -16,7 +17,8 @@ object LessonIntroContentProvider {
                 )
             )
             else -> LessonIntroContent(
-                definitionText = "Definition unavailable",
+                definitionTextOne = "Definition unavailable",
+                definitionTextTwo = "Definition unavailable",
                 definitionAudio = R.raw.cut_cart,
                 points = emptyList()
             )

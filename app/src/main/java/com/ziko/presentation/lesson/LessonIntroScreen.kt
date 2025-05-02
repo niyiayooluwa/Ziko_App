@@ -1,5 +1,7 @@
 package com.ziko.presentation.lesson
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,68 +9,110 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ziko.data.model.LessonDataProvider
 import com.ziko.data.model.LessonIntroContentProvider
 import com.ziko.navigation.Screen
-import com.ziko.presentation.TopLessonBar
+import com.ziko.presentation.ProgressTopAppBar
 import com.ziko.ui.model.LessonIntroContent
-import com.ziko.util.AudioButtonWithLabel
+import com.ziko.util.AudioButtonWithWrappedText
 
 @Composable
 fun LessonIntroScreen(
     navController: NavController,
     lessonId: String,
-    onCancel: () -> Unit // Pass onCancel for the TopLessonBar
+    onCancel: () -> Unit,
+    onNavigateBack: () -> Unit,
+    isFirstScreen: Boolean
 ) {
-    // --- Prepare content and progress ---
     val introContent: LessonIntroContent =
         LessonIntroContentProvider.getIntroContent(lessonId)
-    // total screens = intro + repeating screens
     val totalScreens = 1 + LessonDataProvider.getLessonContent(lessonId).size
-    val progress = 1f / totalScreens  // first screen = 1/total
+    val progress = 1f / totalScreens
+    val currentScreen = 1
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // --- Top App Bar with Cancel + Progress ---
-        TopLessonBar(
-            progress = progress,
-            onCancel = onCancel // Pass it as onCancel
-        )
+    Scaffold(
+        topBar = {
+            // Using the custom progress top app bar with the cancel button
+            ProgressTopAppBar(
+                progress = progress,
+                currentScreen = currentScreen,
+                totalScreens = totalScreens,
+                onCancel = onCancel,
+                onNavigateBack = onNavigateBack,
+                isFirstScreen = isFirstScreen
+            )
+        }
+    ) { paddingValues ->
 
-        Spacer(Modifier.height(16.dp))
-
-        // --- Body Content ---
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 24.dp
+                ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            AudioButtonWithLabel(
-                text = introContent.definitionText,
-                audioResId = introContent.definitionAudio
-            )
+            Spacer(Modifier.height(16.dp))
+
+            Column (
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                horizontalAlignment = Alignment.Start
+            ){
+                AudioButtonWithWrappedText(
+                    textOne = introContent.definitionTextOne,
+                    textTwo = introContent.definitionTextTwo,
+                    audioResId = introContent.definitionAudio
+                )
+            }
 
             introContent.points.forEach { point ->
                 Text(text = point)
             }
-        }
 
-        Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(1f))
 
-        // --- Start Lesson Button ---
-        Button(
-            onClick = { navController.navigate(Screen.LessonContent(lessonId).route) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text("Start Lesson")
+            // --- Start Lesson Button ---
+            /*{Button(
+                onClick = { navController.navigate(Screen.LessonContent(lessonId).route) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                Text("Continue")
+            }}*/
+
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(30.dp))
+                    .background(Color(0xFF5B7BFE))
+                    .clickable{ navController.navigate(Screen.LessonContent(lessonId).route) }
+            ) {
+                Text(
+                    text ="Continue",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.W500
+                )
+            }
         }
     }
 }
-
