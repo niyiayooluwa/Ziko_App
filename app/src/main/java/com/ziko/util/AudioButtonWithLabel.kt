@@ -5,8 +5,10 @@ import androidx.annotation.RawRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,6 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun AudioButtonWithLabel(text: String, @RawRes audioResId: Int) {
@@ -35,16 +39,24 @@ fun AudioButtonWithLabel(text: String, @RawRes audioResId: Int) {
                     )
                 }
             },
+            colors = IconButtonDefaults.iconButtonColors(
+                containerColor = Color.Blue,
+                contentColor = Color.White
+            ),
             enabled = !isPlaying // Disable button while playing
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.VolumeUp,
                 contentDescription = "Play Audio",
-                tint = if (isPlaying) Color.Gray else Color.White
             )
         }
 
-        Text(text = text)
+        Text(
+            text = text,
+            color = Color.Black,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.W500
+        )
     }
 }
 
