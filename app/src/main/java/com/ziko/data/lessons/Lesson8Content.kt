@@ -19,15 +19,18 @@ fun getLesson8Content(): List<LessonScreenContent> {
     return listOf(
         LessonScreenContent(
             id = 1,
-            mainText = "Listen and Repeat",
-            sound = "/I/" to R.raw.cut_cart,
-            subText = "Example words:",
+            mainText = "Examples of rhythmic patterns",
             options = listOf(
-                "Option 1" to R.raw.cut_cart,
-                "Option 2" to R.raw.cut_cart,
-                "Option 3" to R.raw.cut_cart,
-                "Option 4" to R.raw.cut_cart,
+                "The CAT ran FAST to GET the BALL" to R.raw.cut_cart,
             ),
-        )
+        ),
+
+        LessonScreenContent(
+            id = 1,
+            mainText = "Examples of rhythmic patterns",
+            options = listOf(
+                "I want to go to the market " to R.raw.cut_cart,
+            ),
+        ),
     )
 }

@@ -4,5 +4,5 @@ data class LessonIntroContent(
     val definitionTextOne: String,
     val definitionTextTwo: String,
     val definitionAudio: Int,
-    val points: List<String>
+    val points: List<String?>? = null
 )

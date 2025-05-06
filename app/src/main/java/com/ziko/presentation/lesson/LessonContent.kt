@@ -64,27 +64,43 @@ fun LessonContent(
             Text(
                 text = content.mainText,
                 fontSize = 22.sp,
-                fontWeight = FontWeight.W500
+                fontWeight = FontWeight.W500,
+                color = Color.Black
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            AudioButtonWithLabel(
-                text = content.sound.first,
-                audioResId = content.sound.second,
-                size = Size.BIG
-            )
+            if (content.sound != null) {
+                AudioButtonWithLabel(
+                    text = content.sound.first,
+                    audioResId = content.sound.second,
+                    size = Size.BIG
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+            } else {
+                content.boldText?.let {
+                    Text(
+                        text = it,
+                        color = Color(0xFF080E1E),
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
 
-            Text(
-                text = content.subText,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF080E1E)
-            )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            content.subText?.let {
+                Text(
+                    text = it,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF080E1E)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             Column (
                 horizontalAlignment = Alignment.Start,

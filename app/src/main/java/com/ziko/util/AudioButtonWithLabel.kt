@@ -129,7 +129,7 @@ fun AudioButtonWithLabel(text: String, @RawRes audioResId: Int, size: Size) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun AudioButtonWithLabelForiIntro(
+fun AudioButtonWithLabelForIntro(
     textOne: String,
     textTwo: String,
     @RawRes audioResId: Int
@@ -157,7 +157,7 @@ fun AudioButtonWithLabelForiIntro(
                 contentColor = Color.White
             ),
             modifier = Modifier.size(32.dp),
-            enabled = !isPlaying // Disable button while playing
+            //enabled = !isPlaying // Disable button while playing
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.VolumeUp,
@@ -191,6 +191,7 @@ fun AudioButtonWithLabelForiIntro(
         Text(
             text = styledText,
             fontSize = 22.sp,
+            softWrap = true,
         )
     }
 }

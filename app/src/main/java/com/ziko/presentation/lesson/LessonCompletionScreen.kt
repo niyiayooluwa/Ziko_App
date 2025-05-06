@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ziko.R
@@ -65,6 +64,7 @@ fun LessonCompletionScreen(
     ){ paddingValues ->
         Box(
             modifier = Modifier
+                .background(Color.White)
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(24.dp),
@@ -92,15 +92,18 @@ fun LessonCompletionScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                val textPart = lessonId.takeWhile {it.isLetter()}.replaceFirstChar { it.uppercase() }
+                val numPart = lessonId.takeLastWhile {it.isDigit()}
                 // Congratulations message
                 Text(
-                    text = "You have completed lesson $lessonId. You \nare ready for a bigger challenge.",
+                    text = "You have completed $textPart $numPart. You \nare ready for a bigger challenge.",
                     fontSize = 17.sp,
                     textAlign = TextAlign.Center,
                     color = Color(0xFF656872)
                 )
             }
 
+            //Buttons
             Column (
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -109,20 +112,25 @@ fun LessonCompletionScreen(
                     .fillMaxWidth()
             ){
                 // Continue button
-                Button(
-                    onClick = onContinuePractice,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF5b7bfe)
-                    )
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(Color(0xFF5b7bfe))
+                        .clickable{onContinuePractice()}
                 ) {
                     Text(
-                        text = "Continue to practice exercise",
+                        text ="Continue to practice exercise",
+                        color = Color.White,
                         fontSize = 20.sp,
-                        color = Color.White
+                        fontWeight = FontWeight.W500
                     )
                 }
 
+                //Go back home button
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,

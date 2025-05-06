@@ -19,15 +19,24 @@ fun getLesson7Content(): List<LessonScreenContent> {
     return listOf(
         LessonScreenContent(
             id = 1,
-            mainText = "Listen and Repeat",
-            sound = "/I/" to R.raw.cut_cart,
-            subText = "Example words:",
+            mainText = "Examples of word stress",
             options = listOf(
-                "Option 1" to R.raw.cut_cart,
-                "Option 2" to R.raw.cut_cart,
-                "Option 3" to R.raw.cut_cart,
-                "Option 4" to R.raw.cut_cart,
+                "PHOto" to R.raw.cut_cart,
+                "toMAto" to R.raw.cut_cart,
+                "aBOVE" to R.raw.cut_cart,
+                "beLIVE" to R.raw.cut_cart,
+                "deCIDE" to R.raw.cut_cart,
             ),
-        )
+        ),
+
+        LessonScreenContent(
+            id = 2,
+            mainText = "Example of sentence stress",
+            subText = "Example sentence:",
+            options = listOf(
+                "I LOVE apples" to R.raw.cut_cart,
+                "He BOUGHT a NEW car" to R.raw.cut_cart,
+            ),
+        ),
     )
 }

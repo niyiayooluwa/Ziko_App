@@ -26,6 +26,7 @@ import com.ziko.data.model.LessonIntroContentProvider
 import com.ziko.navigation.Screen
 import com.ziko.presentation.ProgressTopAppBar
 import com.ziko.ui.model.LessonIntroContent
+import com.ziko.util.AudioButtonWithLabelForIntro
 import com.ziko.util.AudioButtonWithWrappedText
 
 @Composable
@@ -58,6 +59,7 @@ fun LessonIntroScreen(
 
         Column(
             modifier = Modifier
+                .background(Color.White)
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(
@@ -73,15 +75,22 @@ fun LessonIntroScreen(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
                 horizontalAlignment = Alignment.Start
             ){
-                AudioButtonWithWrappedText(
+                AudioButtonWithLabelForIntro(
                     textOne = introContent.definitionTextOne,
                     textTwo = introContent.definitionTextTwo,
                     audioResId = introContent.definitionAudio
                 )
             }
 
-            introContent.points.forEach { point ->
-                Text(text = point)
+            introContent.points?.forEach { point ->
+                if (point != null) {
+                    Text(
+                        text = point,
+                        fontWeight = FontWeight.W500,
+                        fontSize = 20.sp,
+                        color = Color(0xFF080e1e)
+                    )
+                }
             }
 
             Spacer(Modifier.weight(1f))
