@@ -43,7 +43,8 @@ import androidx.core.content.ContextCompat
 @Composable
 fun SpeechButton(
     modifier: Modifier = Modifier,
-    onSpeechResult: (String?) -> Unit
+    onSpeechResult: (String?) -> Unit,
+    onPermissionDenied: () -> Unit
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
@@ -65,6 +66,8 @@ fun SpeechButton(
                 arrayOf(Manifest.permission.RECORD_AUDIO),
                 1
             )
+            permissionGranted.value = false
+            onPermissionDenied()
         }
 
         speechManager.value = SpeechManager(

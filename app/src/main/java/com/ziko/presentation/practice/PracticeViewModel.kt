@@ -1,44 +1,65 @@
 package com.ziko.presentation.practice
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
+import androidx.lifecycle.ViewModelProvider
+import com.ziko.data.model.PracticeDataProvider
+import com.ziko.ui.model.PracticeScreenContent
 
-class PracticeViewModel @HiltViewModel constructor(
-    private val repository: PracticeRepository
+class PracticeViewModel(
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    // Holds the current practice exercise's data
-    private val _currentPracticeExercise = mutableStateOf<PracticeExercise?>(null)
-    val currentPracticeExercise: State<PracticeExercise?> = _currentPracticeExercise
 
-    // Progress for the current practice exercise
-    private val _progress = mutableStateOf(0f)
-    val progress: State<Float> = _progress
+    private val lessonId: String = savedStateHandle["lessonId"] ?: error("Missing lessonId")
 
-    // Error state
-    private val _error = mutableStateOf<String?>(null)
-    val error: State<String?> = _error
+    private val _screens = mutableStateOf<List<PracticeScreenContent>>(emptyList())
+    val screens: List<PracticeScreenContent> get() = _screens.value
 
-    fun loadPracticeExercise(lessonId: String, exerciseId: String) {
-        // Fetch the exercise from the repository
-        viewModelScope.launch {
-            try {
-                _currentPracticeExercise.value = repository.getPracticeExercise(lessonId, exerciseId)
-                _progress.value = 0f // Reset progress
-            } catch (e: Exception) {
-                _error.value = "Failed to load practice exercise"
-            }
+    private val _currentIndex = mutableIntStateOf(0)
+    val currentIndex: State<Int> = _currentIndex
+
+    val currentScreen: PracticeScreenContent?
+        get() = _screens.value.getOrNull(_currentIndex.intValue)
+
+    val progress: Float
+        get() = if (_screens.value.isEmpty()) 0f else (_currentIndex.intValue + 1).toFloat() / _screens.value.size
+
+
+    val totalScreens: Int
+        get() = _screens.value.size
+
+    init {
+        _screens.value = PracticeDataProvider.getPracticeContent(lessonId)
+    }
+
+    fun nextScreen(onFinished: () -> Unit) {
+        if (_currentIndex.intValue < _screens.value.lastIndex) {
+            _currentIndex.value += 1
+        } else {
+            onFinished()
         }
     }
 
-    fun updateProgress(newProgress: Float) {
-        _progress.value = newProgress.coerceIn(0f, 1f)
+    fun previousScreen() {
+        if (_currentIndex.intValue > 0) {
+            _currentIndex.value -= 1
+        }
     }
 
-    fun nextExercise() {
-        // Logic to go to the next exercise, if any
+    fun reset() {
+        _currentIndex.value = 0
+    }
+}
+
+class PracticeViewModelFactory(private val savedStateHandle: SavedStateHandle) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(PracticeViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return PracticeViewModel(savedStateHandle) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

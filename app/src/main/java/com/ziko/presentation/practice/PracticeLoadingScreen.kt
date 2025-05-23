@@ -38,7 +38,8 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PracticeLoadingScreen(
-    navController: NavController
+    navController: NavController,
+    lessonId: String
 ) {
     val lesson = "Lesson 2"
 

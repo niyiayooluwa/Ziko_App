@@ -26,6 +26,10 @@ import com.ziko.presentation.lesson.LessonIntroScreen
 import com.ziko.presentation.lesson.LessonLoadingScreen
 import com.ziko.presentation.lesson.LessonViewModel
 import com.ziko.presentation.lesson.LessonViewModelFactory
+import com.ziko.presentation.practice.PracticeContent
+import com.ziko.presentation.practice.PracticeLoadingScreen
+import com.ziko.presentation.practice.PracticeViewModel
+import com.ziko.presentation.practice.PracticeViewModelFactory
 import com.ziko.presentation.splash.OnboardingScreen
 import com.ziko.presentation.splash.SplashScreen
 @Composable
@@ -151,7 +155,7 @@ fun NavGraph(
             }
         }
 
-        // Completion
+        // Lesson Completion
         composable(
             Screen.LessonCompletion.BASE_ROUTE,
             arguments = listOf(navArgument("lessonId") { type = NavType.StringType })
@@ -165,6 +169,68 @@ fun NavGraph(
                 },
                 lessonId = lessonId
             )
+        }
+        
+        //Practice Loading
+        composable(
+            Screen.PracticeLoading.BASE_ROUTE,
+            arguments = listOf(navArgument("lessonId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
+            PracticeLoadingScreen(navController, lessonId)
+        }
+        
+        //Practice Content
+        composable(
+            Screen.PracticeContent.BASE_ROUTE,
+            arguments = listOf(navArgument("lessonId") {type = NavType.StringType})
+        ) { backStackEntry ->
+            val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
+
+            //Created the ViewModel scoped to this screen with the lessonId
+            val practiceViewModel: PracticeViewModel = viewModel(
+                factory = PracticeViewModelFactory(SavedStateHandle(mapOf("lessonId" to lessonId)))
+            )
+            val content = practiceViewModel.currentScreen
+            val progress  = practiceViewModel.progress
+            val currentScreen = practiceViewModel.currentIndex.value
+            val totalScreens = practiceViewModel.totalScreens
+            val isFirstScreen = practiceViewModel.currentIndex.value == 0
+
+            if (content != null) {
+                PracticeContent(
+                    content = content,
+                    progress = progress,
+                    currentScreen = currentScreen,
+                    totalScreens = totalScreens,
+                    onNavigateBack = {
+                        if (isFirstScreen) {
+                            navController.popBackStack(Screen.Home.route, false)
+                        } else {
+                            practiceViewModel.previousScreen()
+                        }
+                    },
+                    isFirstScreen = isFirstScreen,
+                    onCancel = {
+                        navController.popBackStack(Screen.Home.route, false)
+                               },
+                    onContinue = {
+                        practiceViewModel.nextScreen {
+                            navController.navigate(Screen.LessonCompletion(lessonId).route) {
+                                popUpTo(Screen.Home.route)
+                            }
+                        }
+                    } ,
+                )
+            } else {
+                // Handle null content case
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }

@@ -23,4 +23,10 @@ sealed class Screen(val route: String) {
     data class LessonCompletion(val lessonId: String): Screen("lesson_completion/$lessonId") {
         companion object { const val BASE_ROUTE = "lesson_completion/{lessonId}" }
     }
+    data class PracticeLoading(val lessonId: String) : Screen("practice_loading/$lessonId") {
+        companion object{ const val BASE_ROUTE = "practice_loading/{lessonId}"}
+    }
+    data class PracticeContent(val lessonId: String): Screen("practice_content/$lessonId") {
+        companion object{const val BASE_ROUTE = "practice_content/{lessonId}"}
+    }
 }
