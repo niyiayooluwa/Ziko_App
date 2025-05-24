@@ -10,8 +10,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.ziko.data.model.LessonCard
 import com.ziko.data.model.LessonDataProvider
-import com.ziko.presentation.home.LessonCard
 import com.ziko.ui.model.LessonScreenContent
+import com.ziko.util.loadAudioManifest
 
 class LessonViewModel(
     savedStateHandle: SavedStateHandle
@@ -19,7 +19,7 @@ class LessonViewModel(
 
     private val lessonId: String = savedStateHandle["lessonId"] ?: error("Missing lessonId")
 
-    // Screens loaded for this lesson
+    // Screens loaded for this lessons
     private val _screens = mutableStateOf<List<LessonScreenContent>>(emptyList())
     val screens: List<LessonScreenContent> get() = _screens.value
 

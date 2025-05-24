@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,11 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ziko.navigation.Screen
-import com.ziko.presentation.ProgressTopAppBar
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.ziko.presentation.components.ProgressTopAppBar
 import com.ziko.ui.model.LessonScreenContent
-import com.ziko.util.AudioButtonWithLabel
-import com.ziko.util.Size
+import com.ziko.presentation.components.AudioButtonWithLabel
+import com.ziko.presentation.components.Size
+import com.ziko.util.AudioManager
 
 @Composable
 fun LessonContent(
@@ -38,6 +39,14 @@ fun LessonContent(
     onNavigateBack: () -> Unit,
     isFirstScreen: Boolean,
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.addObserver(AudioManager)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(AudioManager)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -73,7 +82,7 @@ fun LessonContent(
             if (content.sound != null) {
                 AudioButtonWithLabel(
                     text = content.sound.first,
-                    audioResId = content.sound.second,
+                    assetPath = content.sound.second,
                     size = Size.BIG
                 )
 
@@ -109,7 +118,7 @@ fun LessonContent(
                 content.options.forEach { option ->
                     AudioButtonWithLabel(
                         text = option.first,
-                        audioResId = option.second,
+                        assetPath = option.second,
                         size = Size.SMALL
                     )
                     Spacer(modifier = Modifier.height(16.dp))

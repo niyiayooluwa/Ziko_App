@@ -1,6 +1,6 @@
 package com.ziko.presentation.auth.login
 
-import LineUI
+import com.ziko.presentation.components.LineUI
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,7 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.navigation.Screen
-import com.ziko.presentation.CustomBiggerTopAppBar
+import com.ziko.presentation.components.CustomBiggerTopAppBar
 
 @Composable
 fun LoginScreen(navController: NavController) {

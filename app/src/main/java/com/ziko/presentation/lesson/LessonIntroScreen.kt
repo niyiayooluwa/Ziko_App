@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,14 +21,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.ziko.data.model.LessonDataProvider
 import com.ziko.data.model.LessonIntroContentProvider
 import com.ziko.navigation.Screen
-import com.ziko.presentation.ProgressTopAppBar
+import com.ziko.presentation.components.ProgressTopAppBar
 import com.ziko.ui.model.LessonIntroContent
-import com.ziko.util.AudioButtonWithLabelForIntro
-import com.ziko.util.AudioButtonWithWrappedText
+import com.ziko.presentation.components.AudioButtonWithLabelForIntro
+import com.ziko.util.AudioManager
 
 @Composable
 fun LessonIntroScreen(
@@ -42,6 +44,15 @@ fun LessonIntroScreen(
     val totalScreens = 1 + LessonDataProvider.getLessonContent(lessonId).size
     val progress = 1f / totalScreens
     val currentScreen = 1
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.addObserver(AudioManager)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(AudioManager)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -78,7 +89,7 @@ fun LessonIntroScreen(
                 AudioButtonWithLabelForIntro(
                     textOne = introContent.definitionTextOne,
                     textTwo = introContent.definitionTextTwo,
-                    audioResId = introContent.definitionAudio
+                    assetPath = introContent.definitionAudio
                 )
             }
 

@@ -1,0 +1,465 @@
+{
+  "lessons": {
+    "lesson1": {
+      "title": "Lesson1",
+      "audio": {
+        "lesson": [
+          "about.mp3",
+          "banana.mp3",
+          "bead.mp3",
+          "bet.mp3",
+          "bird.mp3",
+          "bit.mp3",
+          "blue.mp3",
+          "book.mp3",
+          "car.mp3",
+          "cat.mp3",
+          "cinema.mp3",
+          "cup.mp3",
+          "cut.mp3",
+          "dog.mp3",
+          "door.mp3",
+          "fat.mp3",
+          "father.mp3",
+          "feet.mp3",
+          "fit.mp3",
+          "food.mp3",
+          "foot.mp3",
+          "hot.mp3",
+          "hut.mp3",
+          "law.mp3",
+          "let.mp3",
+          "look.mp3",
+          "lot.mp3",
+          "luck.mp3",
+          "mat.mp3",
+          "monophthong_definition.mp3",
+          "mood.mp3",
+          "more.mp3",
+          "neat.mp3",
+          "nurse.mp3",
+          "park.mp3",
+          "pen.mp3",
+          "pot.mp3",
+          "put.mp3",
+          "seed.mp3",
+          "set.mp3",
+          "ship.mp3",
+          "sit.mp3",
+          "sofa.mp3",
+          "star.mp3",
+          "talk.mp3",
+          "tap.mp3",
+          "third.mp3",
+          "too.mp3",
+          "vowel_ah_long.mp3",
+          "vowel_aw_long.mp3",
+          "vowel_a_short.mp3",
+          "vowel_er_long.mp3",
+          "vowel_e_short.mp3",
+          "vowel_i_long.mp3",
+          "vowel_i_short.mp3",
+          "vowel_o_short.mp3",
+          "vowel_schwa.mp3",
+          "vowel_uh_short.mp3",
+          "vowel_u_long.mp3",
+          "vowel_u_short.mp3",
+          "word.mp3"
+        ],
+        "practice": [
+          "bit_beat.mp3",
+          "cut_cart.mp3",
+          "paul_bought_a_long_warm_coat.mp3",
+          "pot_port.mp3",
+          "she_eats_sweet_peaches.mp3",
+          "the_cat_sat_on_the_mat.mp3",
+          "tom_had_a_small_hut_near.mp3"
+        ],
+        "assessment": [
+          "bit_beat.mp3",
+          "full_fool.mp3",
+          "hot_heart.mp3"
+        ]
+      }
+    },
+
+    "lesson2": {
+      "title": "Lesson2",
+      "audio": {
+        "lesson": [
+          "air.mp3",
+          "boy.mp3",
+          "care.mp3",
+          "chair.mp3",
+          "cheer.mp3",
+          "clear.mp3",
+          "cow.mp3",
+          "day.mp3",
+          "diphthong_meaning.mp3",
+          "diph_air_glide.mp3",
+          "diph_ay_glide.mp3",
+          "diph_ear_glide.mp3",
+          "diph_i_glide.mp3",
+          "diph_oor_glide.mp3",
+          "diph_ow_glide.mp3",
+          "diph_oy_glide.mp3",
+          "diph_o_glide.mp3",
+          "endure.mp3",
+          "fair.mp3",
+          "go.mp3",
+          "here.mp3",
+          "high.mp3",
+          "home.mp3",
+          "house.mp3",
+          "joy.mp3",
+          "kite.mp3",
+          "loud.mp3",
+          "my.mp3",
+          "near.mp3",
+          "noise.mp3",
+          "now.mp3",
+          "pay.mp3",
+          "pure.mp3",
+          "right.mp3",
+          "say.mp3",
+          "show.mp3",
+          "sure.mp3",
+          "throw.mp3",
+          "tour.mp3",
+          "toy.mp3",
+          "weight.mp3"
+        ],
+        "practice": [
+          "boy_buy.mp3",
+          "i_may_stay_in_the_rain_today.mp3",
+          "kate_wanted_to_buy_a_new_chair.mp3",
+          "say_sigh.mp3",
+          "she_found_a_rare_chair_near.mp3",
+          "show_cow.mp3",
+          "the_boy_enjoys_playing_with_toys.mp3"
+        ],
+        "assessment": [
+          "air.mp3",
+          "avoid_spilling_the_oil.mp3",
+          "boy.mp3",
+          "buy.mp3",
+          "care.mp3",
+          "chair.mp3",
+          "clear.mp3",
+          "cow.mp3",
+          "day.mp3",
+          "fair.mp3",
+          "he_is_proud_of_his_brown_dog.mp3",
+          "he_will_try_to_find_the_right_time.mp3",
+          "home.mp3",
+          "i_ate_a_piece_of_cake_yesterday.mp3",
+          "i_can_hear_the_birds.mp3",
+          "i_like_to_fly_kites_in_the_sky.mp3",
+          "my.mp3",
+          "near.mp3",
+          "pure.mp3",
+          "right.mp3",
+          "say.mp3",
+          "she_has_a_bright_idea.mp3",
+          "she_takes_good_care_of_her_plants.mp3",
+          "show.mp3",
+          "sigh.mp3",
+          "sure.mp3",
+          "they_say_it_s_a_great_place_to_stay.mp3",
+          "the_air_was_fresh.mp3",
+          "the_boy_enjoys_playing_with_toys.mp3",
+          "the_cat_is_out_of_the_bag.mp3",
+          "the_child_is_crying_for_ice_cream.mp3",
+          "the_crowd_gathered_outside.mp3",
+          "the_little_boy_enjoys_playing.mp3",
+          "the_noise_in_the_market.mp3",
+          "the_old_man_rode_his_boat.mp3",
+          "the_rain_came_late_in_the_day.mp3",
+          "throw.mp3"
+        ]
+      }
+    },
+
+    "lesson3": {
+      "title": "Lesson3",
+      "audio": {
+        "lesson": [
+          "employer.mp3",
+          "fire.mp3",
+          "flower.mp3",
+          "hire.mp3",
+          "hour.mp3",
+          "lawyer.mp3",
+          "layer.mp3",
+          "liar.mp3",
+          "lower.mp3",
+          "mayor.mp3",
+          "mower.mp3",
+          "our.mp3",
+          "player.mp3",
+          "power.mp3",
+          "slower.mp3",
+          "tired.mp3",
+          "triphthongs_definition.mp3",
+          "tri_awa.mp3",
+          "tri_ay.mp3",
+          "tri_i.mp3",
+          "tri_ow.mp3",
+          "tri_oy.mp3"
+        ],
+        "practice": [
+          "fire_far.mp3",
+          "our_house_is_near_the_tower.mp3",
+          "our_or.mp3",
+          "player_play.mp3",
+          "the_fire_burned_brightly_in_the_dark_place.mp3",
+          "the_hour_was_late.mp3",
+          "the_lawyer_spoke_to_the_mayor_about_the_power.mp3"
+        ],
+        "assessment": [
+          "fire.mp3",
+          "he_is_a_known_liar.mp3",
+          "he_put_on_an_extra_layer_of_clothing.mp3",
+          "he_walked_slower_to_enjoy_the_view.mp3",
+          "knowledge_is_power.mp3",
+          "liar.mp3",
+          "loyal.mp3",
+          "my_car_has_a_flat_tire.mp3",
+          "my_employer_gave_me_a_bonus_this_month.mp3",
+          "royal.mp3",
+          "she_has_always_been_loyal_to_her_friends.mp3",
+          "she_waited_for_an_hour.mp3",
+          "the_bridge_is_lower_than_expected.mp3",
+          "the_fire_was_burning_brightly_in_the_fireplace.mp3",
+          "the_football_player_scored_a_goal.mp3",
+          "the_gardener_used_a_mower_to_cut_the_grass.mp3",
+          "the_garden_is_full_of_beautiful_flowers.mp3",
+          "the_mayor_announced_new_policy.mp3",
+          "the_prince_comes_from_a_royal_family.mp3",
+          "tired.mp3"
+        ]
+      }
+    },
+
+    "lesson4": {
+      "title": "Lesson4",
+      "audio": {
+        "lesson": [
+          "add.mp3",
+          "baby.mp3",
+          "bag.mp3",
+          "bat.mp3",
+          "bed.mp3",
+          "big.mp3",
+          "buzz.mp3",
+          "cab.mp3",
+          "consonant_b.mp3",
+          "consonant_d.mp3",
+          "consonant_g.mp3",
+          "consonant_jg.mp3",
+          "consonant_sure.mp3",
+          "consonant_th.mp3",
+          "consonant_v.mp3",
+          "consonant_z.mp3",
+          "dance.mp3",
+          "dog.mp3",
+          "father.mp3",
+          "garden.mp3",
+          "giant.mp3",
+          "go.mp3",
+          "have.mp3",
+          "judge.mp3",
+          "juice.mp3",
+          "jump.mp3",
+          "love.mp3",
+          "measure.mp3",
+          "mother.mp3",
+          "nose.mp3",
+          "pleasure.mp3",
+          "table.mp3",
+          "that.mp3",
+          "this.mp3",
+          "treasure.mp3",
+          "van.mp3",
+          "very.mp3",
+          "vision.mp3",
+          "voiced_consonant_definition.mp3",
+          "zebra.mp3",
+          "zoo.mp3"
+        ],
+        "practice": [
+          "ben_and_daisy_visited_the_zoo.mp3",
+          "david_bought_a_big_bag_of_vegetables.mp3",
+          "pat_bat.mp3",
+          "sip_zip.mp3",
+          "ten_den.mp3",
+          "the_baby_loves_playing_with.mp3",
+          "the_judge_measured_the_treasure.mp3"
+        ],
+        "assessment": [
+          "cap_cab.mp3",
+          "jungle.mp3",
+          "mother.mp3",
+          "price_prize.mp3",
+          "table.mp3",
+          "ten_den.mp3",
+          "the_van_moved_very_fast.mp3",
+          "valley.mp3",
+          "zip.mp3"
+        ]
+      }
+    },
+
+    
+    "lesson5": {
+      "title": "Lesson5",
+      "audio": {
+        "lesson": [
+          "birthday.mp3",
+          "black.mp3",
+          "bus.mp3",
+          "cap.mp3",
+          "cat.mp3",
+          "cheese.mp3",
+          "chop.mp3",
+          "church.mp3",
+          "consonant_ch.mp3",
+          "consonant_f.mp3",
+          "consonant_k.mp3",
+          "consonant_p.mp3",
+          "consonant_s.mp3",
+          "consonant_sh.mp3",
+          "consonant_t.mp3",
+          "consonant_th.mp3",
+          "fish.mp3",
+          "kick.mp3",
+          "nice.mp3",
+          "pan.mp3",
+          "park.mp3",
+          "pat.mp3",
+          "see.mp3",
+          "shoe.mp3",
+          "shop.mp3",
+          "sit.mp3",
+          "teacher.mp3",
+          "ten.mp3",
+          "think.mp3",
+          "three.mp3",
+          "tooth.mp3",
+          "top.mp3",
+          "voiceless_consonants_definition.mp3",
+          "wash.mp3",
+          "water.mp3"
+        ],
+        "practice": [
+          "bag_back.mp3",
+          "bat_pat.mp3",
+          "charlie_chews_chocolate.mp3",
+          "peter_picked_fresh.mp3",
+          "she_washed_the_dishes.mp3",
+          "tommy_took_the_trip_to_the_shop.mp3",
+          "zip_sip.mp3"
+        ],
+        "assessment": [
+          "black.mp3",
+          "buzz_bus.mp3",
+          "church.mp3",
+          "dog_dock.mp3",
+          "fish.mp3",
+          "park.mp3",
+          "the_thick_fog.mp3",
+          "thin.mp3",
+          "van_fan.mp3"
+        ]
+      }
+    },
+
+
+    "lesson6": {
+      "title": "Lesson6",
+      "audio": {
+        "lesson": [
+          "are_you_coming.mp3",
+          "intonation_definition.mp3",
+          "i_am_going_home.mp3",
+          "well_i_think_so.mp3"
+        ],
+        "practice": [
+          "are_you_sure.mp3",
+          "is_she_your_teacher.mp3",
+          "it_was_a_bright_morning.mp3",
+          "okay.mp3",
+          "really.mp3",
+          "we_had_a_great.mp3"
+        ],
+        "assessment": [
+          "she_loves_reading_books.mp3",
+          "what_time_is_it.mp3"
+        ]
+      }
+    },
+
+
+    "lesson7": {
+      "title": "Lesson7",
+      "audio": {
+        "lesson": [
+          "above.mp3",
+          "believe.mp3",
+          "decide.mp3",
+          "he_bought_a.mp3",
+          "i_love_apples.mp3",
+          "photo.mp3",
+          "tomato.mp3"
+        ],
+        "practice": [
+          "afraid.mp3",
+          "remember.mp3",
+          "she_wants_to_buy.mp3",
+          "table.mp3",
+          "the_sun_is_high.mp3",
+          "window.mp3"
+        ],
+        "assessment": [
+          "amazing.mp3",
+          "encouraging.mp3",
+          "photograph.mp3",
+          "photographic.mp3",
+          "photography.mp3",
+          "remarkable.mp3"
+        ]
+      }
+    },
+
+
+    "lesson8": {
+      "title": "Lesson8",
+      "audio": {
+        "lesson": [
+          "i_want_to_go.mp3",
+          "rhythm_definition.mp3",
+          "the_cat_ran.mp3"
+        ],
+        "practice": [
+          "its_rhythm_so_smooth.mp3",
+          "i_walk_through.mp3",
+          "the_birds_start_to_sing.mp3",
+          "the_leaves_dance_high.mp3",
+          "the_rhythm_of_nature.mp3",
+          "the_river_flows_fast.mp3",
+          "the_rustle_and_whisper.mp3",
+          "the_song_of_the.mp3"
+        ],
+        "assessment": [
+          "a_bus_rolls_past.mp3",
+          "i_rush_downstairs.mp3",
+          "i_stretch_and_yawn.mp3",
+          "the_alarm_rings.mp3",
+          "the_city_hums.mp3",
+          "the_school_bell_rings.mp3",
+          "the_sun_shines.mp3"
+        ]
+      }
+    }
+  }
+}

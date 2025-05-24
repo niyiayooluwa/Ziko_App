@@ -1,10 +1,9 @@
 // Lesson1Content.kt
 package com.ziko.data.lessons
 
-import com.ziko.R
+import androidx.compose.ui.graphics.Color
 import com.ziko.data.model.LessonCard
 import com.ziko.ui.model.LessonScreenContent
-import androidx.compose.ui.graphics.Color
 
 fun getLesson7Info(): LessonCard {
     return LessonCard(
@@ -21,11 +20,11 @@ fun getLesson7Content(): List<LessonScreenContent> {
             id = 1,
             mainText = "Examples of word stress",
             options = listOf(
-                "PHOto" to R.raw.cut_cart,
-                "toMAto" to R.raw.cut_cart,
-                "aBOVE" to R.raw.cut_cart,
-                "beLIVE" to R.raw.cut_cart,
-                "deCIDE" to R.raw.cut_cart,
+                "PHOto" to "lessons/lesson1/about.mp3",
+                "toMAto" to "lessons/lesson1/about.mp3",
+                "aBOVE" to "lessons/lesson1/about.mp3",
+                "beLIVE" to "lessons/lesson1/about.mp3",
+                "deCIDE" to "lessons/lesson1/about.mp3",
             ),
         ),
 
@@ -34,8 +33,8 @@ fun getLesson7Content(): List<LessonScreenContent> {
             mainText = "Example of sentence stress",
             subText = "Example sentence:",
             options = listOf(
-                "I LOVE apples" to R.raw.cut_cart,
-                "He BOUGHT a NEW car" to R.raw.cut_cart,
+                "I LOVE apples" to "lessons/lesson1/about.mp3",
+                "He BOUGHT a NEW car" to "lessons/lesson1/about.mp3",
             ),
         ),
     )

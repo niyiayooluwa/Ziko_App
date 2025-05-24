@@ -21,7 +21,7 @@ fun getLesson8Content(): List<LessonScreenContent> {
             id = 1,
             mainText = "Examples of rhythmic patterns",
             options = listOf(
-                "The CAT ran FAST to GET the BALL" to R.raw.cut_cart,
+                "The CAT ran FAST to GET the BALL" to "lessons/lesson1/about.mp3",
             ),
         ),
 
@@ -29,7 +29,7 @@ fun getLesson8Content(): List<LessonScreenContent> {
             id = 1,
             mainText = "Examples of rhythmic patterns",
             options = listOf(
-                "I want to go to the market " to R.raw.cut_cart,
+                "I want to go to the market " to "lessons/lesson1/about.mp3",
             ),
         ),
     )

@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ziko.navigation.Screen
-import com.ziko.presentation.CustomBiggerTopAppBar
+import com.ziko.presentation.components.CustomBiggerTopAppBar
 
 @Composable
 fun SignUpScreenOne(

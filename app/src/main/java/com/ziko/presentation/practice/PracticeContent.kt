@@ -22,13 +22,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.ziko.R
-import com.ziko.presentation.ProgressTopAppBar
+import com.ziko.presentation.components.ProgressTopAppBar
 import com.ziko.presentation.components.SuccessIndicator
 import com.ziko.ui.model.PracticeScreenContent
-import com.ziko.util.AudioButtonWithLabel
-import com.ziko.util.Size
-import com.ziko.util.SpeechButton
+import com.ziko.presentation.components.AudioButtonWithLabel
+import com.ziko.presentation.components.Size
+import com.ziko.presentation.components.SpeechButton
+import com.ziko.util.AudioManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -52,6 +54,14 @@ fun PracticeContent(
     val spokenText = remember { mutableStateOf("") }
     var debounceJob by remember { mutableStateOf<Job?>(null) }
     var permissionDenied by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.addObserver(AudioManager)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(AudioManager)
+        }
+    }
 
     // Reset state when expected text changes (e.g., when screen flips)
     LaunchedEffect(expectedText) {
@@ -103,7 +113,7 @@ fun PracticeContent(
 
             AudioButtonWithLabel(
                 text = "bit - beat",
-                audioResId = R.raw.cut_cart,
+                assetPath = "lessons/lesson1/about.mp3",
                 size = Size.BIG
             )
             
