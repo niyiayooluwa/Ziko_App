@@ -1,4 +1,4 @@
-// Lesson1Content.kt
+// lesson8Content.kt
 package com.ziko.data.lessons
 
 import com.ziko.R
@@ -21,7 +21,7 @@ fun getLesson8Content(): List<LessonScreenContent> {
             id = 1,
             mainText = "Examples of rhythmic patterns",
             options = listOf(
-                "The CAT ran FAST to GET the BALL" to "lessons/lesson1/about.mp3",
+                "The CAT ran FAST to GET the BALL" to "lessons/lesson8/the_cat_ran.mp3",
             ),
         ),
 
@@ -29,7 +29,7 @@ fun getLesson8Content(): List<LessonScreenContent> {
             id = 1,
             mainText = "Examples of rhythmic patterns",
             options = listOf(
-                "I want to go to the market " to "lessons/lesson1/about.mp3",
+                "I want to go to the market " to "lessons/lesson8/i_want_to_go.mp3",
             ),
         ),
     )

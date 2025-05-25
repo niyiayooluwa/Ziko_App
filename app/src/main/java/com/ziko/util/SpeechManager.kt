@@ -10,9 +10,9 @@ import java.util.*
 
 class SpeechManager(
     context: Context,
-    private val onRmsChanged: (Float) -> Unit,
-    private val onResult: (String?) -> Unit,
-    private val onListeningStateChanged: (Boolean) -> Unit
+    private val onRmsChangedCallback: (Float) -> Unit,  // Renamed to avoid conflict
+    private val onResultCallback: (String?) -> Unit,    // Renamed for consistency
+    private val onListeningStateChangedCallback: (Boolean) -> Unit  // Renamed for consistency
 ) {
     private val recognizer = SpeechRecognizer.createSpeechRecognizer(context)
     private val recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -23,30 +23,31 @@ class SpeechManager(
     init {
         recognizer.setRecognitionListener(object : RecognitionListener {
             override fun onReadyForSpeech(params: Bundle?) {
-                onListeningStateChanged(true)
+                onListeningStateChangedCallback(true)
             }
 
             override fun onBeginningOfSpeech() {
-                onListeningStateChanged(true)
+                onListeningStateChangedCallback(true)
             }
 
             override fun onRmsChanged(rmsdB: Float) {
-                onRmsChanged(rmsdB)
+                // Now calls the callback parameter, not itself!
+                onRmsChangedCallback(rmsdB)
             }
 
             override fun onEndOfSpeech() {
-                onListeningStateChanged(false)
+                onListeningStateChangedCallback(false)
             }
 
             override fun onError(error: Int) {
-                onListeningStateChanged(false)
-                onResult(null)
+                onListeningStateChangedCallback(false)
+                onResultCallback(null)
             }
 
             override fun onResults(results: Bundle?) {
-                onListeningStateChanged(false)
+                onListeningStateChangedCallback(false)
                 val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                onResult(matches?.firstOrNull())
+                onResultCallback(matches?.firstOrNull())
             }
 
             override fun onPartialResults(partialResults: Bundle?) {}

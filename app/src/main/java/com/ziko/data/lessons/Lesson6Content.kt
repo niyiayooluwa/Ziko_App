@@ -1,4 +1,4 @@
-// Lesson1Content.kt
+// lesson6Content.kt
 package com.ziko.data.lessons
 
 import androidx.compose.ui.graphics.Color
@@ -22,9 +22,9 @@ fun getLesson6Content(): List<LessonScreenContent> {
             boldText = "Rising intonation",
             subText = "Example sentence:",
             options = listOf(
-                "Are you coming?" to "lessons/lesson1/about.mp3",
-                "Didi she call you?" to "lessons/lesson1/about.mp3",
-                "Are you ready?" to "lessons/lesson1/about.mp3",
+                "Are you coming?" to "lessons/lesson6/are_you_coming.mp3",
+                "Did she call you?" to "lessons/lesson6/did_she_call_you",
+                "Are you ready?" to "lessons/lesson6/are_you_ready",
             ),
         ),
 
@@ -34,9 +34,9 @@ fun getLesson6Content(): List<LessonScreenContent> {
             boldText = "Falling intonation",
             subText = "Example sentence:",
             options = listOf(
-                "I am going home" to "lessons/lesson1/about.mp3",
-                "I finished my work" to "lessons/lesson1/about.mp3",
-                "She was really happy" to "lessons/lesson1/about.mp3",
+                "I am going home" to "lessons/lesson6/i_am_going_home.mp3",
+                "I finished my work" to "lessons/lesson6/i_finished_my_work",
+                "She was really happy" to "lessons/lesson6/she_was_really_happy",
             ),
         ),
 
@@ -46,9 +46,9 @@ fun getLesson6Content(): List<LessonScreenContent> {
             boldText = "Mixed intonation",
             subText = "Example sentence:",
             options = listOf(
-                "Will, I think so" to "lessons/lesson1/about.mp3",
-                "Do you want pizza or pasta?" to "lessons/lesson1/about.mp3",
-                ),
+                "Will, I think so" to "lessons/lesson6/will_i_think_so.mp3",
+                "Do you want pizza or pasta?" to "lessons/lesson6/do_you_want_pizza_or_pasta",
+            ),
         )
     )
 }

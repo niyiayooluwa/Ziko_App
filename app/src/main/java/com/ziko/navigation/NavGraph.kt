@@ -14,6 +14,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.ziko.presentation.assessment.AssessmentCompletionScreen
+import com.ziko.presentation.assessment.AssessmentContent
+import com.ziko.presentation.assessment.AssessmentViewModel
+import com.ziko.presentation.assessment.AssessmentViewModelFactory
 import com.ziko.presentation.auth.login.LoginScreen
 import com.ziko.presentation.auth.signup.SignUpScreenOne
 import com.ziko.presentation.auth.signup.SignUpScreenTwo
@@ -26,12 +30,16 @@ import com.ziko.presentation.lesson.LessonIntroScreen
 import com.ziko.presentation.lesson.LessonLoadingScreen
 import com.ziko.presentation.lesson.LessonViewModel
 import com.ziko.presentation.lesson.LessonViewModelFactory
+import com.ziko.presentation.practice.AssessmentLoadingScreen
+import com.ziko.presentation.practice.PracticeCompletionScreen
 import com.ziko.presentation.practice.PracticeContent
 import com.ziko.presentation.practice.PracticeLoadingScreen
 import com.ziko.presentation.practice.PracticeViewModel
 import com.ziko.presentation.practice.PracticeViewModelFactory
 import com.ziko.presentation.splash.OnboardingScreen
 import com.ziko.presentation.splash.SplashScreen
+import com.ziko.util.getNextLessonId
+
 @Composable
 fun NavGraph(
     navController: NavHostController
@@ -163,10 +171,8 @@ fun NavGraph(
             val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
             LessonCompletionScreen(
                 onPopBackStack = {navController.popBackStack()},
-                onContinuePractice = { /* nav to practice later */ },
-                onBackToHome = {
-                    navController.popBackStack(Screen.Home.route, inclusive = false)
-                },
+                onContinuePractice = { navController.navigate(Screen.PracticeLoading(lessonId).route) },
+                onBackToHome = { navController.popBackStack(Screen.Home.route, inclusive = false) },
                 lessonId = lessonId
             )
         }
@@ -177,53 +183,54 @@ fun NavGraph(
             arguments = listOf(navArgument("lessonId") { type = NavType.StringType })
         ) { backStackEntry ->
             val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
-            PracticeLoadingScreen(navController, lessonId)
+            PracticeLoadingScreen(
+                lessonId = lessonId,
+                onProgress = {
+                    navController.navigate(Screen.PracticeContent(lessonId).route)
+                }
+            )
         }
         
         //Practice Content
         composable(
             Screen.PracticeContent.BASE_ROUTE,
-            arguments = listOf(navArgument("lessonId") {type = NavType.StringType})
-        ) { backStackEntry ->
+            arguments = listOf(navArgument("lessonId") { type = NavType.StringType })
+            ) { backStackEntry ->
             val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
-
-            //Created the ViewModel scoped to this screen with the lessonId
-            val practiceViewModel: PracticeViewModel = viewModel(
+            val viewModel: PracticeViewModel = viewModel(
                 factory = PracticeViewModelFactory(SavedStateHandle(mapOf("lessonId" to lessonId)))
             )
-            val content = practiceViewModel.currentScreen
-            val progress  = practiceViewModel.progress
-            val currentScreen = practiceViewModel.currentIndex.value
-            val totalScreens = practiceViewModel.totalScreens
-            val isFirstScreen = practiceViewModel.currentIndex.value == 0
-
+            val content = viewModel.currentScreen
+            val progress = viewModel.progress
+            val currentScreen = viewModel.currentIndex.value
+            val totalScreens = viewModel.totalScreens
+            val isFirstScreen = viewModel.currentIndex.value == 0
             if (content != null) {
                 PracticeContent(
                     content = content,
                     progress = progress,
                     currentScreen = currentScreen,
                     totalScreens = totalScreens,
+                    isFirstScreen = isFirstScreen,
                     onNavigateBack = {
                         if (isFirstScreen) {
                             navController.popBackStack(Screen.Home.route, false)
                         } else {
-                            practiceViewModel.previousScreen()
+                            viewModel.previousScreen()
                         }
                     },
-                    isFirstScreen = isFirstScreen,
                     onCancel = {
                         navController.popBackStack(Screen.Home.route, false)
-                               },
+                    },
                     onContinue = {
-                        practiceViewModel.nextScreen {
+                        viewModel.nextScreen {
                             navController.navigate(Screen.LessonCompletion(lessonId).route) {
                                 popUpTo(Screen.Home.route)
                             }
                         }
-                    } ,
+                    }
                 )
             } else {
-                // Handle null content case
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -231,6 +238,99 @@ fun NavGraph(
                     CircularProgressIndicator()
                 }
             }
+        }
+
+        // Practice Completion
+        composable(
+            Screen.PracticeCompletion.BASE_ROUTE,
+            arguments = listOf(navArgument("lessonId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
+            val nextLessonId = getNextLessonId(lessonId)
+            PracticeCompletionScreen(
+                onPopBackStack = {navController.popBackStack()},
+                onContinueLesson = { navController.navigate(Screen.LessonLoading(nextLessonId).route) },
+                onBackToHome = { navController.popBackStack(Screen.Home.route, inclusive = false) },
+                lessonId = lessonId
+            )
+        }
+
+        //Assessment Loading
+        composable(
+            Screen.AssessmentLoading.BASE_ROUTE,
+            arguments = listOf(navArgument("lessonId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
+            AssessmentLoadingScreen(
+                lessonId = lessonId,
+                onProgress = {
+                    navController.navigate(Screen.AssessmentContent(lessonId).route)
+                }
+            )
+        }
+
+        //Assessment Content
+        composable(
+            Screen.PracticeContent.BASE_ROUTE,
+            arguments = listOf(navArgument("lessonId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
+            val viewModel: AssessmentViewModel = viewModel(
+                factory = AssessmentViewModelFactory(SavedStateHandle(mapOf("lessonId" to lessonId)))
+            )
+            val content = viewModel.currentScreen
+            val progress = viewModel.progress
+            val currentScreen = viewModel.currentIndex.value
+            val totalScreens = viewModel.totalScreens
+            val isFirstScreen = viewModel.currentIndex.value == 0
+            if (content != null) {
+                AssessmentContent(
+                    content = content,
+                    progress = progress,
+                    currentScreen = currentScreen,
+                    totalScreens = totalScreens,
+                    isFirstScreen = isFirstScreen,
+                    onNavigateBack = {
+                        if (isFirstScreen) {
+                            navController.popBackStack(Screen.Home.route, false)
+                        } else {
+                            viewModel.previousScreen()
+                        }
+                    },
+                    onCancel = {
+                        navController.popBackStack(Screen.Home.route, false)
+                    },
+                    onContinue = {
+                        viewModel.nextScreen {
+                            navController.navigate(Screen.LessonCompletion(lessonId).route) {
+                                popUpTo(Screen.Home.route)
+                            }
+                        }
+                    }
+                )
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+
+        // Assessment Completion
+        composable(
+            Screen.AssessmentCompletion.BASE_ROUTE,
+            arguments = listOf(navArgument("lessonId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
+            val nextLessonId = getNextLessonId(lessonId)
+            AssessmentCompletionScreen(
+                onPopBackStack = {navController.popBackStack()},
+                onContinueLesson = { navController.navigate(Screen.AssessmentLoading(lessonId).route) },
+                onBackToHome = { navController.popBackStack(Screen.Home.route, inclusive = false) },
+                lessonId = lessonId
+            )
         }
     }
 }

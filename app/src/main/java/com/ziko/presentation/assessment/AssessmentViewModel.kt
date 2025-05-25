@@ -1,4 +1,4 @@
-package com.ziko.presentation.practice
+package com.ziko.presentation.assessment
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
@@ -6,22 +6,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.ziko.data.model.PracticeDataProvider
-import com.ziko.ui.model.PracticeScreenContent
+import com.ziko.data.model.AssessmentDataProvider
+import com.ziko.ui.model.AssessmentScreenContent
 
-class PracticeViewModel(
+class AssessmentViewModel(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val lessonId: String = savedStateHandle["lessonId"] ?: error("Missing lessonId")
 
-    private val _screens = mutableStateOf<List<PracticeScreenContent>>(emptyList())
-    val screens: List<PracticeScreenContent> get() = _screens.value
+    private val _screens = mutableStateOf<List<AssessmentScreenContent>>(emptyList())
+    val screens: List<AssessmentScreenContent> get() = _screens.value
 
     private val _currentIndex = mutableIntStateOf(0)
     val currentIndex: State<Int> = _currentIndex
 
-    val currentScreen: PracticeScreenContent?
+    val currentScreen: AssessmentScreenContent?
         get() = _screens.value.getOrNull(_currentIndex.intValue)
 
     val progress: Float
@@ -31,7 +31,7 @@ class PracticeViewModel(
         get() = _screens.value.size
 
     init {
-        _screens.value = PracticeDataProvider.getPracticeContent(lessonId)
+        _screens.value = AssessmentDataProvider.getAssessmentContent(lessonId)
     }
 
     fun nextScreen(onFinished: () -> Unit) {
@@ -54,13 +54,13 @@ class PracticeViewModel(
 }
 
 
-class PracticeViewModelFactory(
+class AssessmentViewModelFactory(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(PracticeViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(AssessmentViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return PracticeViewModel(savedStateHandle) as T
+            return AssessmentViewModel(savedStateHandle) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

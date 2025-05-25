@@ -3,6 +3,7 @@ package com.ziko.presentation.components
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,106 +43,190 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.ziko.util.SpeechManager
 
+val color = Color(0xFF5b7bfe)
+
 @Composable
 fun SpeechButton(
     modifier: Modifier = Modifier,
     onSpeechResult: (String?) -> Unit,
     onPermissionDenied: () -> Unit
 ) {
+    Log.d("SpeechButton", "Composing SpeechButton")
+
     val context = LocalContext.current
     val activity = context as? Activity
+
+    // State variables
     val isListening = remember { mutableStateOf(false) }
     val rmsValue = remember { mutableFloatStateOf(0f) }
     val permissionGranted = remember { mutableStateOf(false) }
-    val speechManager = remember {
-        mutableStateOf<SpeechManager?>(null)
-    }
+    val speechManager = remember { mutableStateOf<SpeechManager?>(null) }
+    val initializationError = remember { mutableStateOf<String?>(null) }
 
+    // Check permissions and initialize on first composition
     LaunchedEffect(Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
-            permissionGranted.value = true
-        } else {
-            ActivityCompat.requestPermissions(
-                activity!!,
-                arrayOf(Manifest.permission.RECORD_AUDIO),
-                1
-            )
-            permissionGranted.value = false
-            onPermissionDenied()
-        }
+        Log.d("SpeechButton", "LaunchedEffect started")
 
-        speechManager.value = SpeechManager(
-            context = context,
-            onRmsChanged = { rms -> rmsValue.floatValue = rms },
-            onResult = { result -> onSpeechResult(result) },
-            onListeningStateChanged = { state -> isListening.value = state }
-        )
+        try {
+            // Check if permission is already granted
+            val hasPermission = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED
+
+            Log.d("SpeechButton", "Permission granted: $hasPermission")
+
+            if (hasPermission) {
+                permissionGranted.value = true
+
+                // Only create SpeechManager if permission is granted
+                Log.d("SpeechButton", "Creating SpeechManager")
+                speechManager.value = SpeechManager(
+                    context = context,
+                    onRmsChangedCallback = { rms ->
+                        Log.d("SpeechButton", "RMS changed: $rms")
+                        rmsValue.floatValue = rms
+                    },
+                    onResultCallback = { result ->
+                        Log.d("SpeechButton", "Speech result: $result")
+                        isListening.value = false
+                        onSpeechResult(result)
+                    },
+                    onListeningStateChangedCallback = { state ->
+                        Log.d("SpeechButton", "Listening state changed: $state")
+                        isListening.value = state
+                    }
+                )
+                Log.d("SpeechButton", "SpeechManager created successfully")
+            } else {
+                // Request permission
+                permissionGranted.value = false
+                if (activity != null) {
+                    Log.d("SpeechButton", "Requesting permission")
+                    ActivityCompat.requestPermissions(
+                        activity,
+                        arrayOf(Manifest.permission.RECORD_AUDIO),
+                        1
+                    )
+                } else {
+                    Log.e("SpeechButton", "Activity is null, cannot request permission")
+                    onPermissionDenied()
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("SpeechButton", "Error in LaunchedEffect", e)
+            initializationError.value = e.message
+        }
     }
 
+    // Cleanup when component is disposed
     DisposableEffect(Unit) {
         onDispose {
-            speechManager.value?.destroy()
+            Log.d("SpeechButton", "Disposing SpeechButton")
+            try {
+                speechManager.value?.destroy()
+            } catch (e: Exception) {
+                Log.e("SpeechButton", "Error destroying SpeechManager", e)
+            }
         }
     }
 
+    // UI
     Box(
         modifier = modifier
-            .size(width = 300.dp, height = 150.dp)
-            .border(2.dp, Color.Blue, RoundedCornerShape(12.dp))
-            .clickable(enabled = permissionGranted.value && !isListening.value) {
-                speechManager.value?.startListening()
+            .fillMaxWidth()
+            .height(76.dp)
+            .border(1.dp, color, RoundedCornerShape(12.dp))
+            .clickable(
+                enabled = permissionGranted.value &&
+                        !isListening.value &&
+                        initializationError.value == null
+            ) {
+                Log.d("SpeechButton", "Button clicked, starting listening")
+                try {
+                    speechManager.value?.startListening()
+                } catch (e: Exception) {
+                    Log.e("SpeechButton", "Error starting listening", e)
+                    initializationError.value = e.message
+                }
             }
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        if (!isListening.value) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Mic,
-                    contentDescription = "Mic",
-                    tint = Color.Blue,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Tap to Speak",
-                    color = Color.Blue,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+        when {
+            // Show error if initialization failed
+            initializationError.value != null -> {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Mic,
+                        contentDescription = "Mic",
+                        tint = Color.Red,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Microphone Error",
+                        color = Color.Red,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.W500
+                    )
+                }
             }
-        } else {
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(12) { index ->
-                    BarShape(rms = rmsValue.floatValue, index = index)
+            // Show listening animation
+            isListening.value -> {
+                Log.d("SpeechButton", "Showing listening animation")
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(21) { index ->
+                        BarShape(rms = rmsValue.floatValue, index = index)
+                    }
+                }
+            }
+            // Show idle state
+            else -> {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Mic,
+                        contentDescription = "Mic",
+                        tint = color,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = if (permissionGranted.value) "Tap to Talk" else "Permission Required",
+                        color = color,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.W500
+                    )
                 }
             }
         }
     }
 }
 
-
 @Composable
 fun BarShape(rms: Float, index: Int) {
+    // Calculate height with bounds checking
+    val baseHeight = 2f
+    val maxHeight = 10f
+    val variation = (index % 4) * 2f
+    val targetHeightFloat = (rms + variation).coerceIn(baseHeight, maxHeight)
+    val targetHeight = (targetHeightFloat * 10).dp
+
     val animatedHeight by animateDpAsState(
-        targetValue = ((rms + (index % 4) * 2f).coerceIn(2f, 10f) * 10).dp,
+        targetValue = targetHeight,
         animationSpec = tween(durationMillis = 150),
         label = "rmsBar"
     )
 
     Box(
         modifier = Modifier
-            .width(8.dp)
+            .width(7.dp)
             .height(animatedHeight)
             .clip(RoundedCornerShape(50))
-            .background(Color.Blue)
+            .background(color)
     )
 }
-
-

@@ -36,7 +36,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PracticeLoadingScreen(
+fun AssessmentLoadingScreen(
     lessonId: String,
     onProgress: () -> Unit
 ) {

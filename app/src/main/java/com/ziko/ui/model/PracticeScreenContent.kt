@@ -5,4 +5,5 @@ data class PracticeScreenContent(
     val instructions: String,
     val sound: Pair<String, String>? = null,
     val expectedPhrase: String, // Correct answer (for validation)
+    val sound8: List<Pair<String, String>>? = null, // For Practice 8
 )
