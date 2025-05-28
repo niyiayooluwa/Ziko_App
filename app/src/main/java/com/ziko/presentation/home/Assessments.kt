@@ -45,7 +45,7 @@ fun AssessmentScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val scrollState = rememberScrollState()
-    val purpleColor = Color(0xFF5E5AEC) // Purple color for top app bar
+    val purpleColor = Color(0xFF410FA3) // Purple color for top app bar
 
     // Root Box that contains everything
     Box(
@@ -137,8 +137,8 @@ fun AssessmentScreen(
                             highestScore = assessment.highestScore,
                             accuracy = assessment.accuracy,
                             onClick = {
-                                val assessmentId = assessment.id
-                                navController.navigate(Screen.LessonLoading(assessmentId).route)
+                                val lessonId = assessment.id
+                                navController.navigate(Screen.AssessmentLoading(lessonId).route)
                             },
                         )
                     }

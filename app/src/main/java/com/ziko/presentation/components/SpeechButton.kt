@@ -3,7 +3,6 @@ package com.ziko.presentation.components
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -51,7 +50,7 @@ fun SpeechButton(
     onSpeechResult: (String?) -> Unit,
     onPermissionDenied: () -> Unit
 ) {
-    Log.d("SpeechButton", "Composing SpeechButton")
+    
 
     val context = LocalContext.current
     val activity = context as? Activity
@@ -65,7 +64,7 @@ fun SpeechButton(
 
     // Check permissions and initialize on first composition
     LaunchedEffect(Unit) {
-        Log.d("SpeechButton", "LaunchedEffect started")
+        
 
         try {
             // Check if permission is already granted
@@ -73,48 +72,41 @@ fun SpeechButton(
                 context,
                 Manifest.permission.RECORD_AUDIO
             ) == PackageManager.PERMISSION_GRANTED
-
-            Log.d("SpeechButton", "Permission granted: $hasPermission")
-
+            
             if (hasPermission) {
                 permissionGranted.value = true
 
                 // Only create SpeechManager if permission is granted
-                Log.d("SpeechButton", "Creating SpeechManager")
                 speechManager.value = SpeechManager(
                     context = context,
                     onRmsChangedCallback = { rms ->
-                        Log.d("SpeechButton", "RMS changed: $rms")
                         rmsValue.floatValue = rms
                     },
                     onResultCallback = { result ->
-                        Log.d("SpeechButton", "Speech result: $result")
                         isListening.value = false
                         onSpeechResult(result)
                     },
                     onListeningStateChangedCallback = { state ->
-                        Log.d("SpeechButton", "Listening state changed: $state")
+                        
                         isListening.value = state
                     }
                 )
-                Log.d("SpeechButton", "SpeechManager created successfully")
+                
             } else {
                 // Request permission
                 permissionGranted.value = false
                 if (activity != null) {
-                    Log.d("SpeechButton", "Requesting permission")
+                    
                     ActivityCompat.requestPermissions(
                         activity,
                         arrayOf(Manifest.permission.RECORD_AUDIO),
                         1
                     )
                 } else {
-                    Log.e("SpeechButton", "Activity is null, cannot request permission")
                     onPermissionDenied()
                 }
             }
         } catch (e: Exception) {
-            Log.e("SpeechButton", "Error in LaunchedEffect", e)
             initializationError.value = e.message
         }
     }
@@ -122,11 +114,9 @@ fun SpeechButton(
     // Cleanup when component is disposed
     DisposableEffect(Unit) {
         onDispose {
-            Log.d("SpeechButton", "Disposing SpeechButton")
             try {
                 speechManager.value?.destroy()
             } catch (e: Exception) {
-                Log.e("SpeechButton", "Error destroying SpeechManager", e)
             }
         }
     }
@@ -142,11 +132,10 @@ fun SpeechButton(
                         !isListening.value &&
                         initializationError.value == null
             ) {
-                Log.d("SpeechButton", "Button clicked, starting listening")
                 try {
                     speechManager.value?.startListening()
                 } catch (e: Exception) {
-                    Log.e("SpeechButton", "Error starting listening", e)
+                    
                     initializationError.value = e.message
                 }
             }
@@ -174,7 +163,7 @@ fun SpeechButton(
             }
             // Show listening animation
             isListening.value -> {
-                Log.d("SpeechButton", "Showing listening animation")
+                
                 Row(
                     modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.SpaceEvenly,

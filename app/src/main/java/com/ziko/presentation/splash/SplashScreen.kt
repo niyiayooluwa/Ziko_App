@@ -24,7 +24,10 @@ fun SplashScreen(navController: NavController) {
     // Call the ViewModel function to start the timer
     splashViewModel.startSplashTimer {
         // Once the timer is done, navigate to the Login screen
-        navController.navigate(Screen.Onboarding.route) {
+        navController.navigate(
+            //Screen.Onboarding.route
+            Screen.Home.route
+        ) {
             popUpTo(Screen.Splash.route) { inclusive = true }
         }
     }

@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.ziko.presentation.components.*
 import com.ziko.ui.model.PracticeScreenContent
 import com.ziko.util.AudioManager
+import com.ziko.util.normalizeText
 
 @Composable
 fun PracticeContent(
@@ -75,7 +76,7 @@ fun PracticeContent(
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
@@ -84,8 +85,8 @@ fun PracticeContent(
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    //.weight(1f)
+                    //.align(Alignment.TopCenter)
+                    .weight(1f)
                     .verticalScroll(rememberScrollState())
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp, vertical = 16.dp)
@@ -177,9 +178,8 @@ fun PracticeContent(
             // Bottom evaluation bar
             SuccessIndicator(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                    //.align(Alignment.BottomCenter)
+                    .fillMaxWidth(),
                 condition = speechCondition.value,
                 hasRecorded = hasRecordedSpeech.value,
                 attemptCount = attemptCount.intValue,
@@ -193,8 +193,8 @@ fun PracticeContent(
                             if (hasRecordedSpeech.value) {
                                 Log.d("PracticeContent", "Evaluating speech: '${spokenText.value}' vs '$expectedText'")
 
-                                val normalizedSpoken = spokenText.value.trim().lowercase()
-                                val normalizedExpected = expectedText.trim().lowercase()
+                                val normalizedSpoken = normalizeText(spokenText.value)
+                                val normalizedExpected = normalizeText(expectedText)
                                 val isCorrect = normalizedSpoken == normalizedExpected
 
                                 attemptCount.intValue += 1

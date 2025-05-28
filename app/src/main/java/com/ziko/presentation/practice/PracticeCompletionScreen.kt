@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ziko.R
@@ -78,7 +77,10 @@ fun PracticeCompletionScreen(
                 modifier = Modifier.align(Alignment.Center)
             ){
                 Image(
-                    painter = painterResource(R.drawable.congratulations),
+                    painter = painterResource(
+                        if (lessonId != "lesson8") R.drawable.congratulations
+                        else R.drawable.practice_completed
+                    ),
                     contentDescription = "Congratulations",
                     modifier = Modifier
                         .size(180.dp)
@@ -87,7 +89,7 @@ fun PracticeCompletionScreen(
 
                 // Title
                 Text(
-                    text = "Congratulations",
+                    text = "Congratulations!",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF080e1e),
@@ -97,7 +99,11 @@ fun PracticeCompletionScreen(
 
                 // Congratulations message
                 Text(
-                    text = "You are moving on to great things.",
+                    text = if (lessonId != "lesson8") {
+                        "You are moving on to great things."
+                    } else {
+                        "You have completed the last\nlesson. Do not stop there. Keep\npracticing."
+                    },
                     fontSize = 17.sp,
                     textAlign = TextAlign.Center,
                     color = Color(0xFF656872)
@@ -113,22 +119,24 @@ fun PracticeCompletionScreen(
                     .fillMaxWidth()
             ){
                 // Continue button
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(Color(0xFF5b7bfe))
-                        .clickable{onContinueLesson()}
-                ) {
-                    Text(
-                        text ="Continue to lesson $nextLesson",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.W500
-                    )
+                if (lessonId != "lesson8") {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(30.dp))
+                            .background(Color(0xFF5b7bfe))
+                            .clickable{onContinueLesson()}
+                    ) {
+                        Text(
+                            text ="Continue to lesson $nextLesson",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.W500
+                        )
+                    }
                 }
 
                 //Go back home button

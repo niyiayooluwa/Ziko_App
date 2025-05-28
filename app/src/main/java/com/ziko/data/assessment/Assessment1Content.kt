@@ -6,18 +6,25 @@ fun getAssessment1Content(): List<AssessmentScreenContent> {
     return listOf(
         AssessmentScreenContent.SpeakAssessment(
             id = 1,
-            instructions = "Pronounce the word",
-            expectedText = "say",
-            displayText = "say",
-            audioPath = "lesson/lesson1/about.mp3"
+            instructions = "Pronounce the word pair",
+            expectedText = "bit beat",
+            displayText = "bit - beat",
+            audioPath = "lesson/lesson1/bit_beat.mp3"
         ),
 
-        AssessmentScreenContent.McqAssessment(
+        AssessmentScreenContent.SpeakAssessment(
             id = 2,
-            instructions = "Choose the correct word with the /ɪ/ vowel.",
-            question = "Which of these words has the /ɪ/ sound?",
-            options = listOf("bit", "bat", "but", "bet"),
-            correctAnswer = "bit"
-        )
+            instructions = "Pronounce the word pair",
+            expectedText = "full fool",
+            displayText = "full - fool",
+            audioPath = "lesson/lesson1/full_fool.mp3"
+        ),
+        AssessmentScreenContent.SpeakAssessment(
+            id = 3,
+            instructions = "Pronounce the word pair",
+            expectedText = "hot heart",
+            displayText = "hot - heart",
+            audioPath = "lesson/lesson1/hot_heart.mp3"
+        ),
     )
 }

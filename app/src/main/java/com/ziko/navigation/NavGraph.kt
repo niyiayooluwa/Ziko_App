@@ -1,7 +1,11 @@
 package com.ziko.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,13 +46,16 @@ import com.ziko.util.getNextLessonId
 
 @Composable
 fun NavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    innerPadding: PaddingValues,
+    modifier: Modifier = Modifier.padding(innerPadding)
 ) {
     val signUpViewModel: SignUpViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route
+        startDestination = Screen.Splash.route,
+        modifier = Modifier.padding(innerPadding)
     ) {
         // Splash Screen
         composable(Screen.Splash.route) { SplashScreen(navController = navController) }
@@ -72,10 +79,61 @@ fun NavGraph(
         }
 
         // Home Screen
-        composable(Screen.Home.route) { LessonScreen(navController = navController) }
+        composable(
+            route = Screen.Home.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End, // New screen slides in from right
+                    animationSpec = tween(700)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start, // Old screen slides out to left
+                    animationSpec = tween(700)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start, // When popping back, comes from left
+                    animationSpec = tween(700)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End, // When popped, slides out to right
+                    animationSpec = tween(700)
+                )
+            }
+        ) { LessonScreen(navController = navController) }
 
         // Assessment Screen
-        composable(Screen.Assessment.route) { AssessmentScreen(navController = navController) }
+        composable(
+            route = Screen.Assessment.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start, // New screen slides in from left
+                    animationSpec = tween(700)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End, // Old screen slides out to right
+                    animationSpec = tween(700)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End, // When popping back, comes from right
+                    animationSpec = tween(700)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start, // When popped, slides out to left
+                    animationSpec = tween(700)
+                )
+            }) { AssessmentScreen(navController = navController) }
 
         // Lesson Loading
         composable(
@@ -202,7 +260,7 @@ fun NavGraph(
             )
             val content = viewModel.currentScreen
             val progress = viewModel.progress
-            val currentScreen = viewModel.currentIndex.value
+            val currentScreen = viewModel.currentIndex.value + 1
             val totalScreens = viewModel.totalScreens
             val isFirstScreen = viewModel.currentIndex.value == 0
             if (content != null) {
@@ -224,7 +282,7 @@ fun NavGraph(
                     },
                     onContinue = {
                         viewModel.nextScreen {
-                            navController.navigate(Screen.LessonCompletion(lessonId).route) {
+                            navController.navigate(Screen.PracticeCompletion(lessonId).route) {
                                 popUpTo(Screen.Home.route)
                             }
                         }
@@ -271,7 +329,7 @@ fun NavGraph(
 
         //Assessment Content
         composable(
-            Screen.PracticeContent.BASE_ROUTE,
+            Screen.AssessmentContent.BASE_ROUTE,
             arguments = listOf(navArgument("lessonId") { type = NavType.StringType })
         ) { backStackEntry ->
             val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
@@ -280,7 +338,7 @@ fun NavGraph(
             )
             val content = viewModel.currentScreen
             val progress = viewModel.progress
-            val currentScreen = viewModel.currentIndex.value
+            val currentScreen = viewModel.currentIndex.value + 1
             val totalScreens = viewModel.totalScreens
             val isFirstScreen = viewModel.currentIndex.value == 0
             if (content != null) {
@@ -298,15 +356,16 @@ fun NavGraph(
                         }
                     },
                     onCancel = {
-                        navController.popBackStack(Screen.Home.route, false)
+                        navController.popBackStack(Screen.Assessment.route, false)
                     },
                     onContinue = {
                         viewModel.nextScreen {
-                            navController.navigate(Screen.LessonCompletion(lessonId).route) {
-                                popUpTo(Screen.Home.route)
+                            navController.navigate(Screen.AssessmentCompletion(lessonId).route) {
+                                popUpTo(Screen.Assessment.route)
                             }
                         }
-                    }
+                    },
+                    onResult = {}
                 )
             } else {
                 Box(
@@ -324,11 +383,10 @@ fun NavGraph(
             arguments = listOf(navArgument("lessonId") { type = NavType.StringType })
         ) { backStackEntry ->
             val lessonId = backStackEntry.arguments!!.getString("lessonId")!!
-            val nextLessonId = getNextLessonId(lessonId)
             AssessmentCompletionScreen(
                 onPopBackStack = {navController.popBackStack()},
                 onContinueLesson = { navController.navigate(Screen.AssessmentLoading(lessonId).route) },
-                onBackToHome = { navController.popBackStack(Screen.Home.route, inclusive = false) },
+                onBackToHome = { navController.popBackStack(Screen.Assessment.route, inclusive = false) },
                 lessonId = lessonId
             )
         }

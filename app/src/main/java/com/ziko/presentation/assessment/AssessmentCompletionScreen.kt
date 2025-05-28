@@ -124,7 +124,7 @@ fun AssessmentCompletionScreen(
                         .clickable{onContinueLesson()}
                 ) {
                     Text(
-                        text ="Continue to lesson $nextLesson",
+                        text ="Retake assessment",
                         color = Color.White,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W500
@@ -150,7 +150,7 @@ fun AssessmentCompletionScreen(
                         .clickable{onBackToHome()}
                 ) {
                     Text(
-                        text ="Back to home",
+                        text ="Back to lessons",
                         color = Color(0xFF5b7bfe),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W500

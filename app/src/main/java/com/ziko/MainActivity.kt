@@ -38,7 +38,8 @@ fun CurrentScreen() {
     val navController = rememberNavController()
     Scaffold { innerPadding ->
         NavGraph(
-            navController = navController
+            navController = navController,
+            innerPadding = innerPadding
         )
     }
 }

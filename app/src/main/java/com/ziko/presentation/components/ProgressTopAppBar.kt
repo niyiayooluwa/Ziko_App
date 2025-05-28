@@ -33,7 +33,8 @@ fun ProgressTopAppBar(
     totalScreens: Int,
     onCancel: () -> Unit,
     onNavigateBack: () -> Unit,
-    isFirstScreen: Boolean
+    isFirstScreen: Boolean,
+    showBackNavigation: Boolean? = true
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -61,12 +62,14 @@ fun ProgressTopAppBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = onNavigateBack) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBackIosNew,
-                    contentDescription = if (isFirstScreen) "Cancel" else "Back",
-                    tint = Color.White
-                )
+            if (showBackNavigation == true) {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = if (isFirstScreen) "Cancel" else "Back",
+                        tint = Color.White
+                    )
+                }
             }
         },
         actions = {

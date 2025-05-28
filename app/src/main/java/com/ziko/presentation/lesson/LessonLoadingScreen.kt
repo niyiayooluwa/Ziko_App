@@ -90,23 +90,22 @@ fun LessonLoadingScreen(
                 ),
         ) {
             Image(
-                painter = painterResource(id = R.drawable.monopthong_illustration),
+                painter = painterResource(
+                    id = when (lessonId) {
+                    "lesson1" -> R.drawable.monopthong_illustration
+                    "lesson2" -> R.drawable.diph
+                    "lesson3" -> R.drawable.tri
+                    "lesson4" -> R.drawable.voiced
+                    "lesson5" -> R.drawable.voiceless
+                    "lesson6" -> R.drawable.intonation
+                    "lesson7" -> R.drawable.stress
+                    "lesson8" -> R.drawable.rhythm
+                        else -> R.drawable.monopthong_illustration
+                }
+                ),
                 contentDescription = "Lesson Illustration",
                 modifier = Modifier.size(300.dp).align(Alignment.CenterHorizontally)
             )
-
-            /*{Button(
-                onClick = { navController.navigate(Screen.LessonIntro(lessonId).route) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .padding(bottom = 16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF5B7BFE)
-                )
-            ) {
-                Text("Continue", color = Color.White, fontSize = 20.sp)
-            }}*/
 
             Column(
                 verticalArrangement = Arrangement.Center,

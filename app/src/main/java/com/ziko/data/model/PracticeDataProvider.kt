@@ -21,7 +21,7 @@ object PracticeDataProvider {
             "lesson6" -> getPractice6Content()
             "lesson7" -> getPractice7Content()
             "lesson8" -> getPractice8Content()
-            else -> emptyList()
+            else -> getPractice1Content()
         }
     }
 }

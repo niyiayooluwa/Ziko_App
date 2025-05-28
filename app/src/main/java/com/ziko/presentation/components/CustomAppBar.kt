@@ -32,7 +32,7 @@ fun CustomBiggerTopAppBar(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFF410FA3))
-            .height(150.dp)
+            .height(100.dp)
             .padding(horizontal = 8.dp, vertical = 8.dp)
     ) {
         Row(
@@ -72,3 +72,4 @@ fun CustomBiggerTopAppBar(
         }
     }
 }
+

@@ -115,7 +115,7 @@ fun AssessmentLoadingScreen(
                     )
 
                     Text(
-                        text = "You have completed $lessonIdentifier.You are ready\nfor a bigger challenge.",
+                        text = "You have completed $lessonIdentifier. You are ready\nfor a bigger challenge.",
                         textAlign = TextAlign.Center,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.W400,
