@@ -11,6 +11,9 @@ sealed class Screen(val route: String) {
     data object Assessment : Screen("assessment")
 
     //Lesson Flow
+    data class PreLessonLoading(val lessonId: String) : Screen("prelesson_loading/$lessonId") {
+        companion object{ const val BASE_ROUTE = "prelesson_loading/{lessonId}"}
+    }
     data class LessonLoading(val lessonId: String) : Screen("lesson_loading/$lessonId") {
         companion object{ const val BASE_ROUTE = "lesson_loading/{lessonId}"}
     }
@@ -36,13 +39,24 @@ sealed class Screen(val route: String) {
     }
 
     //Assessment Flow
+    data object AssessmentGraph : Screen("assessmentGraph/{lessonId}")
     data class AssessmentLoading(val lessonId: String) : Screen("assessment_loading/$lessonId") {
         companion object{ const val BASE_ROUTE = "assessment_loading/{lessonId}"}
     }
     data class AssessmentContent(val lessonId: String): Screen("assessment_content/$lessonId") {
         companion object{const val BASE_ROUTE = "assessment_content/{lessonId}"}
     }
-    data class AssessmentCompletion(val lessonId: String): Screen("assessment_completion/$lessonId") {
-        companion object{const val BASE_ROUTE = "assessment_completion/{lessonId}"}
+    data class AssessmentCompletion(
+        val lessonId: String,
+        val score: Int,
+        val correctAnswers: Int,
+        val totalQuestions: Int,
+        val timeSpent: String
+    ) : Screen(
+        "assessment_completion/$lessonId/$score/$correctAnswers/$totalQuestions/$timeSpent"
+    ) {
+        companion object {
+            const val BASE_ROUTE = "assessment_completion/{lessonId}/{score}/{correctAnswers}/{totalQuestions}/{timeSpent}"
+        }
     }
 }

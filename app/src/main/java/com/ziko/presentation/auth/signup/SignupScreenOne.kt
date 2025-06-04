@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -90,6 +91,9 @@ fun SignUpScreenOne(
                         onValueChange = { firstName = it },
                         placeholder = { Text("John") },
                         singleLine = true,
+                        textStyle = TextStyle(
+                            color = Color.DarkGray,
+                        ),
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -119,6 +123,9 @@ fun SignUpScreenOne(
                         onValueChange = { lastName = it },
                         placeholder = { Text("Doe") },
                         singleLine = true,
+                        textStyle = TextStyle(
+                            color = Color.DarkGray,
+                        ),
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -153,6 +160,9 @@ fun SignUpScreenOne(
                         singleLine = true,
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
+                        textStyle = TextStyle(
+                            color = Color.DarkGray,
+                        ),
                         isError = emailError != null,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = Color(0xFFF2F3F3),
@@ -186,7 +196,7 @@ fun SignUpScreenOne(
                     ),
                     enabled = firstName.isNotBlank() && lastName.isNotBlank() && email.isNotBlank()
                 ) {
-                    Text(text = "Next", fontSize = 20.sp)
+                    Text(text = "Next", fontSize = 20.sp, color = Color.White)
                 }
             }
         }

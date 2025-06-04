@@ -1,6 +1,11 @@
 package com.ziko.presentation.home
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,58 +15,67 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.ziko.data.model.AssessmentCard
+import com.ziko.R
 import com.ziko.navigation.Screen
+import com.ziko.presentation.assessment.AssessmentStatsViewModel
+import com.ziko.presentation.auth.UserViewModel
 import com.ziko.presentation.components.FloatingNavBar
 
 @Composable
 fun AssessmentScreen(
-    navController: NavController,
-    userName: String = "Sam" // Default or from ViewModel
+    navController: NavController
 ) {
+
+    val assessmentStatsViewModel: AssessmentStatsViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
+
+    val assessmentStats by assessmentStatsViewModel.assessmentStats.collectAsState()
+    val user by userViewModel.user.collectAsState()
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val scrollState = rememberScrollState()
-    val purpleColor = Color(0xFF410FA3) // Purple color for top app bar
 
-    // Root Box that contains everything
+    val scrollState = rememberScrollState()
+    val purpleColor = Color(0xFF410FA3)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Purple Top App Bar that doesn't scroll (matching the LessonScreen)
             Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(purpleColor),
+                modifier = Modifier.fillMaxWidth(),
                 color = purpleColor
             ) {
                 Column(
@@ -69,14 +83,8 @@ fun AssessmentScreen(
                     horizontalAlignment = Alignment.Start,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = 48.dp,
-                            bottom = 16.dp
-                        ),
+                        .padding(start = 16.dp, end = 16.dp, top = 48.dp, bottom = 16.dp)
                 ) {
-                    // Profile picture placeholder
                     Box(
                         modifier = Modifier
                             .size(48.dp)
@@ -85,53 +93,61 @@ fun AssessmentScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = userName.first().toString(),
+                            text = user?.firstName?.first().toString(),
                             color = Color.White,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
-                    Text(
-                        text = "Assessment",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.W600,
-                        color = Color.White
-                    )
+                    Text("Assessment", fontSize = 24.sp, fontWeight = FontWeight.W600, color = Color.White)
 
                     Text(
                         text = "Test your knowledge and sharpen your\npronunciation skills",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.W400,
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = Color.White.copy(alpha = 0.8f)
                     )
                 }
             }
 
-            // Scrollable content
             Column(
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.Start,
                 modifier = Modifier
                     .verticalScroll(scrollState)
-                    .padding(
-                        top = 24.dp,
-                        start = 16.dp,
-                        end = 16.dp,
-                        bottom = 70.dp
-                    )
+                    .padding(top = 24.dp, start = 16.dp, end = 16.dp, bottom = 70.dp)
             ) {
-                // Assessments Section
-                Text(
-                    text = "Drill by Topic",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.W600,
-                    color = Color.Black,
-                )
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    assessments.forEach { assessment ->
+                    SpecialAssessment(
+                        title = "General Assessment",
+                        description = "A mix of questions from all\ncompleted lessons",
+                        highestScore = 90,
+                        accuracy = 56,
+                        backGroundColor = Color(0xFFFFF6EB),
+                        borderColor = Color(0xFFB6AFA7),
+                        onClick = {},
+                        modifier = Modifier.weight(1f)
+                    )
+                    SpecialAssessment(
+                        title = "Target Practice",
+                        description = "Work on the lessons where\nyour score is below 70%",
+                        highestScore = 90,
+                        accuracy = 56,
+                        backGroundColor = Color(0xFFDBF6FF),
+                        borderColor = Color(0xFFD0EAF4),
+                        onClick = {},
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Text("Drill by Topic", fontSize = 20.sp, fontWeight = FontWeight.W600, color = Color.Black)
+
+                Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                    assessmentStats.forEach { assessment ->
                         AssessmentCard(
                             title = assessment.title,
                             highestScore = assessment.highestScore,
@@ -139,18 +155,16 @@ fun AssessmentScreen(
                             onClick = {
                                 val lessonId = assessment.id
                                 navController.navigate(Screen.AssessmentLoading(lessonId).route)
-                            },
+                            }
                         )
                     }
                 }
             }
         }
 
-        // Floating Navigation Bar positioned at the bottom center
         if (currentRoute in listOf(Screen.Home.route, Screen.Assessment.route)) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 FloatingNavBar(
@@ -162,104 +176,82 @@ fun AssessmentScreen(
     }
 }
 
-
 @Composable
 fun AssessmentCard(
     title: String,
-    highestScore: Int?,
-    accuracy: Float?,
+    highestScore: Int? = null,
+    accuracy: Int? = null,
     onClick: () -> Unit
 ) {
-    val accuracyVar = accuracy?.times(100)?.toInt()
-
-    val colorPrimary = when (accuracyVar) {
-        null -> Color(0xFFE5E5E5)
+    val colorPrimary = when (accuracy) {
+        null -> Color(0xFF656872)
         in 70..100 -> Color(0xFF5BA890)
+        in 50..69 -> Color(0xFFF76400)
         else -> Color(0xFFD6185D)
     }
-    val colorSecondary = when (accuracyVar) {
+    val colorSecondary = when (accuracy) {
         null -> Color(0xFFf3f3f4)
-        in 0..69 -> Color(0xFFf7d1df)
+        in 0..49 -> Color(0xFFf7d1df)
+        in 50..69 -> Color(0xFFf7d1df)
         else -> Color(0xFFDeeee9)
     }
+
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp) // Add padding here
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
         ) {
             Column(
                 horizontalAlignment = Alignment.Start,
-                modifier = Modifier.padding(end = 16.dp) // Add spacing between text and progress
+                modifier = Modifier.padding(end = 16.dp)
             ) {
-                Text(
-                    text = title,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.W500,
-                    color = Color.Black
-                )
-
+                Text(title, fontSize = 17.sp, fontWeight = FontWeight.W500, color = Color.Black)
                 Spacer(modifier = Modifier.height(8.dp))
-
-                if (highestScore != null) {
-                    Text(
-                        text = "Highest Score: ${highestScore}%",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF656872)
-                    )
-                } else {
-                    Text(
-                        text = "Highest Score: Not attempted",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF656872)
-                    )
-                }
+                Text(
+                    text = highestScore?.let { "Highest Score: $it%" }
+                        ?: "Highest Score: Not attempted",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.W400,
+                    color = Color(0xFF656872)
+                )
             }
 
-            Box(
-                modifier = Modifier.size(72.dp)
-            ) {
-                if (highestScore != null) {
-                    if (accuracy != null) {
-                        CircularProgressIndicator(
-                            progress = { accuracy },
-                            modifier = Modifier.fillMaxSize().align(Alignment.Center),
-                            color = colorPrimary,
-                            strokeWidth = 8.43.dp,
-                            trackColor = colorSecondary,
-                            strokeCap = ProgressIndicatorDefaults.CircularDeterminateStrokeCap,
-                        )
-                    }
-
+            Box(modifier = Modifier.size(72.dp)) {
+                if (highestScore != null && accuracy != null) {
+                    val animatedProgress by animateFloatAsState(
+                        targetValue = accuracy.toFloat() / 100,
+                        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
+                        label = "",
+                    )
+                    CircularProgressIndicator(
+                        progress = { animatedProgress},
+                        modifier = Modifier.fillMaxSize().align(Alignment.Center),
+                        color = colorPrimary,
+                        strokeWidth = 8.43.dp,
+                        trackColor = colorSecondary,
+                        strokeCap = StrokeCap.Round
+                    )
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.align(Alignment.Center)
                     ) {
                         Text(
-                            text = "$accuracyVar%",
+                            "$accuracy%",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = colorPrimary
                         )
                         Text(
-                            text = "Accuracy",
+                            "Accuracy",
                             fontSize = 8.64.sp,
                             fontWeight = FontWeight.W400,
-                            color = Color(0xFF656872),
-                            modifier = Modifier.offset(y = (-8).dp)
+                            color = Color(0xFF656872)
                         )
                     }
                 } else {
@@ -269,23 +261,21 @@ fun AssessmentCard(
                         color = Color(0xFFe5e5e5),
                         strokeWidth = 8.43.dp,
                         trackColor = Color(0xFFececec),
-                        strokeCap = ProgressIndicatorDefaults.CircularDeterminateStrokeCap,
+                        strokeCap = ProgressIndicatorDefaults.CircularDeterminateStrokeCap
                     )
-
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.align(Alignment.Center)
                     ) {
                         Text(
-                            text = "N/A",
+                            "N/A",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color(0xFFe5e5e5)
                         )
-
                         Text(
-                            text = "Accuracy",
+                            "Accuracy",
                             fontSize = 8.64.sp,
                             fontWeight = FontWeight.W400,
                             color = Color(0xFFe5e5e5)
@@ -297,53 +287,111 @@ fun AssessmentCard(
     }
 }
 
-val assessments = listOf(
-    AssessmentCard(
-        "Monophthongs",
-        highestScore = 62,
-        accuracy = 0.72f,
-        id = "lesson1"
-    ),
-    AssessmentCard(
-        "Diphthongs",
-        highestScore = 58,
-        accuracy = 0.65f,
-        id = "lesson2"
-    ),
-    AssessmentCard(
-        "Triphthongs",
-        highestScore = null,  // No score
-        accuracy = null,     // No accuracy
-        id = "lesson3"
-    ),
-    AssessmentCard(
-        "Voiced Consonants",
-        highestScore = 74,
-        accuracy = 0.81f,
-        id = "lesson4"
-    ),
-    AssessmentCard(
-        "Voiceless Consonants",
-        highestScore = 89,
-        accuracy = 0.92f,
-        id = "lesson5"
-    ),
-    AssessmentCard(
-        "Intonation",
-        highestScore = null,  // No score
-        accuracy = null,       // No accuracy
-        id = "lesson6"
-    ),
-    AssessmentCard(
-        "Stress",
-        highestScore = 67,
-        accuracy = 0.71f,
-        id = "lesson7"
-    ),
-    AssessmentCard(
-        "Rhythm",
-        highestScore = null,  // No score
-        accuracy = null,      // No accuracy
-        id = "lesson8"
-    )
-)
+@Composable
+fun SpecialAssessment(
+    title: String,
+    description: String,
+    highestScore: Int?,
+    accuracy: Int?,
+    backGroundColor: Color,
+    borderColor: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.Start,
+        modifier = modifier
+            .clickable(onClick = onClick)
+            .height(164.dp)
+            .clip(shape = RoundedCornerShape(size = 16.dp))
+            .background(backGroundColor)
+            .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(size = 16.dp))
+            .padding(horizontal = 16.dp, vertical = 24.dp)
+    ) {
+        Column (
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = title,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.W500,
+                color = Color.Black
+            )
+            Text(
+                text = description,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.W400,
+                color = Color(0xFF656872)
+            )
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ){
+                    Icon(
+                        painter = painterResource(R.drawable.highest_score),
+                        contentDescription = "High score",
+                        tint = Color(0xFF656872),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "$highestScore%",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.W500,
+                        color = when (highestScore) {
+                            null -> Color(0xFF656872)
+                            in 70..100 -> Color(0xFF5BA890)
+                            in 50..69 -> Color(0xFFF76400)
+                            else -> Color(0xFFD6185D)
+                        }
+                    )
+                }
+
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ){
+                    Icon(
+                        painter = painterResource(R.drawable.accuracy),
+                        contentDescription = "accuracy",
+                        tint = Color(0xFF656872),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "$accuracy%",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.W500,
+                        color = when (accuracy) {
+                            null -> Color(0xFF656872)
+                            in 70..100 -> Color(0xFF5BA890)
+                            in 50..69 -> Color(0xFFF76400)
+                            else -> Color(0xFFD6185D)
+                        }
+                    )
+                }
+
+            }
+
+            Image (
+                painter = painterResource(R.drawable.frame_1000004403),
+                contentDescription = null,
+                modifier = Modifier.size(40.dp).clickable { onClick() },
+            )
+        }
+    }
+}
+
+
+

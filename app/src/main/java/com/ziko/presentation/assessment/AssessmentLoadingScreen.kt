@@ -1,4 +1,4 @@
-package com.ziko.presentation.practice
+package com.ziko.presentation.assessment
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween

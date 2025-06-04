@@ -22,12 +22,15 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -47,30 +51,40 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.navigation.Screen
+import com.ziko.presentation.auth.UserViewModel
 import com.ziko.presentation.components.CustomBiggerTopAppBar
 
 @Composable
 fun LoginScreen(navController: NavController) {
     val loginViewModel: LoginViewModel = hiltViewModel()
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    val userViewModel: UserViewModel = hiltViewModel()
+
+    val user by userViewModel.user.collectAsState()
     val loginState = loginViewModel.loginState.value
+
     val context = LocalContext.current
 
-    Scaffold (
-        modifier = Modifier
-            .fillMaxSize(),
+    // Centralize navigation & fetch logic here
+    LaunchedEffect(loginState) {
+        if (loginState is LoginState.Success) {
+            userViewModel.fetchUser()
+            navController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             CustomBiggerTopAppBar(
                 title = "Login",
-                onNavigationClick = {navController.navigate(Screen.Onboarding.route)}
+                onNavigationClick = { navController.navigate(Screen.Onboarding.route) }
             )
         }
-    ){
-        padding ->
+    ) { padding ->
 
-        Column (
+        Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
@@ -95,25 +109,24 @@ fun LoginScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                //Email
-                Column (
+                // Email
+                Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    //Label
                     Text(
                         text = "Email",
                         fontSize = 15.sp,
                         color = Color(0xFF363B44)
                     )
 
-                    //Email Field
                     OutlinedTextField(
-                        value = email,
-                        onValueChange = {email = it},
+                        value = loginViewModel.email,
+                        onValueChange = { loginViewModel.onEmailChange(it) },
                         placeholder = { Text("username@domain.com") },
                         singleLine = true,
+                        textStyle = TextStyle(color = Color.DarkGray),
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
                         isError = loginState is LoginState.Error,
@@ -128,46 +141,40 @@ fun LoginScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                //Password
-                Column (
+                // Password
+                Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    //Label
                     Text(
                         text = "Password",
                         fontSize = 15.sp,
                         color = Color(0xFF363B44)
                     )
 
-                    // Password FilledTextField
                     OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
+                        value = loginViewModel.password,
+                        onValueChange = { loginViewModel.onPasswordChange(it) },
                         placeholder = { Text("••••••••") },
                         singleLine = true,
-                        visualTransformation = if (passwordVisible)
-                            VisualTransformation.None else PasswordVisualTransformation(),
+                        textStyle = TextStyle(color = Color.DarkGray),
+                        visualTransformation = if (loginViewModel.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         isError = loginState is LoginState.Error,
                         trailingIcon = {
-                            val image = if (passwordVisible)
-                                Icons.Filled.Visibility
-                            else Icons.Filled.VisibilityOff
+                            val image = if (loginViewModel.passwordVisible)
+                                Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                            val description = if (loginViewModel.passwordVisible)
+                                "Hide password" else "Show password"
 
-                            val description = if (passwordVisible) "Hide password" else "Show password"
-
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(imageVector = image, description)
-                            }
-                            IconButton(onClick = {passwordVisible = !passwordVisible }) {
+                            IconButton(onClick = { loginViewModel.onPasswordVisibilityToggle() }) {
                                 Icon(
-                                    image,
+                                    imageVector = image,
                                     contentDescription = description,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(16.dp)
+                                    tint = Color(0xFF080E1E),
+                                    modifier = Modifier.size(20.dp)
                                 )
                             }
                         },
@@ -179,17 +186,17 @@ fun LoginScreen(navController: NavController) {
                         )
                     )
 
-                    //Forgot Password
                     Text(
                         text = "Forgot Password",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFFD6185D),
-                        modifier = Modifier.clickable { TODO() }
+                        modifier = Modifier.clickable {
+                            // TODO: Add forgot password navigation/logic
+                        }
                     )
                 }
 
-                // Error message (replaces Toast)
                 if (loginState is LoginState.Error) {
                     Text(
                         text = loginState.message,
@@ -200,55 +207,46 @@ fun LoginScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Login button (disabled when fields are empty)
                 Button(
-                    onClick = { loginViewModel.login(email, password) },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF5B7BFE)
-                    ),
-                    enabled = email.isNotBlank() && password.isNotBlank()
+                    onClick = { loginViewModel.login() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5B7BFE)),
+                    enabled = loginViewModel.email.isNotBlank() && loginViewModel.password.isNotBlank()
                 ) {
                     if (loginState is LoginState.Loading) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
                     } else {
-                        Text(text = "Log In", fontSize = 20.sp)
+                        Text(text = "Log In", fontSize = 20.sp, color = Color.White)
                     }
-                }
-
-                // Navigation handling (kept as-is)
-                when (loginState) {
-                    is LoginState.Success -> {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
-                    }
-
-                    else -> {}
                 }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Column (
+            Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Row (
+            ) {
+                Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
                     LineUI(true, 150.dp)
-                    Text ("Or", fontSize = 15.sp)
+                    Text("Or", fontSize = 15.sp)
                     LineUI(true, 150.dp)
                 }
 
-                Row (
+                Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row (
+                    Row(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -257,13 +255,13 @@ fun LoginScreen(navController: NavController) {
                             .size(width = 164.dp, height = 50.dp)
                             .padding(vertical = 12.dp, horizontal = 63.dp)
                     ) {
-                        Icon(
+                        Image(
                             painter = painterResource(R.drawable.google),
                             contentDescription = "Sign in with google"
                         )
                     }
 
-                    Row (
+                    Row(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -284,10 +282,12 @@ fun LoginScreen(navController: NavController) {
                 ) {
                     Text(text = "Not a member?", fontSize = 17.sp, color = Color(0xFF656872))
                     Text(
-                        text = "Signup",
+                        text = " Signup",
                         fontSize = 17.sp,
                         color = Color(0xFF5B7BFE),
-                        modifier = Modifier.clickable { navController.navigate(Screen.SignOne.route) }
+                        modifier = Modifier.clickable {
+                            navController.navigate(Screen.SignOne.route)
+                        }
                     )
                 }
             }

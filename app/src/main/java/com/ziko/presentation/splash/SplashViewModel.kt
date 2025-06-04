@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 
 class SplashViewModel : ViewModel() {
 
+
     // Function to simulate background work (e.g., checking if user is logged in)
     fun startSplashTimer(onTimerFinished: () -> Unit) {
         viewModelScope.launch {

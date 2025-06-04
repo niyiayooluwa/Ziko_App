@@ -1,7 +1,10 @@
 [versions]
+accompanistPlaceholderMaterial = "0.34.0"
 agp = "8.7.3"
+composeneumorphism = "1.0.0-alpha02"
 converterGson = "2.9.0"
 coreSplashscreen = "1.0.1"
+datastorePreferences = "1.1.7"
 hilt = "2.50" # Consistent Hilt version
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
@@ -18,12 +21,15 @@ retrofit = "2.9.0"
 hiltNavigationCompose = "1.2.0"
 
 [libraries]
+accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
 adapter-rxjava2 = { module = "com.squareup.retrofit2:adapter-rxjava2", version.ref = "converterGson" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+composeneumorphism = { module = "me.nikhilchaudhari:composeNeumorphism", version.ref = "composeneumorphism" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" } # Use consistent hilt version
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" } # Use consistent hilt version

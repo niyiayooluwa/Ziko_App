@@ -1,19 +1,14 @@
 package com.ziko.presentation.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,14 +21,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ziko.util.AudioManager
 
-enum class Size{
+enum class Size {
     SMALL, BIG
 }
 
 @Composable
 fun AudioButtonWithLabel(text: String, assetPath: String, size: Size) {
     val context = LocalContext.current
-    var isPlaying by remember { mutableStateOf(false) }
+    val currentlyPlaying by AudioManager.currentlyPlaying.collectAsState()
+
+    val isPlaying = currentlyPlaying == assetPath
 
     val buttonModifier = when (size) {
         Size.SMALL -> Modifier.size(32.dp)
@@ -60,21 +57,22 @@ fun AudioButtonWithLabel(text: String, assetPath: String, size: Size) {
                     AudioManager.playAsset(
                         context,
                         assetPath,
-                        onStarted = { isPlaying = true },
-                        onFinished = { isPlaying = false }
+                        onStarted = {},
+                        onFinished = {}
                     )
+                } else {
+                    AudioManager.stop()
                 }
             },
             colors = IconButtonDefaults.iconButtonColors(
                 containerColor = Color(0xFF5B7BFE),
                 contentColor = Color.White
             ),
-            modifier = buttonModifier,
-            // enabled = !isPlaying // uncomment if you want button disabled while playing
+            modifier = buttonModifier
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.VolumeUp,
-                contentDescription = "Play Audio",
+                contentDescription = "Play Audio"
             )
         }
 
@@ -87,6 +85,7 @@ fun AudioButtonWithLabel(text: String, assetPath: String, size: Size) {
     }
 }
 
+
 @Composable
 fun AudioButtonWithLabelForIntro(
     textOne: String,
@@ -94,7 +93,8 @@ fun AudioButtonWithLabelForIntro(
     assetPath: String
 ) {
     val context = LocalContext.current
-    var isPlaying by remember { mutableStateOf(false) }
+    val currentlyPlaying by AudioManager.currentlyPlaying.collectAsState()
+    val isPlaying = currentlyPlaying == assetPath
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -103,24 +103,24 @@ fun AudioButtonWithLabelForIntro(
         IconButton(
             onClick = {
                 if (!isPlaying) {
+                    Log.d("AudioButton", "Clicked: trying to play $assetPath")
                     AudioManager.playAsset(
-                        context,
-                        assetPath,
-                        onStarted = { isPlaying = true },
-                        onFinished = { isPlaying = false }
+                        context = context,
+                        assetPath = assetPath
                     )
+                } else {
+                    AudioManager.stop()
                 }
             },
             colors = IconButtonDefaults.iconButtonColors(
                 containerColor = Color(0xFF5B7BFE),
                 contentColor = Color.White
             ),
-            modifier = Modifier.size(32.dp),
-            // enabled = !isPlaying
+            modifier = Modifier.size(32.dp)
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.VolumeUp,
-                contentDescription = "Play Audio",
+                imageVector = if (isPlaying) Icons.Default.Pause else Icons.AutoMirrored.Filled.VolumeUp,
+                contentDescription = if (isPlaying) "Stop Audio" else "Play Audio"
             )
         }
 
@@ -152,75 +152,3 @@ fun AudioButtonWithLabelForIntro(
         )
     }
 }
-
-
-/*{@Composable
-fun AudioButtonWithWrappedText(
-    textOne: String,
-    textTwo: String,
-    @RawRes audioResId: Int
-) {
-    val context = LocalContext.current
-    var isPlaying by remember { mutableStateOf(false) }
-
-    AndroidView(
-        factory = { ctx ->
-            TextView(ctx).apply {
-                textSize = 18f
-                setLineSpacing(0f, 1.2f)
-                setTextColor(Color.Black.toArgb())
-                typeface = Typeface.DEFAULT
-
-                // Set up compound drawable (icon on the left)
-                val icon = ContextCompat.getDrawable(ctx, R.drawable.volume)
-                setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
-                compoundDrawablePadding = 16
-
-                // Format the text using SpannableString
-                val fullText = textOne + textTwo
-                val spannable = SpannableString(fullText)
-
-                spannable.setSpan(
-                    ForegroundColorSpan(Color(0xFF5B7BFE).toArgb()),
-                    0, textOne.length,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                spannable.setSpan(
-                    UnderlineSpan(),
-                    0, textOne.length,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-
-                spannable.setSpan(
-                    ForegroundColorSpan(Color.Black.toArgb()),
-                    textOne.length, fullText.length,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-
-                setText(spannable, TextView.BufferType.SPANNABLE)
-
-                // Make the icon trigger audio
-                setOnTouchListener { _, event ->
-                    val iconBounds = compoundDrawables[0]?.bounds
-                    if (event.x < (iconBounds?.width() ?: 0) + compoundDrawablePadding) {
-                        if (!isPlaying) {
-                            AudioManager.play(
-                                ctx,
-                                audioResId,
-                                onStarted = { isPlaying = true },
-                                onFinished = { isPlaying = false }
-                            )
-                        }
-                        true
-                    } else {
-                        false
-                    }
-                }
-            }
-        },
-        modifier = Modifier.fillMaxWidth()
-    )
-}}*/
-
-
-

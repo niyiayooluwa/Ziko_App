@@ -4,7 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,16 +32,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.ziko.R
 import com.ziko.data.model.LessonDataProvider
 import com.ziko.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LessonLoadingScreen(
+fun PreLoadingScreen(
     navController: NavController,
     lessonId: String,
 ) {
@@ -47,7 +52,7 @@ fun LessonLoadingScreen(
         LessonDataProvider.getLessonInfo(lessonId)
     }
 
-    Scaffold (
+    Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -56,7 +61,7 @@ fun LessonLoadingScreen(
                 title = {
                     if (lesson != null) {
                         Text(
-                            text = lesson.title,
+                            text = "",
                             fontSize = 22.sp,
                             color = Color.White
                         )
@@ -66,58 +71,70 @@ fun LessonLoadingScreen(
                     IconButton(onClick = { navController.navigate(Screen.Home.route) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description",
+                            contentDescription = null,
                             tint = Color.White
                         )
                     }
                 }
             )
         }
-    ){ paddingValues ->
+    ) { paddingValues ->
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
                 .padding(paddingValues)
-                .padding(
-                    top = 148.dp,
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 24.dp
-                ),
+                .background(Color.White)
+                .padding(16.dp)
         ) {
-            Image(
-                painter = painterResource(
-                    id = when (lessonId) {
-                    "lesson1" -> R.drawable.monopthong_illustration
-                    "lesson2" -> R.drawable.diph
-                    "lesson3" -> R.drawable.tri
-                    "lesson4" -> R.drawable.voiced
-                    "lesson5" -> R.drawable.voiceless
-                    "lesson6" -> R.drawable.intonation
-                    "lesson7" -> R.drawable.stress
-                    "lesson8" -> R.drawable.rhythm
-                        else -> R.drawable.monopthong_illustration
-                }
-                ),
-                contentDescription = "Lesson Illustration",
-                modifier = Modifier.size(420.dp).align(Alignment.CenterHorizontally)
-            )
-
+            // Top Section (Image + Text)
             Column(
-                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Image(
+                    painter = painterResource(R.drawable.mono_preloading),
+                    contentDescription = null,
+                    modifier = Modifier.size(250.dp)
+                )
+
+                Spacer(Modifier.height(30.dp))
+
+                Text(
+                    text = "Learning Tip",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF080e1e),
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Hear it loud and clear : turn up the\nvolume or use headphone.",
+                    fontSize = 17.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF656872)
+                )
+            }
+
+            // Bottom Button
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
                     .clip(RoundedCornerShape(30.dp))
                     .background(Color(0xFF5B7BFE))
-                    .clickable{navController.navigate(Screen.LessonIntro(lessonId).route)}
+                    .clickable {
+                        navController.navigate(Screen.LessonLoading(lessonId).route)
+                    },
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text ="Continue",
+                    text = "Got it!",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.W500
@@ -127,3 +144,13 @@ fun LessonLoadingScreen(
     }
 }
 
+
+
+@Preview(showSystemUi = true)
+@Composable
+fun Preview () {
+    PreLoadingScreen(
+        navController = rememberNavController(),
+        lessonId = "lesson1"
+    )
+}

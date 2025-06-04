@@ -19,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,19 +28,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ziko.navigation.Screen
 import com.ziko.presentation.components.FloatingNavBar
 import com.ziko.data.model.LessonCard
+import com.ziko.presentation.auth.UserViewModel
 
 @Composable
 fun LessonScreen(
-    navController: NavController,
-    userName: String = "Sam" // Default or from ViewModel
+    navController: NavController
 ) {
+    val userViewModel: UserViewModel = hiltViewModel()
+    val user by userViewModel.user.collectAsState()
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
     val scrollState = rememberScrollState()
     val purpleColor = Color(0xFF410FA3)
 
@@ -80,14 +86,14 @@ fun LessonScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = userName.first().toString(),
+                            text = user?.firstName?.first().toString(),
                             color = Color.White,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
                     Text(
-                        text = "Hello, $userName",
+                        text = "Hello, ${user?.firstName}",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.W600,
                         color = Color.White
@@ -134,7 +140,11 @@ fun LessonScreen(
                             color = lesson.color,
                             onClick = {
                                 val lessonId = lesson.id
-                                navController.navigate(Screen.LessonLoading(lessonId).route)
+                                if (lessonId != "lesson1") {
+                                    navController.navigate(Screen.LessonLoading(lessonId).route)
+                                } else {
+                                    navController.navigate(Screen.PreLessonLoading(lessonId).route)
+                                }
                             }
                         )
                     }
@@ -195,8 +205,6 @@ fun LessonCard(
         }
     }
 }
-
-
 
 val lessons = listOf(
     LessonCard(

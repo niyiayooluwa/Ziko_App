@@ -52,7 +52,6 @@ import com.ziko.util.AudioManager
 import com.ziko.util.normalizeText
 
 @Composable
-
 fun AssessmentContent(
     content: AssessmentScreenContent,
     progress: Float,
@@ -63,7 +62,11 @@ fun AssessmentContent(
     totalScreens: Int,
     onNavigateBack: () -> Unit,
     isFirstScreen: Boolean,
+    onStart: () -> Unit
 ) {
+    // Trigger onStart only once on first composition
+    LaunchedEffect(Unit) { onStart() }
+
     Scaffold(
         modifier = Modifier.background(Color.White),
         topBar = {
@@ -400,12 +403,6 @@ fun McqAssessmentUI(
             attemptCount = 1,
             maxAttempts = 1,
             onClick = {
-                /*{
-                    isAnswerCorrect.value?.let { isCorrect ->
-                        onResult(isCorrect)
-                        onContinue()
-                    }
-                }*/
                 when (isAnswerCorrect.value) {
                     null -> {
                         if (hasAnswered.value) {

@@ -61,11 +61,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.accompanist.placeholder.material)
+
 
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-    // REMOVE THIS LINE: kapt(libs.hilt.compiler.v250)
 
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -76,5 +77,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.adapter.rxjava2)
 
-    implementation("me.nikhilchaudhari:composeNeumorphism:1.0.0-alpha02")
+    //Datastore dependencies
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.composeneumorphism)
 }

@@ -1,9 +1,7 @@
 package com.ziko.data.remote
 
 data class LoginResponse(
-    val token: String,
-    val userId: String,
-    val name: String,
-    val message: String,
-    val success: Boolean
+    val msg: String,
+    val errorMsg: String,
+    val data: String, //token
 )
