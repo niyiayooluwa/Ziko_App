@@ -7,8 +7,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +52,9 @@ fun AudioButtonWithLabel(text: String, assetPath: String, size: Size) {
         Size.BIG -> FontWeight.SemiBold
     }
 
+    val icon = if (isPlaying) Icons.Default.Pause else Icons.AutoMirrored.Filled.VolumeUp
+
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -71,7 +79,7 @@ fun AudioButtonWithLabel(text: String, assetPath: String, size: Size) {
             modifier = buttonModifier
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                imageVector = icon,
                 contentDescription = "Play Audio"
             )
         }

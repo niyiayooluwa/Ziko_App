@@ -79,19 +79,21 @@ fun PreLoadingScreen(
             )
         }
     ) { paddingValues ->
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Box(
             modifier = Modifier
+                .background(Color.White)
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color.White)
-                .padding(16.dp)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 24.dp
+                ),
         ) {
             // Top Section (Image + Text)
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().align(Alignment.Center)
             ) {
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -123,6 +125,7 @@ fun PreLoadingScreen(
             // Bottom Button
             Column(
                 modifier = Modifier
+                    .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .height(56.dp)
                     .clip(RoundedCornerShape(30.dp))

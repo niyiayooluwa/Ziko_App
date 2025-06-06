@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ziko.domain.usecase.AuthUseCase
+import com.ziko.presentation.profile.UserViewModel
 import com.ziko.util.DataStoreManager
 import com.ziko.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class LoginViewModel @javax.inject.Inject constructor(
     private val authUseCase: AuthUseCase,
-    private val dataStoreManager: DataStoreManager
+    private val dataStoreManager: DataStoreManager,
 ) : ViewModel() {
 
     var email by mutableStateOf("")

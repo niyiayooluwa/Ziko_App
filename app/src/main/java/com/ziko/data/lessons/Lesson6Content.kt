@@ -46,7 +46,7 @@ fun getLesson6Content(): List<LessonScreenContent> {
             boldText = "Mixed intonation",
             subText = "Example sentence:",
             options = listOf(
-                "Will, I think so" to "lessons/lesson6/will_i_think_so.mp3",
+                "Well, I think so" to "lessons/lesson6/well_i_think_so.mp3",
                 "Do you want pizza or pasta?" to "lessons/lesson6/do_you_want_pizza_or_pasta",
             ),
         )

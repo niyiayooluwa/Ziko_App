@@ -105,13 +105,13 @@ fun PracticeLoadingScreen(
                     )
 
                     LinearProgressIndicator(
-                        progress = progress.value,
+                        progress = { progress.value },
+                        modifier = Modifier
+                            .height(11.dp)
+                            .fillMaxWidth(),
                         color = Color(0xFF5B7BFE),
                         trackColor = Color(0xFFe5e5e5),
                         strokeCap = StrokeCap.Round,
-                        modifier = Modifier
-                            .height(11.dp)
-                            .fillMaxWidth()
                     )
 
                     Text(

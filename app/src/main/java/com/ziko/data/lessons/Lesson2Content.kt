@@ -19,7 +19,7 @@ fun getLesson2Content(): List<LessonScreenContent> {
         LessonScreenContent(
             id = 1,
             mainText = "Types of Diphthongs & word examples",
-            sound = "/eɪ/" to "lessons/lesson2/diph_ay.mp3",
+            sound = "/eɪ/" to "lessons/lesson2/diph_ay_glide.mp3",
             subText = "Example words:",
             options = listOf(
                 "day" to "lessons/lesson2/day.mp3",
@@ -32,7 +32,7 @@ fun getLesson2Content(): List<LessonScreenContent> {
         LessonScreenContent(
             id = 2,
             mainText = "Types of Diphthongs & word examples",
-            sound = "/aɪ/" to "lessons/lesson2/diph_i.mp3",
+            sound = "/aɪ/" to "lessons/lesson2/diph_i_glide.mp3",
             subText = "Example words:",
             options = listOf(
                 "high" to "lessons/lesson2/high.mp3",
@@ -45,7 +45,7 @@ fun getLesson2Content(): List<LessonScreenContent> {
         LessonScreenContent(
             id = 3,
             mainText = "Types of Diphthongs & word examples",
-            sound = "/ɔɪ/" to "lessons/lesson2/diph_oy.mp3",
+            sound = "/ɔɪ/" to "lessons/lesson2/diph_oy_glide.mp3",
             subText = "Example words:",
             options = listOf(
                 "boy" to "lessons/lesson2/boy.mp3",
@@ -58,7 +58,7 @@ fun getLesson2Content(): List<LessonScreenContent> {
         LessonScreenContent(
             id = 4,
             mainText = "Types of Diphthongs & word examples",
-            sound = "/aʊ/" to "lessons/lesson2/diph_ow.mp3",
+            sound = "/aʊ/" to "lessons/lesson2/diph_ow_glide.mp3",
             subText = "Example words:",
             options = listOf(
                 "now" to "lessons/lesson2/now.mp3",
@@ -71,7 +71,7 @@ fun getLesson2Content(): List<LessonScreenContent> {
         LessonScreenContent(
             id = 5,
             mainText = "Types of Diphthongs & word examples",
-            sound = "/əʊ/" to "lessons/lesson2/diph_o.mp3",
+            sound = "/əʊ/" to "lessons/lesson2/diph_o_glide.mp3",
             subText = "Example words:",
             options = listOf(
                 "go" to "lessons/lesson2/go.mp3",
@@ -84,7 +84,7 @@ fun getLesson2Content(): List<LessonScreenContent> {
         LessonScreenContent(
             id = 6,
             mainText = "Types of Diphthongs & word examples",
-            sound = "/ɪə/" to "lessons/lesson2/diph_ear.mp3",
+            sound = "/ɪə/" to "lessons/lesson2/diph_ear_glide.mp3",
             subText = "Example words:",
             options = listOf(
                 "here" to "lessons/lesson2/here.mp3",
@@ -97,7 +97,7 @@ fun getLesson2Content(): List<LessonScreenContent> {
         LessonScreenContent(
             id = 7,
             mainText = "Types of Diphthongs & word examples",
-            sound = "/eə/" to "lessons/lesson2/diph_air.mp3",
+            sound = "/eə/" to "lessons/lesson2/diph_air_glide.mp3",
             subText = "Example words:",
             options = listOf(
                 "air" to "lessons/lesson2/air.mp3",
@@ -110,7 +110,7 @@ fun getLesson2Content(): List<LessonScreenContent> {
         LessonScreenContent(
             id = 8,
             mainText = "Types of Diphthongs & word examples",
-            sound = "/ʊə/" to "lessons/lesson2/diph_oor.mp3",
+            sound = "/ʊə/" to "lessons/lesson2/diph_oor_glide.mp3",
             subText = "Example words:",
             options = listOf(
                 "pure" to "lessons/lesson2/pure.mp3",

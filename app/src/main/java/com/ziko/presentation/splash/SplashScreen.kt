@@ -22,10 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.navigation.Screen
-import com.ziko.presentation.auth.UserViewModel
-import com.ziko.util.DataStoreManager
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.firstOrNull
+import com.ziko.presentation.profile.UserViewModel
 
 // Shows the logo, waits 2 seconds, then moves to the Login screen
 @Composable

@@ -26,7 +26,8 @@ interface ApiService {
 
     @GET("profile") //Endpoint to get user info
     suspend fun profile(
-        @Header ("ProfileRequest") token: String): Response<ProfileResponse>
+        @Header ("Authorization") token: String
+    ): Response<ProfileResponse>
 
     @GET("assessments")
     suspend fun getAssessmentStats(

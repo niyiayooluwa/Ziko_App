@@ -2,21 +2,36 @@ package com.ziko.presentation.practice
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.ziko.presentation.components.*
+import com.ziko.presentation.components.AudioButtonWithLabel
+import com.ziko.presentation.components.ProgressTopAppBar
+import com.ziko.presentation.components.Size
+import com.ziko.presentation.components.SpeechButton
+import com.ziko.presentation.components.SuccessIndicator
 import com.ziko.ui.model.PracticeScreenContent
 import com.ziko.util.AudioManager
 import com.ziko.util.normalizeText
@@ -46,13 +61,11 @@ fun PracticeContent(
 
     // AudioManager lifecycle management
     val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        Log.d("PracticeContent", "Adding AudioManager observer")
+
+    LaunchedEffect(Unit) {
+        Log.d("AudioManager", "Observer force-added")
+        lifecycleOwner.lifecycle.removeObserver(AudioManager) // Just in case
         lifecycleOwner.lifecycle.addObserver(AudioManager)
-        onDispose {
-            Log.d("PracticeContent", "Removing AudioManager observer")
-            lifecycleOwner.lifecycle.removeObserver(AudioManager)
-        }
     }
 
     // Reset speech state when expected text changes
@@ -85,7 +98,6 @@ fun PracticeContent(
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
-                    //.align(Alignment.TopCenter)
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
                     .padding(paddingValues)
@@ -225,24 +237,4 @@ fun PracticeContent(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-    PracticeContent(
-        content = PracticeScreenContent(
-            id = 1,
-            instructions = "Repeat after me",
-            sound = "bit - beat" to "lesson/lesson1/bit_beat.mp3",
-            expectedPhrase = "bit beat"
-        ),
-        progress = 0.2f,
-        onCancel = {},
-        onContinue = {},
-        currentScreen = 1,
-        totalScreens = 1,
-        onNavigateBack = {},
-        isFirstScreen = true
-    )
 }

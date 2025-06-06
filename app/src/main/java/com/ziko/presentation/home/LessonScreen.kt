@@ -28,19 +28,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ziko.data.model.LessonCard
 import com.ziko.navigation.Screen
 import com.ziko.presentation.components.FloatingNavBar
-import com.ziko.data.model.LessonCard
-import com.ziko.presentation.auth.UserViewModel
+import com.ziko.presentation.profile.UserViewModel
 
 @Composable
 fun LessonScreen(
-    navController: NavController
+    navController: NavController,
+    userViewModel: UserViewModel
 ) {
-    val userViewModel: UserViewModel = hiltViewModel()
     val user by userViewModel.user.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -80,20 +79,21 @@ fun LessonScreen(
                     // Profile picture placeholder
                     Box(
                         modifier = Modifier
+                            .clickable{navController.navigate(Screen.Profile.route)}
                             .size(48.dp)
                             .clip(CircleShape)
                             .background(Color.White.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = user?.firstName?.first().toString(),
+                            text = user?.first_name?.first().toString(),
                             color = Color.White,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
                     Text(
-                        text = "Hello, ${user?.firstName}",
+                        text = "Hello, ${user?.first_name}",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.W600,
                         color = Color.White

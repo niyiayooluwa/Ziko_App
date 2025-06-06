@@ -22,6 +22,7 @@ import com.ziko.presentation.assessment.AssessmentContent
 import com.ziko.presentation.assessment.AssessmentLoadingScreen
 import com.ziko.presentation.assessment.AssessmentViewModel
 import com.ziko.presentation.auth.login.LoginScreen
+import com.ziko.presentation.auth.login.LoginViewModel
 import com.ziko.presentation.auth.signup.SignUpScreenOne
 import com.ziko.presentation.auth.signup.SignUpScreenTwo
 import com.ziko.presentation.auth.signup.SignUpViewModel
@@ -39,6 +40,8 @@ import com.ziko.presentation.practice.PracticeContent
 import com.ziko.presentation.practice.PracticeLoadingScreen
 import com.ziko.presentation.practice.PracticeViewModel
 import com.ziko.presentation.practice.PracticeViewModelFactory
+import com.ziko.presentation.profile.ProfileScreen
+import com.ziko.presentation.profile.UserViewModel
 import com.ziko.presentation.splash.OnboardingScreen
 import com.ziko.presentation.splash.SplashScreen
 import com.ziko.util.getNextLessonId
@@ -50,6 +53,7 @@ fun NavGraph(
     modifier: Modifier = Modifier.padding(innerPadding)
 ) {
     val signUpViewModel: SignUpViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -63,7 +67,7 @@ fun NavGraph(
         composable(Screen.Onboarding.route) { OnboardingScreen(navController = navController) }
 
         // Login Screen
-        composable(Screen.Login.route) { LoginScreen(navController = navController) }
+        composable(Screen.Login.route) { LoginScreen(navController = navController, userViewModel) }
 
         // Sign Up Screen 1
         composable(Screen.SignOne.route) {
@@ -74,14 +78,21 @@ fun NavGraph(
         // Sign Up Screen 2
         composable(Screen.SignTwo.route) {
             // Passing the ViewModel to SignUpScreenTwo
-            SignUpScreenTwo(navController = navController, viewModel = signUpViewModel)
+            SignUpScreenTwo(
+                navController = navController,
+                viewModel = signUpViewModel,
+                userViewModel = userViewModel
+            )
         }
 
         // Home Screen
-        composable(route = Screen.Home.route) { LessonScreen(navController) }
+        composable(Screen.Home.route) { LessonScreen(navController, userViewModel) }
 
         // Assessment Screen
-        composable(route = Screen.Assessment.route) { AssessmentScreen(navController) }
+        composable(Screen.Assessment.route) { AssessmentScreen(navController, userViewModel) }
+
+        //Profile
+        composable(Screen.Profile.route) {ProfileScreen(navController, userViewModel)}
 
         //Prelesson loading
         composable(

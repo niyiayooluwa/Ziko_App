@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.*
@@ -95,6 +96,6 @@ sealed class BottomNavItem(
     val icon: ImageVector,
     val route: String
 ) {
-    object Lesson : BottomNavItem("Lesson", Icons.Filled.MenuBook, Screen.Home.route)
-    object Assessment : BottomNavItem("Assessment", Icons.Filled.Assignment, Screen.Assessment.route)
+    data object Lesson : BottomNavItem("Lesson", Icons.AutoMirrored.Filled.MenuBook, Screen.Home.route)
+    data object Assessment : BottomNavItem("Assessment", Icons.Filled.Assignment, Screen.Assessment.route)
 }

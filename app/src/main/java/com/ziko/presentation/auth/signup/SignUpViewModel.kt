@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ziko.domain.model.SignUpData
 import com.ziko.domain.usecase.AuthUseCase
 import com.ziko.network.SignUpRequest
+import com.ziko.presentation.auth.login.LoginViewModel
 import com.ziko.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,8 +15,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(private val authUseCase: AuthUseCase) : ViewModel() {
-    private val signUpData = mutableStateOf(SignUpData())
+class SignUpViewModel @Inject constructor(
+    private val authUseCase: AuthUseCase,
+) : ViewModel() {
+    val signUpData = mutableStateOf(SignUpData())
     val emailError = mutableStateOf<String?>(null)
     val passwordMismatchError = mutableStateOf(false)
     private val _signUpState = MutableStateFlow<SignUpState>(SignUpState.Idle)

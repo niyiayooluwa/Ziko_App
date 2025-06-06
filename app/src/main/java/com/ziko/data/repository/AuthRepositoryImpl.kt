@@ -46,8 +46,18 @@ class AuthRepositoryImpl(private val apiService: ApiService) : AuthRepository {
     }
 
     override suspend fun profile(token: String): Response<ProfileResponse> {
-        return apiService.profile("Bearer $token")
+        return try {
+            Log.d("AuthRepo", "Calling profile API with token: Bearer $token")
+            val response = apiService.profile("Bearer $token")
+            Log.d("AuthRepo", "Profile response body: ${response.body()?.toString()}")
+            Log.d("AuthRepo", "Profile API response: ${response.code()} - ${response.message()}")
+            response
+        } catch (e: Exception) {
+            Log.e("AuthRepo", "Profile API call failed: ${e.localizedMessage}", e)
+            throw e
+        }
     }
+
 
     override suspend fun getAssessmentStats(token: String): Result<List<AssessmentStatsItem>> {
         return try {

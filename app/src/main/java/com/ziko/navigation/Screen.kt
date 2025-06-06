@@ -59,4 +59,8 @@ sealed class Screen(val route: String) {
             const val BASE_ROUTE = "assessment_completion/{lessonId}/{score}/{correctAnswers}/{totalQuestions}/{timeSpent}"
         }
     }
+
+    //Profile & Settings Flow
+    data object Profile : Screen("profile")
+    data object Security : Screen("security")
 }

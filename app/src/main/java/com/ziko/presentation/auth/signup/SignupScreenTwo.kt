@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -24,6 +26,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,20 +40,63 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ziko.navigation.Screen
+import com.ziko.presentation.auth.login.LoginState
+import com.ziko.presentation.auth.login.LoginViewModel
 import com.ziko.presentation.components.CustomBiggerTopAppBar
+import com.ziko.presentation.profile.UserViewModel
 
 @Composable
 fun SignUpScreenTwo(
     navController: NavController,
-    viewModel: SignUpViewModel
+    viewModel: SignUpViewModel,
+    userViewModel: UserViewModel
 ) { // Receive ViewModel
+    val loginViewModel: LoginViewModel = hiltViewModel()
+
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     val signUpState by viewModel.signUpState.collectAsState()
+    val scrollState = rememberScrollState()
+
+    var localErrorMessage by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(signUpState) {
+        when (signUpState) {
+            is SignUpState.Success -> {
+                loginViewModel.apply {
+                    onEmailChange(viewModel.signUpData.value.email)
+                    onPasswordChange(viewModel.signUpData.value.password)
+                    login()
+                }
+            }
+            is SignUpState.Error -> {
+                localErrorMessage = (signUpState as SignUpState.Error).message
+            }
+            else -> Unit
+        }
+    }
+
+    val loginState by loginViewModel.loginState
+
+    LaunchedEffect(loginState) {
+        when (loginState) {
+            is LoginState.Success -> {
+                userViewModel.fetchUser()
+                navController.navigate(Screen.Home.route)
+            }
+            is LoginState.Error -> {
+                localErrorMessage = (loginState as LoginState.Error).message
+            }
+            else -> Unit
+        }
+    }
+
+
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -65,6 +111,7 @@ fun SignUpScreenTwo(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(scrollState)
                 .padding(padding)
                 .background(Color.White),
         ) {
@@ -184,11 +231,7 @@ fun SignUpScreenTwo(
                 Button(
                     onClick = {
                         viewModel.signup(
-                            onSuccess = {
-                                navController.navigate(Screen.Home.route) {
-                                    popUpTo("login") { inclusive = true }
-                                }
-                            },
+                            onSuccess = {},
                             onError = { /* Error handling via SignUpState */ }
                         )
                     },

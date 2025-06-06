@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -74,15 +75,12 @@ fun LessonLoadingScreen(
             )
         }
     ){ paddingValues ->
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Box(
             modifier = Modifier
-                .fillMaxSize()
                 .background(Color.White)
+                .fillMaxSize()
                 .padding(paddingValues)
                 .padding(
-                    top = 148.dp,
                     start = 16.dp,
                     end = 16.dp,
                     bottom = 24.dp
@@ -103,7 +101,7 @@ fun LessonLoadingScreen(
                 }
                 ),
                 contentDescription = "Lesson Illustration",
-                modifier = Modifier.size(420.dp).align(Alignment.CenterHorizontally)
+                modifier = Modifier.size(420.dp).align(Alignment.Center)
             )
 
             Column(
@@ -111,6 +109,7 @@ fun LessonLoadingScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
                     .height(56.dp)
                     .clip(RoundedCornerShape(30.dp))
                     .background(Color(0xFF5B7BFE))

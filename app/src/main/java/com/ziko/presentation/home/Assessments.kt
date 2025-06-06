@@ -46,16 +46,16 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ziko.R
 import com.ziko.navigation.Screen
 import com.ziko.presentation.assessment.AssessmentStatsViewModel
-import com.ziko.presentation.auth.UserViewModel
+import com.ziko.presentation.profile.UserViewModel
 import com.ziko.presentation.components.FloatingNavBar
 
 @Composable
 fun AssessmentScreen(
-    navController: NavController
+    navController: NavController,
+    userViewModel: UserViewModel
 ) {
 
     val assessmentStatsViewModel: AssessmentStatsViewModel = hiltViewModel()
-    val userViewModel: UserViewModel = hiltViewModel()
 
     val assessmentStats by assessmentStatsViewModel.assessmentStats.collectAsState()
     val user by userViewModel.user.collectAsState()
@@ -89,11 +89,12 @@ fun AssessmentScreen(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
+                            .clickable {navController.navigate(Screen.Profile.route)}
                             .background(Color.White.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = user?.firstName?.first().toString(),
+                            text = user?.first_name?.first().toString(),
                             color = Color.White,
                             fontWeight = FontWeight.Bold
                         )
