@@ -154,7 +154,7 @@ fun AssessmentCompletionScreen(
                     text = "Let's see how you did and where you can improve:"
                 )
 
-                StatRow("ScoreImprovement", "$scoreImprovement")
+                StatRow("Score Improvement", "$scoreImprovement")
                 StatRow("Correct Answers", correctAnswers)
                 StatRow("Time spent", timeSpent)
 

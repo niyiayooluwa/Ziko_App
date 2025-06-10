@@ -62,5 +62,5 @@ sealed class Screen(val route: String) {
 
     //Profile & Settings Flow
     data object Profile : Screen("profile")
-    data object Security : Screen("security")
+    data object SecurityScreen : Screen("security")
 }

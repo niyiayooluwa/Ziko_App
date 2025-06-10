@@ -2,6 +2,7 @@ package com.ziko.presentation.components
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -21,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,6 +32,7 @@ enum class Size {
     SMALL, BIG
 }
 
+//In a row
 @Composable
 fun AudioButtonWithLabel(text: String, assetPath: String, size: Size) {
     val context = LocalContext.current
@@ -93,6 +96,69 @@ fun AudioButtonWithLabel(text: String, assetPath: String, size: Size) {
     }
 }
 
+@Composable
+fun AudioButtonWithLabelForLesson8(text: String, assetPath: String, size: Size) {
+    val context = LocalContext.current
+    val currentlyPlaying by AudioManager.currentlyPlaying.collectAsState()
+
+    val isPlaying = currentlyPlaying == assetPath
+
+    val buttonModifier = when (size) {
+        Size.SMALL -> Modifier.size(32.dp)
+        Size.BIG -> Modifier.size(48.dp)
+    }
+
+    val fontSize = when (size) {
+        Size.SMALL -> 20.sp
+        Size.BIG -> 28.sp
+    }
+
+    val fontWeight = when (size) {
+        Size.SMALL -> FontWeight.Medium
+        Size.BIG -> FontWeight.SemiBold
+    }
+
+    val icon = if (isPlaying) Icons.Default.Pause else Icons.AutoMirrored.Filled.VolumeUp
+
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        IconButton(
+            onClick = {
+                if (!isPlaying) {
+                    AudioManager.playAsset(
+                        context,
+                        assetPath,
+                        onStarted = {},
+                        onFinished = {}
+                    )
+                } else {
+                    AudioManager.stop()
+                }
+            },
+            colors = IconButtonDefaults.iconButtonColors(
+                containerColor = Color(0xFF5B7BFE),
+                contentColor = Color.White
+            ),
+            modifier = buttonModifier
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = "Play Audio"
+            )
+        }
+
+        Text(
+            text = text,
+            color = Color(0xFF080E1E),
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            textAlign = TextAlign.Center
+        )
+    }
+}
 
 @Composable
 fun AudioButtonWithLabelForIntro(

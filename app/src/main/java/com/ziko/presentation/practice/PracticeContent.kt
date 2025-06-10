@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.ziko.presentation.components.AudioButtonWithLabel
+import com.ziko.presentation.components.AudioButtonWithLabelForLesson8
 import com.ziko.presentation.components.ProgressTopAppBar
 import com.ziko.presentation.components.Size
 import com.ziko.presentation.components.SpeechButton
@@ -46,6 +47,7 @@ fun PracticeContent(
     totalScreens: Int,
     onNavigateBack: () -> Unit,
     isFirstScreen: Boolean,
+    lessonId: String
 ) {
     Log.d("PracticeContent", "Composing PracticeContent")
 
@@ -122,11 +124,19 @@ fun PracticeContent(
 
                     // Audio playback button if sound is available
                     if (content.sound != null) {
-                        AudioButtonWithLabel(
-                            text = content.sound.first,
-                            assetPath = content.sound.second,
-                            size = Size.BIG
-                        )
+                        if (lessonId != "lesson8") {
+                            AudioButtonWithLabel(
+                                text = content.sound.first,
+                                assetPath = content.sound.second,
+                                size = Size.BIG
+                            )
+                        } else {
+                            AudioButtonWithLabelForLesson8(
+                                text = content.sound.first,
+                                assetPath = content.sound.second,
+                                size = Size.BIG
+                            )
+                        }
                     }
                 }
 

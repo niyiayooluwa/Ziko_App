@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,7 +63,8 @@ fun AssessmentContent(
     totalScreens: Int,
     onNavigateBack: () -> Unit,
     isFirstScreen: Boolean,
-    onStart: () -> Unit
+    onStart: () -> Unit,
+    lessonId: String
 ) {
     // Trigger onStart only once on first composition
     LaunchedEffect(Unit) { onStart() }
@@ -86,13 +88,14 @@ fun AssessmentContent(
                 content = content,
                 onContinue = onContinue,
                 onResult = onResult,
-                paddingValues = paddingValues
+                paddingValues = paddingValues,
+                lessonId = lessonId
             )
             is AssessmentScreenContent.McqAssessment -> McqAssessmentUI(
                 content = content,
                 onContinue = onContinue,
                 onResult = onResult,
-                paddingValues = paddingValues
+                paddingValues = paddingValues,
             )
         }
     }
@@ -103,7 +106,8 @@ fun SpeakAssessmentUI(
     content: AssessmentScreenContent.SpeakAssessment,
     onContinue: () -> Unit,
     onResult: (Boolean) -> Unit,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    lessonId: String
 ) {
     val expectedText = content.expectedText
     val context = LocalContext.current
@@ -191,13 +195,24 @@ fun SpeakAssessmentUI(
                                 cornerRadius = 12.dp
                             ),
                     ) {
-                        Text(
-                            text = content.displayText,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.W500,
-                            color = Color(0xFF080E1E),
-                            modifier = Modifier.padding(16.dp)
-                        )
+                        if (lessonId != "lesson8") {
+                            Text(
+                                text = content.displayText,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.W500,
+                                color = Color(0xFF080E1E),
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        } else {
+                            Text(
+                                text = content.displayText,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.W500,
+                                color = Color(0xFF080E1E),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -296,7 +311,7 @@ fun McqAssessmentUI(
     content: AssessmentScreenContent.McqAssessment,
     onContinue: () -> Unit,
     onResult: (Boolean) -> Unit,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
 ) {
     val isAnswerCorrect = remember { mutableStateOf<Boolean?>(null) }
     val correctAnswer = content.correctAnswer

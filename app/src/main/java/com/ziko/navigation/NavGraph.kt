@@ -22,7 +22,6 @@ import com.ziko.presentation.assessment.AssessmentContent
 import com.ziko.presentation.assessment.AssessmentLoadingScreen
 import com.ziko.presentation.assessment.AssessmentViewModel
 import com.ziko.presentation.auth.login.LoginScreen
-import com.ziko.presentation.auth.login.LoginViewModel
 import com.ziko.presentation.auth.signup.SignUpScreenOne
 import com.ziko.presentation.auth.signup.SignUpScreenTwo
 import com.ziko.presentation.auth.signup.SignUpViewModel
@@ -41,6 +40,7 @@ import com.ziko.presentation.practice.PracticeLoadingScreen
 import com.ziko.presentation.practice.PracticeViewModel
 import com.ziko.presentation.practice.PracticeViewModelFactory
 import com.ziko.presentation.profile.ProfileScreen
+import com.ziko.presentation.profile.SecurityScreen
 import com.ziko.presentation.profile.UserViewModel
 import com.ziko.presentation.splash.OnboardingScreen
 import com.ziko.presentation.splash.SplashScreen
@@ -93,6 +93,9 @@ fun NavGraph(
 
         //Profile
         composable(Screen.Profile.route) {ProfileScreen(navController, userViewModel)}
+
+        //Security Screen
+        composable(Screen.SecurityScreen.route) {SecurityScreen(navController, userViewModel)}
 
         //Prelesson loading
         composable(
@@ -171,7 +174,7 @@ fun NavGraph(
                     onNavigateBack = {
                         // If on first screen, go back to Home, otherwise go to previous screen
                         if (isFirstScreen) {
-                            navController.popBackStack(Screen.Home.route, false)
+                            navController.popBackStack(Screen.LessonIntro(lessonId).route, false)
                         } else {
                             lessonViewModel.previousScreen()
                         }
@@ -238,6 +241,7 @@ fun NavGraph(
                     currentScreen = currentScreen,
                     totalScreens = totalScreens,
                     isFirstScreen = isFirstScreen,
+                    lessonId = lessonId,
                     onNavigateBack = {
                         if (isFirstScreen) {
                             navController.popBackStack(Screen.Home.route, false)
@@ -316,7 +320,7 @@ fun NavGraph(
             ).route
             val navigateToResultsValue = viewModel.navigateToResults.value
             LaunchedEffect(navigateToResultsValue) {
-                navigateToResultsValue?.let { percentage -> // Only percentage is received
+                navigateToResultsValue?.let { _percentage -> // Only percentage is received
                     navController.navigate(
                         route
                     ) {
@@ -357,6 +361,7 @@ fun NavGraph(
                     onStart = {
                         viewModel.startAssessment()
                     },
+                    lessonId = lessonId,
                 )
             } else {
                 Box(
@@ -368,6 +373,7 @@ fun NavGraph(
             }
         }
 
+        //Assessment Completion
         composable(
             route = Screen.AssessmentCompletion.BASE_ROUTE,
             arguments = listOf(

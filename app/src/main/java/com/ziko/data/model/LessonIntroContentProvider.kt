@@ -80,7 +80,7 @@ object LessonIntroContentProvider {
                 definitionTextOne = "Stress",
                 definitionTextTwo = " is the emphasis placed on a particular syllable in a word or a particular word in a sentence." +
                         "It affects pronunciation, rhythm, and meaning",
-                definitionAudio = "lessons/lesson1/",
+                definitionAudio = "lessons/lesson7/stress_definition.mp3",
             )
 
             "lesson8" -> LessonIntroContent(

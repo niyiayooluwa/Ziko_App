@@ -1,5 +1,6 @@
 package com.ziko.presentation.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,7 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material.icons.outlined.AddPhotoAlternate
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -29,35 +30,64 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.navigation.Screen
+import kotlinx.coroutines.launch
 import me.nikhilchaudhari.library.neumorphic
 import me.nikhilchaudhari.library.shapes.Pressed
-import me.nikhilchaudhari.library.shapes.Punched
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
     val user by userViewModel.user.collectAsState()
-    var showSheet by remember{mutableStateOf(false)}
+    val updateResult by userViewModel.userUpdateResult.collectAsState()
+
+    var showSheet by remember{ mutableStateOf(false) }
+    var showEditProfileSheet by remember { mutableStateOf(false) }
+
+    var firstName by remember { mutableStateOf("")}
+    var lastName by remember { mutableStateOf("") }
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(updateResult) {
+        updateResult?.let {
+            if (it.isSuccess) {
+                Toast.makeText(context, "Name updated successfully!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed: ${it.exceptionOrNull()?.message}", Toast.LENGTH_SHORT).show()
+            }
+            // Reset after showing
+            //userViewModel.userUpdateResult.value = null
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -101,12 +131,13 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                     modifier = Modifier
                         .size(120.dp)
                         .clip(CircleShape)
+                        .background(Color(0xFF5b7bfe).copy(alpha = 0.2f))
                         .border(1.dp, Color(0xFF5b7bfe), CircleShape)
                 ) {
                     Text(
                         text = user?.first_name?.first().toString(),
                         fontSize = 13.sp,
-                        color = Color.White
+                        color = Color(0xFF5b7bfe)
                     )
                 }
                 
@@ -134,7 +165,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
 
                 //edit profile button
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { showEditProfileSheet = true },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
                         contentColor = Color(0xFF5b7bfe)
@@ -197,7 +228,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                     }
 
                     IconButton(
-                        onClick = {/*TODO()*/ }
+                        onClick = {navController.navigate(Screen.SecurityScreen.route) }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
@@ -243,7 +274,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                 containerColor = Color.White,
             ) {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(16.dp)
                 ) {
@@ -284,7 +315,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                                     strokeWidth = 4.dp,
                                     elevation = 4.dp
                                 )
-                                .clickable{showSheet = false}
+                                .clickable { showSheet = false }
                         ) {
                             Text(
                                 text ="Cancel",
@@ -303,7 +334,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                                 .height(56.dp)
                                 .clip(RoundedCornerShape(30.dp))
                                 .background(Color(0xFFD6185D))
-                                .clickable{
+                                .clickable {
                                     userViewModel.logout {
                                         navController.navigate(Screen.Login.route)
                                     }
@@ -311,6 +342,168 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         ) {
                             Text(
                                 text ="Yes, Logout",
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.W500
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Bottom sheet
+        if (showEditProfileSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showEditProfileSheet = false },
+                sheetState = sheetState,
+                containerColor = Color.White,
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Edit Profile",
+                        fontSize = 22.sp,
+                        color = Color.Black,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    HorizontalDivider(color = Color(0xFFe5e5e5))
+
+                    Box (
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF5b7bfe).copy(alpha = 0.2f))
+                            .border(1.dp, Color(0xFF5b7bfe), CircleShape)
+                    ) {
+                        Text(
+                            text = user?.first_name?.first().toString(),
+                            fontSize = 13.sp,
+                            color = Color(0xFF5b7bfe),
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+
+                        Icon(
+                            Icons.Outlined.AddPhotoAlternate,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .size(16.dp)
+                        )
+                    }
+
+                    //First Name
+                    Column(
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "First Name",
+                            fontSize = 15.sp,
+                            color = Color(0xFF363B44)
+                        )
+
+                        OutlinedTextField(
+                            value = firstName,
+                            onValueChange = { firstName = it },
+                            placeholder = { Text("John") },
+                            singleLine = true,
+                            textStyle = TextStyle(color = Color.DarkGray),
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = Color(0xFFF2F3F3),
+                                unfocusedContainerColor = Color(0xFFF2F3F3),
+                                focusedBorderColor = Color(0x33080E1E),
+                                unfocusedBorderColor = Color.Transparent
+                            )
+                        )
+                    }
+
+                    //Last Name
+                    Column(
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Last Name",
+                            fontSize = 15.sp,
+                            color = Color(0xFF363B44)
+                        )
+
+                        OutlinedTextField(
+                            value = lastName,
+                            onValueChange = { lastName = it },
+                            placeholder = { Text("Doe") },
+                            singleLine = true,
+                            textStyle = TextStyle(color = Color.DarkGray),
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = Color(0xFFF2F3F3),
+                                unfocusedContainerColor = Color(0xFFF2F3F3),
+                                focusedBorderColor = Color(0x33080E1E),
+                                unfocusedBorderColor = Color.Transparent
+                            )
+                        )
+                    }
+
+                    //Buttons
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        //Cancel
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp)
+                                .clip(RoundedCornerShape(30.dp))
+                                .background(Color(0xFFF0eDff))
+                                .neumorphic(
+                                    neuShape = Pressed.Rounded(radius = 4.dp),
+                                    lightShadowColor = Color.White,
+                                    darkShadowColor = Color(0xFFCACCD1).copy(alpha = 0.5f),
+                                    strokeWidth = 4.dp,
+                                    elevation = 4.dp
+                                )
+                                .clickable { showEditProfileSheet = false }
+                        ) {
+                            Text(
+                                text ="Cancel",
+                                color = Color(0xFF5b7bfe),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.W500
+                            )
+                        }
+
+                        //Save
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp)
+                                .clip(RoundedCornerShape(30.dp))
+                                .background(Color(0xFF5b7bfe))
+                                .clickable {
+                                    scope.launch{
+                                        userViewModel.updateUserName(firstName, lastName)
+                                        !showEditProfileSheet
+                                    }
+                                }
+                        ) {
+                            Text(
+                                text ="Save",
                                 color = Color.White,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.W500

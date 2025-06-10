@@ -23,8 +23,8 @@ fun getLesson6Content(): List<LessonScreenContent> {
             subText = "Example sentence:",
             options = listOf(
                 "Are you coming?" to "lessons/lesson6/are_you_coming.mp3",
-                "Did she call you?" to "lessons/lesson6/did_she_call_you",
-                "Are you ready?" to "lessons/lesson6/are_you_ready",
+                "Did she call you?" to "lessons/lesson6/did_she_call_you.mp3",
+                "Are you ready?" to "lessons/lesson6/are_you_ready.mp3",
             ),
         ),
 
@@ -35,8 +35,8 @@ fun getLesson6Content(): List<LessonScreenContent> {
             subText = "Example sentence:",
             options = listOf(
                 "I am going home" to "lessons/lesson6/i_am_going_home.mp3",
-                "I finished my work" to "lessons/lesson6/i_finished_my_work",
-                "She was really happy" to "lessons/lesson6/she_was_really_happy",
+                "I finished my work" to "lessons/lesson6/i_finished_my_work.mp3",
+                "She was really happy" to "lessons/lesson6/she_was_really_happy.mp3",
             ),
         ),
 
@@ -47,7 +47,7 @@ fun getLesson6Content(): List<LessonScreenContent> {
             subText = "Example sentence:",
             options = listOf(
                 "Well, I think so" to "lessons/lesson6/well_i_think_so.mp3",
-                "Do you want pizza or pasta?" to "lessons/lesson6/do_you_want_pizza_or_pasta",
+                "Do you want pizza or pasta?" to "lessons/lesson6/do_you_want_pizza.mp3",
             ),
         )
     )

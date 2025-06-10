@@ -18,4 +18,10 @@ interface AuthRepository {
     suspend fun getAssessmentStats(token: String): Result<List<AssessmentStatsItem>>
 
     suspend fun updateHighestScore(token: String, lesson: String, score: Int): Result<Unit>
+
+    suspend fun updateUserName(token: String, firstName: String, lastName: String): Result<Unit>
+
+    suspend fun deleteAccount(token: String): Result<Unit>
+
+    suspend fun changePassword(token: String, oldPassword: String, newPassword: String): Result<Unit>
 }

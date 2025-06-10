@@ -32,6 +32,16 @@ class UserViewModel @Inject constructor(
     private val _isUserCheckComplete = MutableStateFlow(false)
     val isUserCheckComplete = _isUserCheckComplete.asStateFlow()
 
+    // NEW STATEFLOWS
+    private val _userUpdateResult = MutableStateFlow<Result<Unit>?>(null)
+    val userUpdateResult = _userUpdateResult.asStateFlow()
+
+    private val _accountDeleteResult = MutableStateFlow<Result<Unit>?>(null)
+    val accountDeleteResult = _accountDeleteResult.asStateFlow()
+
+    private val _passwordChangeResult = MutableStateFlow<Result<Unit>?>(null)
+    val passwordChangeResult = _passwordChangeResult.asStateFlow()
+
     private fun markUserCheckComplete() {
         _isUserCheckComplete.value = true
     }
@@ -57,7 +67,6 @@ class UserViewModel @Inject constructor(
                 return@launch
             }
 
-            // Check local cache
             val cachedUser = dataStoreManager.getCachedUser.firstOrNull()
             if (!forceRefresh && cachedUser != null) {
                 _user.value = cachedUser
@@ -65,7 +74,6 @@ class UserViewModel @Inject constructor(
                 return@launch
             }
 
-            // Use passed token if available; fallback to data store
             val authToken = token ?: dataStoreManager.getToken.firstOrNull()
             if (authToken.isNullOrEmpty()) {
                 markUserCheckComplete()
@@ -77,7 +85,7 @@ class UserViewModel @Inject constructor(
                 if (response.isSuccessful && response.body()?.data != null) {
                     val userData = response.body()!!.data
                     _user.value = userData
-                    dataStoreManager.saveUser(userData) // Save to local cache
+                    dataStoreManager.saveUser(userData)
                     _tokenExpired.value = false
                 } else {
                     val errorBodyString = response.errorBody()?.string()
@@ -101,7 +109,6 @@ class UserViewModel @Inject constructor(
         }
     }
 
-
     fun logout(onLogoutComplete: () -> Unit) {
         viewModelScope.launch {
             try {
@@ -115,6 +122,56 @@ class UserViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e("UserViewModel", "Logout failed: ${e.message}", e)
             }
+        }
+    }
+
+    // Update user name
+    fun updateUserName(firstName: String, lastName: String) {
+        viewModelScope.launch {
+            val token = dataStoreManager.getToken.firstOrNull()
+            if (token.isNullOrEmpty()) {
+                _userUpdateResult.value = Result.failure(Exception("Token not found"))
+                return@launch
+            }
+
+            val result = authUseCase.updateUserName(token, firstName, lastName)
+            _userUpdateResult.value = result
+
+            if (result.isSuccess) {
+                fetchUser(forceRefresh = true)
+            }
+        }
+    }
+
+    // Delete account
+    fun deleteUserAccount(onDeleted: () -> Unit) {
+        viewModelScope.launch {
+            val token = dataStoreManager.getToken.firstOrNull()
+            if (token.isNullOrEmpty()) {
+                _accountDeleteResult.value = Result.failure(Exception("Token not found"))
+                return@launch
+            }
+
+            val result = authUseCase.deleteAccount(token)
+            _accountDeleteResult.value = result
+
+            if (result.isSuccess) {
+                logout(onDeleted)
+            }
+        }
+    }
+
+    // Change password
+    fun changeUserPassword(oldPassword: String, newPassword: String) {
+        viewModelScope.launch {
+            val token = dataStoreManager.getToken.firstOrNull()
+            if (token.isNullOrEmpty()) {
+                _passwordChangeResult.value = Result.failure(Exception("Token not found"))
+                return@launch
+            }
+
+            val result = authUseCase.changePassword(token, oldPassword, newPassword)
+            _passwordChangeResult.value = result
         }
     }
 }

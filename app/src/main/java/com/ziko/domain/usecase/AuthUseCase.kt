@@ -32,4 +32,16 @@ class AuthUseCase(private val authRepository: AuthRepository) {
     suspend fun updateHighestScore(token: String, lesson: String, score: Int): Result<Unit> {
         return authRepository.updateHighestScore(token, lesson, score)
     }
+
+    suspend fun updateUserName(token: String, firstName: String, lastName: String): Result<Unit> {
+        return authRepository.updateUserName(token, firstName, lastName)
+    }
+
+    suspend fun deleteAccount(token: String): Result<Unit> {
+        return authRepository.deleteAccount(token)
+    }
+
+    suspend fun changePassword(token: String, oldPassword: String, newPassword: String): Result<Unit> {
+        return authRepository.changePassword(token, oldPassword, newPassword)
+    }
 }

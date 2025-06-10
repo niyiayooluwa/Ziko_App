@@ -2,10 +2,12 @@ package com.ziko.data.repository
 
 import android.util.Log
 import com.ziko.data.model.AssessmentStatsItem
+import com.ziko.data.remote.ChangePasswordRequest
 import com.ziko.data.remote.LoginResponse
 import com.ziko.data.remote.ProfileResponse
 import com.ziko.data.remote.ScoreUpdateRequest
 import com.ziko.data.remote.SignUpResponse
+import com.ziko.data.remote.UpdateUserNameRequest
 import com.ziko.domain.repository.AuthRepository
 import com.ziko.network.ApiService
 import com.ziko.network.LoginRequest
@@ -82,4 +84,46 @@ class AuthRepositoryImpl(private val apiService: ApiService) : AuthRepository {
         }
     }
 
+    override suspend fun updateUserName(token: String, firstName: String, lastName: String): Result<Unit> {
+        return try {
+            val response = apiService.updateUserName("Bearer $token", UpdateUserNameRequest(firstName, lastName))
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                val error = response.errorBody()?.string() ?: "Unknown error"
+                Result.failure(Exception("Update Name Failed: ${response.code()} - $error"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteAccount(token: String): Result<Unit> {
+        return try {
+            val response = apiService.deleteAccount("Bearer $token")
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                val error = response.errorBody()?.string() ?: "Unknown error"
+                Result.failure(Exception("Account Deletion Failed: ${response.code()} - $error"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun changePassword(token: String, oldPassword: String, newPassword: String): Result<Unit> {
+        return try {
+            val request = ChangePasswordRequest(oldPassword, newPassword)
+            val response = apiService.changePassword("Bearer $token", request)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                val error = response.errorBody()?.string() ?: "Unknown error"
+                Result.failure(Exception("Password Change Failed: ${response.code()} - $error"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
