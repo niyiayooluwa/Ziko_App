@@ -1,5 +1,6 @@
 package com.ziko.presentation.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,11 +26,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import coil.compose.rememberAsyncImagePainter
 import com.ziko.data.model.LessonCard
 import com.ziko.navigation.Screen
 import com.ziko.presentation.components.FloatingNavBar
@@ -41,6 +44,7 @@ fun LessonScreen(
     userViewModel: UserViewModel
 ) {
     val user by userViewModel.user.collectAsState()
+    val profilePicUri by userViewModel.profilePicUri.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -85,11 +89,24 @@ fun LessonScreen(
                             .background(Color.White.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = user?.first_name?.first().toString(),
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
+                        if (profilePicUri != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(model = profilePicUri),
+                                contentDescription = null,
+                                contentScale = (ContentScale.Crop),
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                            )
+                        }
+                        else {
+                            Text(
+                                text = user?.first_name?.first().toString(),
+                                fontSize = 13.sp,
+                                color = Color(0xFF5b7bfe),
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
 
                     Text(

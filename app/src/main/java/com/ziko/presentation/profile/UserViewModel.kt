@@ -8,6 +8,7 @@ import com.ziko.domain.usecase.AuthUseCase
 import com.ziko.util.DataStoreManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -25,6 +26,9 @@ class UserViewModel @Inject constructor(
 
     private val _userError = MutableStateFlow<String?>(null)
     val userError = _userError.asStateFlow()
+
+    private val _profilePicUri = MutableStateFlow<String?>(null)
+    val profilePicUri: StateFlow<String?> = _profilePicUri
 
     private val _tokenExpired = MutableStateFlow(false)
     val tokenExpired = _tokenExpired.asStateFlow()
@@ -51,6 +55,7 @@ class UserViewModel @Inject constructor(
             val token = dataStoreManager.getToken.firstOrNull()
             if (!token.isNullOrEmpty()) {
                 fetchUser(forceRefresh = false)
+                _profilePicUri.value = dataStoreManager.getProfilePicUri()
             } else {
                 markUserCheckComplete()
             }
@@ -106,6 +111,13 @@ class UserViewModel @Inject constructor(
             } finally {
                 markUserCheckComplete()
             }
+        }
+    }
+
+    fun updateProfilePic(uri: String) {
+        viewModelScope.launch {
+            dataStoreManager.saveProfilePicUri(uri)
+            _profilePicUri.value = uri
         }
     }
 

@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import coil.compose.rememberAsyncImagePainter
 import com.ziko.R
 import com.ziko.navigation.Screen
 import com.ziko.presentation.assessment.AssessmentStatsViewModel
@@ -56,9 +58,10 @@ fun AssessmentScreen(
 ) {
 
     val assessmentStatsViewModel: AssessmentStatsViewModel = hiltViewModel()
-
     val assessmentStats by assessmentStatsViewModel.assessmentStats.collectAsState()
+
     val user by userViewModel.user.collectAsState()
+    val profilePicUri by userViewModel.profilePicUri.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -85,19 +88,32 @@ fun AssessmentScreen(
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, top = 48.dp, bottom = 16.dp)
                 ) {
-                    Box(
+                    Box (
                         modifier = Modifier
+                            .clickable{navController.navigate(Screen.Profile.route)}
                             .size(48.dp)
                             .clip(CircleShape)
-                            .clickable {navController.navigate(Screen.Profile.route)}
-                            .background(Color.White.copy(alpha = 0.2f)),
-                        contentAlignment = Alignment.Center
+                            .background(Color(0xFF5b7bfe).copy(alpha = 0.2f))
+                            //.border(1.dp, Color(0xFF5b7bfe), CircleShape)
                     ) {
-                        Text(
-                            text = user?.first_name?.first().toString(),
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
+                        if (profilePicUri != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(model = profilePicUri),
+                                contentDescription = null,
+                                contentScale = (ContentScale.Crop),
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                            )
+                        }
+                        else {
+                            Text(
+                                text = user?.first_name?.first().toString(),
+                                fontSize = 13.sp,
+                                color = Color(0xFF5b7bfe),
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
 
                     Text("Assessment", fontSize = 24.sp, fontWeight = FontWeight.W600, color = Color.White)

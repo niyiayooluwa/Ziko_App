@@ -33,6 +33,7 @@ import com.ziko.presentation.components.ProgressTopAppBar
 import com.ziko.presentation.components.Size
 import com.ziko.presentation.components.SpeechButton
 import com.ziko.presentation.components.SuccessIndicator
+import com.ziko.presentation.components.rememberSpeechButtonController
 import com.ziko.ui.model.PracticeScreenContent
 import com.ziko.util.AudioManager
 import com.ziko.util.normalizeText
@@ -60,6 +61,7 @@ fun PracticeContent(
     val attemptCount = remember { mutableIntStateOf(0) } // Track number of attempts
     val maxAttempts = 3 // Maximum attempts before allowing skip
     var permissionDenied by remember { mutableStateOf(false) }
+    val speechButtonController = rememberSpeechButtonController()
 
     // AudioManager lifecycle management
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -77,6 +79,7 @@ fun PracticeContent(
         speechCondition.value = null
         hasRecordedSpeech.value = false
         attemptCount.intValue = 0
+        speechButtonController.enable()
     }
 
     Scaffold(
@@ -173,13 +176,15 @@ fun PracticeContent(
                         onSpeechResult = { result ->
                             Log.d("PracticeContent", "Speech result received: $result")
                             spokenText.value = result ?: ""
-                            hasRecordedSpeech.value = !result.isNullOrBlank() // Mark as recorded if we got text
+                            hasRecordedSpeech.value =
+                                !result.isNullOrBlank() // Mark as recorded if we got text
                             speechCondition.value = null // Reset evaluation state
                         },
                         onPermissionDenied = {
                             Log.d("PracticeContent", "Permission denied")
                             permissionDenied = true
-                        }
+                        },
+                        controller = speechButtonController
                     )
 
                     Spacer(modifier = Modifier.height(11.dp))
@@ -222,20 +227,23 @@ fun PracticeContent(
                                 attemptCount.intValue += 1
                                 Log.d("PracticeContent", "Speech evaluation result: $isCorrect, Attempt: ${attemptCount.intValue}")
                                 speechCondition.value = isCorrect
+
+                                if (isCorrect) {
+                                    speechButtonController.disable() // ✅ Disable if correct
+                                }
                             }
                         }
                         true -> {
-                            // Correct answer - continue to next screen
                             Log.d("PracticeContent", "Continuing to next screen")
+                            speechButtonController.disable() // ✅ Disable if already correct
                             onContinue()
                         }
                         false -> {
                             if (attemptCount.intValue >= maxAttempts) {
-                                // Max attempts reached - allow skip to next screen
                                 Log.d("PracticeContent", "Max attempts reached, skipping to next screen")
+                                speechButtonController.disable() // ✅ Disable after skip
                                 onContinue()
                             } else {
-                                // Incorrect - reset for retry
                                 Log.d("PracticeContent", "Resetting for retry")
                                 spokenText.value = ""
                                 speechCondition.value = null
@@ -244,6 +252,7 @@ fun PracticeContent(
                         }
                     }
                 }
+
             )
         }
     }

@@ -63,6 +63,8 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.accompanist.placeholder.material)
 
+    //Coil
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     // Hilt
     implementation(libs.hilt.android)

@@ -1,7 +1,14 @@
 package com.ziko.presentation.profile
 
+import android.content.ContentValues
+import android.content.Context
+import android.net.Uri
+import android.provider.MediaStore
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -48,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -55,6 +63,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.ziko.R
 import com.ziko.navigation.Screen
 import kotlinx.coroutines.launch
@@ -76,6 +85,39 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    val profilePicUri by userViewModel.profilePicUri.collectAsState()
+    var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Camera image result
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && tempCameraUri != null) {
+            userViewModel.updateProfilePic(tempCameraUri.toString())
+        }
+    }
+
+    // Gallery image result
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            userViewModel.updateProfilePic(it.toString())
+        }
+    }
+
+    // Request camera permission
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            tempCameraUri = createImageUri(context)
+            tempCameraUri?.let { cameraLauncher.launch(it) }
+        } else {
+            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     LaunchedEffect(updateResult) {
         updateResult?.let {
@@ -134,11 +176,24 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         .background(Color(0xFF5b7bfe).copy(alpha = 0.2f))
                         .border(1.dp, Color(0xFF5b7bfe), CircleShape)
                 ) {
-                    Text(
-                        text = user?.first_name?.first().toString(),
-                        fontSize = 13.sp,
-                        color = Color(0xFF5b7bfe)
-                    )
+                    if (profilePicUri != null) {
+                        Image(
+                            painter = rememberAsyncImagePainter(model = profilePicUri),
+                            contentDescription = null,
+                            contentScale = (ContentScale.Crop),
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(CircleShape)
+                        )
+                    }
+                    else {
+                        Text(
+                            text = user?.first_name?.first().toString(),
+                            fontSize = 13.sp,
+                            color = Color(0xFF5b7bfe),
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
                 }
                 
                 Spacer (modifier = Modifier.height(16.dp))
@@ -379,21 +434,26 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                             .clip(CircleShape)
                             .background(Color(0xFF5b7bfe).copy(alpha = 0.2f))
                             .border(1.dp, Color(0xFF5b7bfe), CircleShape)
+                            .clickable{ galleryLauncher.launch("image/*") }
                     ) {
-                        Text(
-                            text = user?.first_name?.first().toString(),
-                            fontSize = 13.sp,
-                            color = Color(0xFF5b7bfe),
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-
-                        Icon(
-                            Icons.Outlined.AddPhotoAlternate,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .size(16.dp)
-                        )
+                        if (profilePicUri != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(model = profilePicUri),
+                                contentDescription = null,
+                                contentScale = (ContentScale.Crop),
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                            )
+                        }
+                        else {
+                            Text(
+                                text = user?.first_name?.first().toString(),
+                                fontSize = 13.sp,
+                                color = Color(0xFF5b7bfe),
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
 
                     //First Name
@@ -514,4 +574,19 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
             }
         }
     }
+}
+
+
+
+
+fun createImageUri(context: Context): Uri? {
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, "profile_${System.currentTimeMillis()}.jpg")
+        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+    }
+
+    return context.contentResolver.insert(
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        contentValues
+    )
 }

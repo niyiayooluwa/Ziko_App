@@ -38,6 +38,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,32 +55,9 @@ import com.ziko.util.SpeechManager
 val color = Color(0xFF5b7bfe)
 
 @Composable
-fun BarShape(rms: Float, index: Int) {
-    // Calculate height with bounds checking
-    val baseHeight = 2f
-    val maxHeight = 10f
-    val variation = (index % 4) * 2f
-    val targetHeightFloat = (rms + variation).coerceIn(baseHeight, maxHeight)
-    val targetHeight = (targetHeightFloat * 10).dp
-
-    val animatedHeight by animateDpAsState(
-        targetValue = targetHeight,
-        animationSpec = tween(durationMillis = 150),
-        label = "rmsBar"
-    )
-
-    Box(
-        modifier = Modifier
-            .width(7.dp)
-            .height(animatedHeight)
-            .clip(RoundedCornerShape(50))
-            .background(color)
-    )
-}
-
-@Composable
 fun SpeechButton(
     modifier: Modifier = Modifier,
+    controller: SpeechButtonController,
     onSpeechResult: (String?) -> Unit,
     onPermissionDenied: () -> Unit
 ) {
@@ -111,7 +89,6 @@ fun SpeechButton(
                 Manifest.permission.RECORD_AUDIO
             )
             if (!shouldShowRationale) {
-                // User checked "Don't ask again"
                 showSettingsPrompt.value = true
             } else {
                 onPermissionDenied()
@@ -119,14 +96,12 @@ fun SpeechButton(
         }
     }
 
-    // Initial check
     LaunchedEffect(Unit) {
         if (!permissionGranted.value) {
             permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         }
     }
 
-    // Initialize speech manager when permission is granted
     LaunchedEffect(permissionGranted.value) {
         if (permissionGranted.value && speechManager.value == null) {
             try {
@@ -149,7 +124,6 @@ fun SpeechButton(
         }
     }
 
-    // Cleanup
     DisposableEffect(Unit) {
         onDispose {
             try {
@@ -157,7 +131,6 @@ fun SpeechButton(
             } catch (_: Exception) {}
         }
     }
-
 
     val color = Color(0xFF5b7bfe)
 
@@ -168,7 +141,8 @@ fun SpeechButton(
                 .height(76.dp)
                 .border(1.dp, color, RoundedCornerShape(12.dp))
                 .clickable(
-                    enabled = permissionGranted.value &&
+                    enabled = controller.isEnabled &&
+                            permissionGranted.value &&
                             !isListening.value &&
                             initializationError.value == null
                 ) {
@@ -222,9 +196,12 @@ fun SpeechButton(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (permissionGranted.value) "Tap to Talk"
-                            else if (showSettingsPrompt.value) "Open Settings"
-                            else "Permission Required",
+                            text = when {
+                                !controller.isEnabled -> "Speech Disabled"
+                                permissionGranted.value -> "Tap to Talk"
+                                showSettingsPrompt.value -> "Open Settings"
+                                else -> "Permission Required"
+                            },
                             color = color,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.W500
@@ -248,4 +225,222 @@ fun SpeechButton(
             }
         }
     }
+}
+
+@Composable
+fun BarShape(rms: Float, index: Int) {
+    // Calculate height with bounds checking
+    val baseHeight = 2f
+    val maxHeight = 10f
+    val variation = (index % 4) * 2f
+    val targetHeightFloat = (rms + variation).coerceIn(baseHeight, maxHeight)
+    val targetHeight = (targetHeightFloat * 10).dp
+
+    val animatedHeight by animateDpAsState(
+        targetValue = targetHeight,
+        animationSpec = tween(durationMillis = 150),
+        label = "rmsBar"
+    )
+
+    Box(
+        modifier = Modifier
+            .width(7.dp)
+            .height(animatedHeight)
+            .clip(RoundedCornerShape(50))
+            .background(color)
+    )
+}
+
+/*{
+    @Composable
+    fun SpeechButton(
+        modifier: Modifier = Modifier,
+        onSpeechResult: (String?) -> Unit,
+        onPermissionDenied: () -> Unit
+    ) {
+        val context = LocalContext.current
+        val activity = context as? Activity
+
+        val isListening = remember { mutableStateOf(false) }
+        val rmsValue = remember { mutableFloatStateOf(0f) }
+        val speechManager = remember { mutableStateOf<SpeechManager?>(null) }
+        val initializationError = remember { mutableStateOf<String?>(null) }
+        val showSettingsPrompt = remember { mutableStateOf(false) }
+
+        val permissionGranted = remember {
+            mutableStateOf(
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.RECORD_AUDIO
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        }
+
+        val permissionLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { granted ->
+            permissionGranted.value = granted
+            if (!granted) {
+                val shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
+                    activity ?: return@rememberLauncherForActivityResult,
+                    Manifest.permission.RECORD_AUDIO
+                )
+                if (!shouldShowRationale) {
+                    // User checked "Don't ask again"
+                    showSettingsPrompt.value = true
+                } else {
+                    onPermissionDenied()
+                }
+            }
+        }
+
+        // Initial check
+        LaunchedEffect(Unit) {
+            if (!permissionGranted.value) {
+                permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            }
+        }
+
+        // Initialize speech manager when permission is granted
+        LaunchedEffect(permissionGranted.value) {
+            if (permissionGranted.value && speechManager.value == null) {
+                try {
+                    speechManager.value = SpeechManager(
+                        context = context,
+                        onRmsChangedCallback = { rms ->
+                            rmsValue.floatValue = rms
+                        },
+                        onResultCallback = { result ->
+                            isListening.value = false
+                            onSpeechResult(result)
+                        },
+                        onListeningStateChangedCallback = { state ->
+                            isListening.value = state
+                        }
+                    )
+                } catch (e: Exception) {
+                    initializationError.value = e.message
+                }
+            }
+        }
+
+        // Cleanup
+        DisposableEffect(Unit) {
+            onDispose {
+                try {
+                    speechManager.value?.destroy()
+                } catch (_: Exception) {
+                }
+            }
+        }
+
+
+        val color = Color(0xFF5b7bfe)
+
+        Column(modifier = modifier) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(76.dp)
+                    .border(1.dp, color, RoundedCornerShape(12.dp))
+                    .clickable(
+                        enabled = permissionGranted.value &&
+                                !isListening.value &&
+                                initializationError.value == null
+                    ) {
+                        try {
+                            speechManager.value?.startListening()
+                        } catch (e: Exception) {
+                            initializationError.value = e.message
+                        }
+                    }
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                when {
+                    initializationError.value != null -> {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Mic,
+                                contentDescription = "Mic",
+                                tint = Color.Red,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Microphone Error",
+                                color = Color.Red,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.W500
+                            )
+                        }
+                    }
+
+                    isListening.value -> {
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            repeat(21) { index ->
+                                BarShape(rms = rmsValue.floatValue, index = index)
+                            }
+                        }
+                    }
+
+                    else -> {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Mic,
+                                contentDescription = "Mic",
+                                tint = color,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = if (permissionGranted.value) "Tap to Talk"
+                                else if (showSettingsPrompt.value) "Open Settings"
+                                else "Permission Required",
+                                color = color,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.W500
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (showSettingsPrompt.value) {
+                Spacer(modifier = Modifier.height(8.dp))
+                TextButton(
+                    onClick = {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    }
+                ) {
+                    Text("Open App Settings", color = color)
+                }
+            }
+        }
+    }
+}*/
+
+class SpeechButtonController {
+    var isEnabled by mutableStateOf(true)
+        private set
+
+    fun disable() {
+        isEnabled = false
+    }
+
+    fun enable() {
+        isEnabled = true
+    }
+}
+
+@Composable
+fun rememberSpeechButtonController(): SpeechButtonController {
+    return remember { SpeechButtonController() }
 }

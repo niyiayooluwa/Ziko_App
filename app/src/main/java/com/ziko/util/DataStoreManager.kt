@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import com.ziko.data.remote.UserData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -15,6 +16,7 @@ class DataStoreManager @Inject constructor(
 ) {
     private val TOKEN_KEY = stringPreferencesKey("token")
     private val dataStore = context.dataStore  // uses the top-level singleton
+    private val PROFILE_PIC_URI = stringPreferencesKey("profile_pic_uri")
 
     suspend fun saveToken(token: String) {
         dataStore.edit { prefs ->
@@ -25,6 +27,17 @@ class DataStoreManager @Inject constructor(
     val getToken: Flow<String?> = dataStore.data.map { prefs ->
         prefs[TOKEN_KEY]
     }
+
+    suspend fun saveProfilePicUri(uri: String) {
+        context.dataStore.edit { prefs ->
+            prefs[PROFILE_PIC_URI] = uri
+        }
+    }
+
+    suspend fun getProfilePicUri(): String? {
+        return context.dataStore.data.first()[PROFILE_PIC_URI]
+    }
+
 
     suspend fun clearToken() {
         dataStore.edit { prefs ->

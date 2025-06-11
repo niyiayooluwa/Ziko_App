@@ -48,6 +48,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.ziko.presentation.components.ProgressTopAppBar
 import com.ziko.presentation.components.SpeechButton
 import com.ziko.presentation.components.SuccessIndicator
+import com.ziko.presentation.components.rememberSpeechButtonController
 import com.ziko.ui.model.AssessmentScreenContent
 import com.ziko.util.AudioManager
 import com.ziko.util.normalizeText
@@ -112,6 +113,7 @@ fun SpeakAssessmentUI(
     val expectedText = content.expectedText
     val context = LocalContext.current
     var isPlaying by remember { mutableStateOf(false) }
+    val speechButtonController = rememberSpeechButtonController()
 
     // Speech recognition state
     val spokenText = remember { mutableStateOf("") }
@@ -136,6 +138,7 @@ fun SpeakAssessmentUI(
         speechCondition.value = null
         hasRecordedSpeech.value = false
         attemptCount.intValue = 0
+        speechButtonController.enable()
     }
 
     Column(
@@ -262,7 +265,8 @@ fun SpeakAssessmentUI(
                     },
                     onPermissionDenied = {
                         permissionDenied = true
-                    }
+                    },
+                    controller = speechButtonController
                 )
             }
 
@@ -277,7 +281,6 @@ fun SpeakAssessmentUI(
                 onClick = {
                     when (speechCondition.value) {
                         null -> {
-                            // Only evaluate if user has recorded speech
                             if (hasRecordedSpeech.value) {
                                 val normalizedSpoken = normalizeText(spokenText.value)
                                 val normalizedExpected = normalizeText(expectedText)
@@ -285,22 +288,25 @@ fun SpeakAssessmentUI(
 
                                 attemptCount.intValue += 1
                                 speechCondition.value = isCorrect
+
+                                speechButtonController.disable() // ✅ Disable right after evaluating
                             }
                         }
 
                         true -> {
-                            // Correct answer - report result and continue
+                            speechButtonController.disable() // ✅ Already correct, disable just in case
                             onResult(true)
                             onContinue()
                         }
 
                         false -> {
-                            // Incorrect answer - report result and continue
+                            speechButtonController.disable() // ✅ Wrong, but still done — disable
                             onResult(false)
                             onContinue()
                         }
                     }
                 }
+
             )
         }
     }
