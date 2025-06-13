@@ -176,9 +176,12 @@ fun PracticeContent(
                         onSpeechResult = { result ->
                             Log.d("PracticeContent", "Speech result received: $result")
                             spokenText.value = result ?: ""
-                            hasRecordedSpeech.value =
-                                !result.isNullOrBlank() // Mark as recorded if we got text
+                            hasRecordedSpeech.value = !result.isNullOrBlank() // Mark as recorded if we got text
                             speechCondition.value = null // Reset evaluation state
+
+                            if (!result.isNullOrBlank()) {
+                                speechButtonController.setCompleted()
+                            }
                         },
                         onPermissionDenied = {
                             Log.d("PracticeContent", "Permission denied")
@@ -227,27 +230,22 @@ fun PracticeContent(
                                 attemptCount.intValue += 1
                                 Log.d("PracticeContent", "Speech evaluation result: $isCorrect, Attempt: ${attemptCount.intValue}")
                                 speechCondition.value = isCorrect
-
-                                if (isCorrect) {
-                                    speechButtonController.disable() // ✅ Disable if correct
-                                }
                             }
                         }
                         true -> {
                             Log.d("PracticeContent", "Continuing to next screen")
-                            speechButtonController.disable() // ✅ Disable if already correct
                             onContinue()
                         }
                         false -> {
                             if (attemptCount.intValue >= maxAttempts) {
                                 Log.d("PracticeContent", "Max attempts reached, skipping to next screen")
-                                speechButtonController.disable() // ✅ Disable after skip
                                 onContinue()
                             } else {
                                 Log.d("PracticeContent", "Resetting for retry")
                                 spokenText.value = ""
                                 speechCondition.value = null
                                 hasRecordedSpeech.value = false
+                                speechButtonController.enable()
                             }
                         }
                     }

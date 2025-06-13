@@ -180,7 +180,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         Image(
                             painter = rememberAsyncImagePainter(model = profilePicUri),
                             contentDescription = null,
-                            contentScale = (ContentScale.Crop),
+                            contentScale = (ContentScale.Fit),
                             modifier = Modifier
                                 .size(80.dp)
                                 .clip(CircleShape)

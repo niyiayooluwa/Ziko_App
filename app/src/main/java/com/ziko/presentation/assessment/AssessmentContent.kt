@@ -262,6 +262,11 @@ fun SpeakAssessmentUI(
                         spokenText.value = result ?: ""
                         hasRecordedSpeech.value = !result.isNullOrBlank()
                         speechCondition.value = null // Reset evaluation state
+
+                        // ✅ Show static waveform immediately after recording
+                        if (!result.isNullOrBlank()) {
+                            speechButtonController.setCompleted()
+                        }
                     },
                     onPermissionDenied = {
                         permissionDenied = true
@@ -289,24 +294,21 @@ fun SpeakAssessmentUI(
                                 attemptCount.intValue += 1
                                 speechCondition.value = isCorrect
 
-                                speechButtonController.disable() // ✅ Disable right after evaluating
+                                // Button stays in completed state regardless of correctness
                             }
                         }
 
                         true -> {
-                            speechButtonController.disable() // ✅ Already correct, disable just in case
                             onResult(true)
                             onContinue()
                         }
 
                         false -> {
-                            speechButtonController.disable() // ✅ Wrong, but still done — disable
                             onResult(false)
                             onContinue()
                         }
                     }
                 }
-
             )
         }
     }

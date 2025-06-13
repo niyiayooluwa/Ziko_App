@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,6 +40,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -86,7 +89,7 @@ fun AssessmentScreen(
                     horizontalAlignment = Alignment.Start,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, top = 48.dp, bottom = 16.dp)
+                        .padding(start = 16.dp, end = 16.dp, top = 36.dp, bottom = 16.dp)
                 ) {
                     Box (
                         modifier = Modifier
@@ -320,7 +323,7 @@ fun SpecialAssessment(
         horizontalAlignment = Alignment.Start,
         modifier = modifier
             .clickable(onClick = onClick)
-            .height(164.dp)
+            .wrapContentHeight()
             .clip(shape = RoundedCornerShape(size = 16.dp))
             .background(backGroundColor)
             .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(size = 16.dp))
@@ -407,6 +410,36 @@ fun SpecialAssessment(
                 modifier = Modifier.size(40.dp).clickable { onClick() },
             )
         }
+    }
+}
+
+@Preview(showSystemUi = true, device = Devices.PIXEL_FOLD)
+@Composable
+fun Preview () {
+    Row(
+        Modifier.fillMaxWidth().wrapContentHeight()
+    ) {
+        SpecialAssessment(
+            title = "",
+            description = "Preview to see the magic to be rendered on screen",
+            highestScore = 24,
+            accuracy = 24,
+            backGroundColor = Color.LightGray,
+            borderColor = Color.Gray,
+            modifier = Modifier.weight(1f),
+            onClick = {}
+        )
+
+        SpecialAssessment(
+            title = "",
+            description = "Preview to see the magic to be rendered on screen",
+            highestScore = 24,
+            accuracy = 24,
+            backGroundColor = Color.LightGray,
+            borderColor = Color.Gray,
+            modifier = Modifier.weight(1f),
+            onClick = {}
+        )
     }
 }
 
