@@ -40,8 +40,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,15 +49,19 @@ import coil.compose.rememberAsyncImagePainter
 import com.ziko.R
 import com.ziko.navigation.Screen
 import com.ziko.presentation.assessment.AssessmentStatsViewModel
-import com.ziko.presentation.profile.UserViewModel
 import com.ziko.presentation.components.FloatingNavBar
+import com.ziko.presentation.profile.UserViewModel
+import com.ziko.util.UpdateSystemBarsColors
 
 @Composable
 fun AssessmentScreen(
     navController: NavController,
     userViewModel: UserViewModel
 ) {
-
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color.White
+    )
     val assessmentStatsViewModel: AssessmentStatsViewModel = hiltViewModel()
     val assessmentStats by assessmentStatsViewModel.assessmentStats.collectAsState()
 
@@ -410,36 +412,6 @@ fun SpecialAssessment(
                 modifier = Modifier.size(40.dp).clickable { onClick() },
             )
         }
-    }
-}
-
-@Preview(showSystemUi = true, device = Devices.PIXEL_FOLD)
-@Composable
-fun Preview () {
-    Row(
-        Modifier.fillMaxWidth().wrapContentHeight()
-    ) {
-        SpecialAssessment(
-            title = "",
-            description = "Preview to see the magic to be rendered on screen",
-            highestScore = 24,
-            accuracy = 24,
-            backGroundColor = Color.LightGray,
-            borderColor = Color.Gray,
-            modifier = Modifier.weight(1f),
-            onClick = {}
-        )
-
-        SpecialAssessment(
-            title = "",
-            description = "Preview to see the magic to be rendered on screen",
-            highestScore = 24,
-            accuracy = 24,
-            backGroundColor = Color.LightGray,
-            borderColor = Color.Gray,
-            modifier = Modifier.weight(1f),
-            onClick = {}
-        )
     }
 }
 

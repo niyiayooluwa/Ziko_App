@@ -44,6 +44,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ziko.util.UpdateSystemBarsColors
 import me.nikhilchaudhari.library.neumorphic
 import me.nikhilchaudhari.library.shapes.Pressed
 
@@ -59,6 +60,11 @@ fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
     var oldPasswordVisible by remember { mutableStateOf(false) }
     var newPasswordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
+
+    UpdateSystemBarsColors(
+        topColor = Color.White,
+        bottomColor = Color.White
+    )
 
     LaunchedEffect(changeResult) {
         changeResult?.let {

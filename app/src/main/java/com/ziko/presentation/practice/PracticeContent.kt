@@ -36,6 +36,7 @@ import com.ziko.presentation.components.SuccessIndicator
 import com.ziko.presentation.components.rememberSpeechButtonController
 import com.ziko.ui.model.PracticeScreenContent
 import com.ziko.util.AudioManager
+import com.ziko.util.UpdateSystemBarsColors
 import com.ziko.util.normalizeText
 
 @Composable
@@ -65,6 +66,18 @@ fun PracticeContent(
 
     // AudioManager lifecycle management
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    val navBarColor = when (speechCondition.value) {
+        true -> Color(0xFF12D18E)
+        false -> Color(0xFFf75555)
+        null -> Color.White // Default
+    }
+
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = navBarColor
+    )
+
 
     LaunchedEffect(Unit) {
         Log.d("AudioManager", "Observer force-added")

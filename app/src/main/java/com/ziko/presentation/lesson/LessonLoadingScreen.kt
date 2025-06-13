@@ -37,6 +37,7 @@ import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.data.model.LessonDataProvider
 import com.ziko.navigation.Screen
+import com.ziko.util.UpdateSystemBarsColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +45,11 @@ fun LessonLoadingScreen(
     navController: NavController,
     lessonId: String,
 ) {
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color.White
+    )
+
     val lesson = remember(lessonId) {
         LessonDataProvider.getLessonInfo(lessonId)
     }

@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ziko.R
 import kotlinx.coroutines.delay
+import com.ziko.util.UpdateSystemBarsColors
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +41,11 @@ fun AssessmentLoadingScreen(
     lessonId: String,
     onProgress: () -> Unit
 ) {
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color.White
+    )
+
     val textPart = lessonId.takeWhile { it.isLetter() }.replaceFirstChar { it.uppercase() }
     val numPart = lessonId.takeLastWhile { it.isDigit() }
     val lessonIdentifier = "$textPart $numPart"

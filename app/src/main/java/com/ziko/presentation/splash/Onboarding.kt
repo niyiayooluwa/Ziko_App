@@ -32,11 +32,17 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.navigation.Screen
+import com.ziko.util.UpdateSystemBarsColors
 
 @Composable
 fun OnboardingScreen (
     navController: NavController
 ) {
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color.White
+    )
+
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize().background(Color.White)
@@ -59,7 +65,7 @@ fun OnboardingScreen (
 
             Image (
                 painter = painterResource(R.drawable.onboarding_image_2),
-                contentDescription = "fore imsage",
+                contentDescription = "fore image",
                 modifier = Modifier
                     .size(240.dp)
                     .align(Alignment.Center)

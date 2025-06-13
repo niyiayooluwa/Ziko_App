@@ -47,6 +47,7 @@ import com.ziko.presentation.auth.login.LoginState
 import com.ziko.presentation.auth.login.LoginViewModel
 import com.ziko.presentation.components.CustomBiggerTopAppBar
 import com.ziko.presentation.profile.UserViewModel
+import com.ziko.util.UpdateSystemBarsColors
 
 @Composable
 fun SignUpScreenTwo(
@@ -81,6 +82,11 @@ fun SignUpScreenTwo(
         }
     }
 
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color.White
+    )
+
     val loginState by loginViewModel.loginState
 
     LaunchedEffect(loginState) {
@@ -95,8 +101,6 @@ fun SignUpScreenTwo(
             else -> Unit
         }
     }
-
-
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

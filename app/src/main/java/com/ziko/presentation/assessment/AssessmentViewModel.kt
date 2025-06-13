@@ -104,7 +104,7 @@ class AssessmentViewModel @Inject constructor(
         return when (lessonId) {
             "lesson1" -> "monophthongs"
             "lesson2" -> "diphthongs"
-            "lesson3" -> "diphthongs"
+            "lesson3" -> "triphthongs"
             "lesson4" -> "voiced-consonants"
             "lesson5" -> "voiceless-consonants"
             "lesson6" -> "intonation"

@@ -1,5 +1,8 @@
 package com.ziko.presentation.assessment
 
+import android.graphics.DashPathEffect
+import android.graphics.Paint
+import android.graphics.RectF
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -51,6 +54,7 @@ import com.ziko.presentation.components.SuccessIndicator
 import com.ziko.presentation.components.rememberSpeechButtonController
 import com.ziko.ui.model.AssessmentScreenContent
 import com.ziko.util.AudioManager
+import com.ziko.util.UpdateSystemBarsColors
 import com.ziko.util.normalizeText
 
 @Composable
@@ -67,6 +71,7 @@ fun AssessmentContent(
     onStart: () -> Unit,
     lessonId: String
 ) {
+
     // Trigger onStart only once on first composition
     LaunchedEffect(Unit) { onStart() }
 
@@ -140,6 +145,17 @@ fun SpeakAssessmentUI(
         attemptCount.intValue = 0
         speechButtonController.enable()
     }
+
+    val navBarColor = when (speechCondition.value) {
+        true -> Color(0xFF12D18E)
+        false -> Color(0xFFf75555)
+        null -> Color.White // Default
+    }
+
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = navBarColor
+    )
 
     Column(
         modifier = Modifier
@@ -326,11 +342,23 @@ fun McqAssessmentUI(
     var selectedOption by remember { mutableStateOf("")}
     val hasAnswered = remember { mutableStateOf(false) }
 
+    val navBarColor = when (isAnswerCorrect.value) {
+        true -> Color(0xFF12D18E)
+        false -> Color(0xFFf75555)
+        null -> Color.White // Default
+    }
+
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = navBarColor
+    )
+
     LaunchedEffect(correctAnswer) {
         isAnswerCorrect.value = null
         hasAnswered.value = false
         selectedOption = ""
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -401,14 +429,20 @@ fun McqAssessmentUI(
                             modifier = Modifier.fillMaxWidth(),
                             text = option,
                             selected = isSelected,
-                            enabled = !hasAnswered.value,
+                            //enabled = !hasAnswered.value,
                             onClick = {
+                                if (isAnswerCorrect.value == null) {
+                                    selectedOption = option
+                                    hasAnswered.value = true
+                                }
+                            }
+                            /*onClick = {
                                 if (!hasAnswered.value) {
                                     selectedOption = option
                                     hasAnswered.value = true
                                     //isAnswerCorrect.value = option == content.correctAnswer
                                 }
-                            }
+                            }*/
                         )
                     }
                 }
@@ -426,6 +460,18 @@ fun McqAssessmentUI(
             attemptCount = 1,
             maxAttempts = 1,
             onClick = {
+                if (isAnswerCorrect.value == null) {
+                    if (selectedOption.isNotBlank()) {
+                        val isCorrect = selectedOption == correctAnswer
+                        isAnswerCorrect.value = isCorrect
+                        hasAnswered.value = true
+                    }
+                } else {
+                    onResult(isAnswerCorrect.value == true)
+                    onContinue()
+                }
+            }
+            /*onClick = {
                 when (isAnswerCorrect.value) {
                     null -> {
                         if (hasAnswered.value) {
@@ -442,7 +488,7 @@ fun McqAssessmentUI(
                         onContinue()
                     }
                 }
-            }
+            }*/
         )
     }
 }
@@ -460,15 +506,15 @@ fun Modifier.dashedRoundedBorder(
         val gapPx = gapLength.toPx()
         val radiusPx = cornerRadius.toPx()
 
-        val paint = android.graphics.Paint().apply {
-            style = android.graphics.Paint.Style.STROKE
+        val paint = Paint().apply {
+            style = Paint.Style.STROKE
             this.color = color.toArgb()
             this.strokeWidth = strokePx
-            pathEffect = android.graphics.DashPathEffect(floatArrayOf(dashPx, gapPx), 0f)
+            pathEffect = DashPathEffect(floatArrayOf(dashPx, gapPx), 0f)
             isAntiAlias = true
         }
 
-        val rect = android.graphics.RectF(
+        val rect = RectF(
             strokePx / 2f,
             strokePx / 2f,
             size.width - strokePx / 2f,

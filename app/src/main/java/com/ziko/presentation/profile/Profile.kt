@@ -66,6 +66,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.ziko.R
 import com.ziko.navigation.Screen
+import com.ziko.util.UpdateSystemBarsColors
 import kotlinx.coroutines.launch
 import me.nikhilchaudhari.library.neumorphic
 import me.nikhilchaudhari.library.shapes.Pressed
@@ -85,6 +86,11 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    UpdateSystemBarsColors(
+        topColor = Color.White,
+        bottomColor = Color.White
+    )
 
     val profilePicUri by userViewModel.profilePicUri.collectAsState()
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }

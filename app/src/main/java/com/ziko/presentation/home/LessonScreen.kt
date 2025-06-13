@@ -37,12 +37,18 @@ import com.ziko.data.model.LessonCard
 import com.ziko.navigation.Screen
 import com.ziko.presentation.components.FloatingNavBar
 import com.ziko.presentation.profile.UserViewModel
+import com.ziko.util.UpdateSystemBarsColors
 
 @Composable
 fun LessonScreen(
     navController: NavController,
     userViewModel: UserViewModel
 ) {
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color.White
+    )
+
     val user by userViewModel.user.collectAsState()
     val profilePicUri by userViewModel.profilePicUri.collectAsState()
 

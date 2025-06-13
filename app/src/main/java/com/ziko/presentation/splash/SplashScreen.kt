@@ -23,6 +23,7 @@ import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.navigation.Screen
 import com.ziko.presentation.profile.UserViewModel
+import com.ziko.util.UpdateSystemBarsColors
 
 // Shows the logo, waits 2 seconds, then moves to the Login screen
 @Composable
@@ -37,6 +38,11 @@ fun SplashScreen(navController: NavController) { // Correct: Only one top-level 
 
     // State to track if the initial splash timer has finished
     var splashTimerFinished by remember { mutableStateOf(false) }
+
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color(0xFF410FA3)
+    )
 
     // Step 1: Start the initial splash screen timer
     LaunchedEffect(Unit) {

@@ -27,6 +27,7 @@ import com.ziko.ui.model.LessonScreenContent
 import com.ziko.presentation.components.AudioButtonWithLabel
 import com.ziko.presentation.components.Size
 import com.ziko.util.AudioManager
+import com.ziko.util.UpdateSystemBarsColors
 
 @Composable
 fun LessonContent(
@@ -39,6 +40,11 @@ fun LessonContent(
     onNavigateBack: () -> Unit,
     isFirstScreen: Boolean,
 ) {
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color.White
+    )
+
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(lifecycleOwner) {

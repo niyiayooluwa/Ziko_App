@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ziko.navigation.Screen
 import com.ziko.presentation.components.CustomBiggerTopAppBar
+import com.ziko.util.UpdateSystemBarsColors
 
 @Composable
 fun SignUpScreenOne(
@@ -43,6 +44,11 @@ fun SignUpScreenOne(
     var email by remember { mutableStateOf("") }
     val emailError = viewModel.emailError.value
     val scrollState = rememberScrollState()
+
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color.White
+    )
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

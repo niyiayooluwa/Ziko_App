@@ -1,6 +1,5 @@
 package com.ziko.presentation.auth.login
 
-import com.ziko.presentation.components.LineUI
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,8 +30,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,8 +46,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.navigation.Screen
-import com.ziko.presentation.profile.UserViewModel
 import com.ziko.presentation.components.CustomBiggerTopAppBar
+import com.ziko.presentation.components.LineUI
+import com.ziko.presentation.profile.UserViewModel
+import com.ziko.util.UpdateSystemBarsColors
 
 @Composable
 fun LoginScreen(navController: NavController, userViewModel: UserViewModel) {
@@ -59,7 +58,10 @@ fun LoginScreen(navController: NavController, userViewModel: UserViewModel) {
     val loginState = loginViewModel.loginState.value
     val scrollState = rememberScrollState()
 
-    val context = LocalContext.current
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color.White
+    )
 
     LaunchedEffect(loginState) {
         val token = (loginState as? LoginState.Success)?.data

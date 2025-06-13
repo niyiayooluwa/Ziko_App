@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ziko.R
+import com.ziko.util.UpdateSystemBarsColors
 import me.nikhilchaudhari.library.neumorphic
 import me.nikhilchaudhari.library.shapes.Pressed
 
@@ -44,6 +45,11 @@ fun LessonCompletionScreen(
     onBackToHome: () -> Unit,
     lessonId: String
 ) {
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color.White
+    )
+
     Scaffold (
         topBar = { CenterAlignedTopAppBar(
             title = { Text(" ") },

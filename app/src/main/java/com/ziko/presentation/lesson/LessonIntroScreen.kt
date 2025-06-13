@@ -30,6 +30,7 @@ import com.ziko.presentation.components.ProgressTopAppBar
 import com.ziko.ui.model.LessonIntroContent
 import com.ziko.presentation.components.AudioButtonWithLabelForIntro
 import com.ziko.util.AudioManager
+import com.ziko.util.UpdateSystemBarsColors
 
 @Composable
 fun LessonIntroScreen(
@@ -39,6 +40,11 @@ fun LessonIntroScreen(
     onNavigateBack: () -> Unit,
     isFirstScreen: Boolean
 ) {
+    UpdateSystemBarsColors(
+        topColor = Color(0xFF410FA3),
+        bottomColor = Color.White
+    )
+
     val introContent: LessonIntroContent =
         LessonIntroContentProvider.getIntroContent(lessonId)
     val totalScreens = 1 + LessonDataProvider.getLessonContent(lessonId).size

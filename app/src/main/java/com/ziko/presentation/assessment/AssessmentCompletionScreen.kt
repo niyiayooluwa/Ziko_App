@@ -1,10 +1,8 @@
 package com.ziko.presentation.assessment
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,29 +13,28 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ProgressIndicatorDefaults.CircularDeterminateStrokeCap
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.ziko.R
+import com.ziko.util.UpdateSystemBarsColors
 import me.nikhilchaudhari.library.neumorphic
 import me.nikhilchaudhari.library.shapes.Pressed
-import kotlin.random.Random
 
 @Composable
 fun AssessmentCompletionScreen(
@@ -49,6 +46,11 @@ fun AssessmentCompletionScreen(
     correctAnswers: String,
     timeSpent: String,
 ) {
+    UpdateSystemBarsColors(
+        topColor = Color.White,
+        bottomColor = Color.White
+    )
+
     val accuracyOfAssessment = percentage.toInt()
     val colorPrimary = when (accuracyOfAssessment) {
         in 70..100 -> Color(0xFF5BA890)
@@ -66,41 +68,43 @@ fun AssessmentCompletionScreen(
     }
 
     Box (modifier = Modifier.fillMaxSize().background(Color.White)) {
-        if (accuracyOfAssessment >= 50 ) {
-            ConfettiAnimation(repeat = true)
-        } else {
-            SadDropAnimation()
-        }
+        Image(
+            painter = painterResource(id = R.drawable.assessment_complete),
+            contentDescription = null,
+            modifier = Modifier.fillMaxWidth().height(248.dp).align(Alignment.TopCenter).offset(x = (-8).dp)
+        )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp, vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             Spacer(modifier = Modifier.height(48.dp))
 
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(160.dp)
+                    .size(204.dp)
                     .align(Alignment.CenterHorizontally)
             ) {
                 val animatedProgress = remember { Animatable(0f) }
                 LaunchedEffect(accuracyOfAssessment) {
+                    val targetValue = (accuracyOfAssessment / 100f).coerceIn(0f, 1f)
                     animatedProgress.animateTo(
-                        (accuracyOfAssessment/100).toFloat(),
+                        targetValue = targetValue,
                         animationSpec = tween(durationMillis = 1000)
                     )
                 }
 
                 CircularProgressIndicator(
-                    progress = animatedProgress.value,
+                    progress = { animatedProgress.value },
+                    modifier = Modifier.fillMaxSize(),
                     color = colorPrimary,
+                    strokeWidth = 23.dp,
                     trackColor = colorSecondary,
-                    strokeWidth = 12.dp,
-                    strokeCap = CircularDeterminateStrokeCap,
-                    modifier = Modifier.fillMaxSize()
+                    strokeCap = StrokeCap.Round,
                 )
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -128,7 +132,8 @@ fun AssessmentCompletionScreen(
                 Text(
                     text = if (accuracyOfAssessment >= 0.5f) "Great Job!" else "Keep Practicing!",
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.Black
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -142,142 +147,87 @@ fun AssessmentCompletionScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            //Stats
+            //Stats and Buttons
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFFFF3E0), shape = RoundedCornerShape(12.dp))
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Let's see how you did and where you can improve:"
-                )
-
-                StatRow("Score Improvement", "$scoreImprovement")
-                StatRow("Correct Answers", correctAnswers)
-                StatRow("Time spent", timeSpent)
-
-            }
-
-            Spacer(Modifier.height(32.dp))
-
-            //Buttons
-            Column (
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    //.align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-            ){
-                // Continue button
+                //Stats
                 Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(Color(0xFF5b7bfe))
-                        .clickable { onRetakeAssessment() }
+                        .background(Color(0xFFFFF6EB), shape = RoundedCornerShape(12.dp))
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text ="Continue to practice exercise",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.W500
+                        text = "Let's see how you did and where you can improve:",
+                        fontSize = 13.sp,
+                        color = Color(0xFF656872),
+                        fontWeight = FontWeight.Normal
                     )
+
+                    StatRow("Score Improvement", "$scoreImprovement%")
+                    StatRow("Correct Answers", correctAnswers)
+                    StatRow("Time spent", timeSpent)
+
                 }
 
-                //Go back home button
-                Column(
-                    verticalArrangement = Arrangement.Center,
+                Spacer(Modifier.height(38.dp))
+
+                //Buttons
+                Column (
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
+                        //.align(Alignment.BottomCenter)
                         .fillMaxWidth()
-                        .height(56.dp)
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(Color(0xFFF0eDff))
-                        .neumorphic(
-                            neuShape = Pressed.Rounded(radius = 4.dp),
-                            lightShadowColor = Color.White,
-                            darkShadowColor = Color(0xFFd3d3d3),
-                            strokeWidth = 4.dp,
-                            elevation = 4.dp
+                ){
+                    // Continue button
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(30.dp))
+                            .background(Color(0xFF5b7bfe))
+                            .clickable { onRetakeAssessment() }
+                    ) {
+                        Text(
+                            text ="Continue to practice exercise",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.W500
                         )
-                        .clickable { onBackToHome() }
-                ) {
-                    Text(
-                        text ="Back to home",
-                        color = Color(0xFF5b7bfe),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.W500
-                    )
+                    }
+
+                    //Go back home button
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(30.dp))
+                            .background(Color(0xFFF0eDff))
+                            .neumorphic(
+                                neuShape = Pressed.Rounded(radius = 4.dp),
+                                lightShadowColor = Color.White,
+                                darkShadowColor = Color(0xFFd3d3d3),
+                                strokeWidth = 4.dp,
+                                elevation = 4.dp
+                            )
+                            .clickable { onBackToHome() }
+                    ) {
+                        Text(
+                            text ="Back to home",
+                            color = Color(0xFF5b7bfe),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.W500
+                        )
+                    }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun ConfettiAnimation(repeat: Boolean) {
-    val colors = listOf(Color(0xFFE57373), Color(0xFF64B5F6), Color(0xFFBA68C8), Color(0xFF81C784))
-    val scope = rememberCoroutineScope()
-    val particles = remember { List(20) { Animatable(Offset.Zero, Offset.VectorConverter) } }
-
-    LaunchedEffect(repeat) {
-        while (true) {
-            particles.forEachIndexed { index, anim ->
-                scope.launch {
-                    val x = Random.nextInt(0, 800).toFloat()
-                    val y = Random.nextInt(0, 600).toFloat()
-                    anim.snapTo(Offset.Zero)
-                    anim.animateTo(
-                        Offset(x, y),
-                        animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing)
-                    )
-                }
-            }
-            delay(3000)
-        }
-    }
-
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        particles.forEachIndexed { index, offsetAnim ->
-            drawCircle(
-                color = colors[index % colors.size],
-                radius = 6f,
-                center = offsetAnim.value
-            )
-        }
-    }
-}
-
-@Composable
-fun SadDropAnimation() {
-    val drops = remember { List(10) { Animatable(Offset(0f, 0f), Offset.VectorConverter) } }
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            drops.forEach { drop ->
-                scope.launch {
-                    val x = Random.nextInt(0, 800).toFloat()
-                    val y = Random.nextInt(500, 1200).toFloat()
-                    drop.snapTo(Offset(x, 0f))
-                    drop.animateTo(
-                        Offset(x, y),
-                        animationSpec = tween(durationMillis = 1200)
-                    )
-                }
-            }
-            delay(2500)
-        }
-    }
-
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        drops.forEach { drop ->
-            drawCircle(color = Color(0xFF90A4AE), radius = 5f, center = drop.value)
         }
     }
 }
@@ -292,8 +242,8 @@ fun StatRow( description: String, value: String) {
         Text (
             text = description,
             fontSize = 12.sp,
-            fontWeight = FontWeight.W400,
-            color = Color.Gray
+            fontWeight = FontWeight.W500,
+            color = Color(0xFF363b44)
         )
 
         Text (
