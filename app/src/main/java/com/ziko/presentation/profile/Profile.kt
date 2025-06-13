@@ -180,9 +180,9 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         Image(
                             painter = rememberAsyncImagePainter(model = profilePicUri),
                             contentDescription = null,
-                            contentScale = (ContentScale.Fit),
+                            contentScale = (ContentScale.Crop),
                             modifier = Modifier
-                                .size(80.dp)
+                                .fillMaxSize()
                                 .clip(CircleShape)
                         )
                     }
@@ -575,9 +575,6 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
         }
     }
 }
-
-
-
 
 fun createImageUri(context: Context): Uri? {
     val contentValues = ContentValues().apply {
