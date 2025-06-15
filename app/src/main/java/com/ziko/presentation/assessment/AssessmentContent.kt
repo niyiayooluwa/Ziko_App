@@ -195,16 +195,6 @@ fun SpeakAssessmentUI(
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier
                             .defaultMinSize(minHeight = 66.dp)
-                            .clickable {
-                                if (!isPlaying) {
-                                    AudioManager.playAsset(
-                                        context,
-                                        assetPath = content.audioPath,
-                                        onStarted = { isPlaying = true },
-                                        onFinished = { isPlaying = false }
-                                    )
-                                }
-                            }
                             .fillMaxWidth()
                             .dashedRoundedBorder(
                                 color = Color(0xFF656872),
@@ -291,10 +281,9 @@ fun SpeakAssessmentUI(
                 )
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(12.dp))
             SuccessIndicator(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 condition = speechCondition.value,
                 hasRecorded = hasRecordedSpeech.value,
                 attemptCount = attemptCount.intValue,

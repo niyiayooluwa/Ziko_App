@@ -12,16 +12,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,8 +52,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberAsyncImagePainter
 import com.ziko.R
 import com.ziko.navigation.Screen
-import com.ziko.presentation.assessment.AssessmentStatsViewModel
 import com.ziko.presentation.components.FloatingNavBar
+import com.ziko.presentation.components.NetworkStatusIndicator
 import com.ziko.presentation.profile.UserViewModel
 import com.ziko.util.UpdateSystemBarsColors
 
@@ -63,7 +67,8 @@ fun AssessmentScreen(
         bottomColor = Color.White
     )
     val assessmentStatsViewModel: AssessmentStatsViewModel = hiltViewModel()
-    val assessmentStats by assessmentStatsViewModel.assessmentStats.collectAsState()
+    val assessmentDataState by assessmentStatsViewModel.assessmentDataState.collectAsState()
+    val assessmentStats = assessmentDataState.data
 
     val user by userViewModel.user.collectAsState()
     val profilePicUri by userViewModel.profilePicUri.collectAsState()
@@ -93,25 +98,23 @@ fun AssessmentScreen(
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, top = 36.dp, bottom = 16.dp)
                 ) {
-                    Box (
+                    Box(
                         modifier = Modifier
-                            .clickable{navController.navigate(Screen.Profile.route)}
+                            .clickable { navController.navigate(Screen.Profile.route) }
                             .size(48.dp)
                             .clip(CircleShape)
                             .background(Color(0xFF5b7bfe).copy(alpha = 0.2f))
-                            //.border(1.dp, Color(0xFF5b7bfe), CircleShape)
                     ) {
                         if (profilePicUri != null) {
                             Image(
                                 painter = rememberAsyncImagePainter(model = profilePicUri),
                                 contentDescription = null,
-                                contentScale = (ContentScale.Crop),
+                                contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .size(80.dp)
                                     .clip(CircleShape)
                             )
-                        }
-                        else {
+                        } else {
                             Text(
                                 text = user?.first_name?.first().toString(),
                                 fontSize = 13.sp,
@@ -121,7 +124,12 @@ fun AssessmentScreen(
                         }
                     }
 
-                    Text("Assessment", fontSize = 24.sp, fontWeight = FontWeight.W600, color = Color.White)
+                    Text(
+                        "Assessment",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.W600,
+                        color = Color.White
+                    )
 
                     Text(
                         text = "Test your knowledge and sharpen your\npronunciation skills",
@@ -131,6 +139,13 @@ fun AssessmentScreen(
                     )
                 }
             }
+
+            // Network Status Indicator
+            NetworkStatusIndicator(
+                status = assessmentDataState.status,
+                lastUpdated = assessmentDataState.lastUpdated,
+                onRefreshClick = { assessmentStatsViewModel.refreshData() }
+            )
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -142,43 +157,61 @@ fun AssessmentScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
                 ) {
                     SpecialAssessment(
                         title = "General Assessment",
-                        description = "A mix of questions from all\ncompleted lessons",
+                        description = "A mix of questions from all completed lessons",
                         highestScore = 90,
                         accuracy = 56,
                         backGroundColor = Color(0xFFFFF6EB),
-                        borderColor = Color(0xFFB6AFA7),
+                        borderColor = Color(0xFFFFF195),
+                        darkerColor = Color(0xFFB78107),
                         onClick = {},
                         modifier = Modifier.weight(1f)
                     )
                     SpecialAssessment(
                         title = "Target Practice",
-                        description = "Work on the lessons where\nyour score is below 70%",
+                        description = "Work on the lessons where your score is below 70%",
                         highestScore = 90,
                         accuracy = 56,
                         backGroundColor = Color(0xFFDBF6FF),
                         borderColor = Color(0xFFD0EAF4),
                         onClick = {},
-                        modifier = Modifier.weight(1f)
+                        darkerColor = Color(0xFF00516E),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
                 }
 
-                Text("Drill by Topic", fontSize = 20.sp, fontWeight = FontWeight.W600, color = Color.Black)
+                Text(
+                    "Drill by Topic",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.W600,
+                    color = Color.Black
+                )
 
                 Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                    assessmentStats.forEach { assessment ->
-                        AssessmentCard(
-                            title = assessment.title,
-                            highestScore = assessment.highestScore,
-                            accuracy = assessment.accuracy,
-                            onClick = {
-                                val lessonId = assessment.id
-                                navController.navigate(Screen.AssessmentLoading(lessonId).route)
-                            }
-                        )
+                    if (assessmentStats.isEmpty() && assessmentDataState.status == AssessmentDataStatus.LOADING) {
+                        // Show loading state for individual cards
+                        repeat(8) {
+                            AssessmentCardSkeleton()
+                        }
+                    } else {
+                        assessmentStats.forEach { assessment ->
+                            AssessmentCard(
+                                title = assessment.title,
+                                highestScore = assessment.highestScore,
+                                accuracy = assessment.accuracy,
+                                onClick = {
+                                    val lessonId = assessment.id
+                                    navController.navigate(Screen.AssessmentLoading(lessonId).route)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -194,6 +227,49 @@ fun AssessmentScreen(
                     currentRoute = currentRoute ?: Screen.Assessment.route
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun AssessmentCardSkeleton() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(16.dp)
+                        .background(Color(0xFFE0E0E0), RoundedCornerShape(4.dp))
+                )
+                Box(
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(12.dp)
+                        .background(Color(0xFFE0E0E0), RoundedCornerShape(4.dp))
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .width(60.dp)
+                    .height(24.dp)
+                    .background(Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
+            )
         }
     }
 }
@@ -219,14 +295,18 @@ fun AssessmentCard(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Column(
                 horizontalAlignment = Alignment.Start,
@@ -252,7 +332,9 @@ fun AssessmentCard(
                     )
                     CircularProgressIndicator(
                         progress = { animatedProgress},
-                        modifier = Modifier.fillMaxSize().align(Alignment.Center),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center),
                         color = colorPrimary,
                         strokeWidth = 8.43.dp,
                         trackColor = colorSecondary,
@@ -279,7 +361,9 @@ fun AssessmentCard(
                 } else {
                     CircularProgressIndicator(
                         progress = { 0.5f },
-                        modifier = Modifier.fillMaxSize().align(Alignment.Center),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center),
                         color = Color(0xFFe5e5e5),
                         strokeWidth = 8.43.dp,
                         trackColor = Color(0xFFececec),
@@ -318,6 +402,7 @@ fun SpecialAssessment(
     backGroundColor: Color,
     borderColor: Color,
     onClick: () -> Unit,
+    darkerColor: Color,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -333,7 +418,7 @@ fun SpecialAssessment(
     ) {
         Column (
             verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.Start,
         ) {
             Text(
                 text = title,
@@ -406,11 +491,21 @@ fun SpecialAssessment(
 
             }
 
-            Image (
-                painter = painterResource(R.drawable.frame_1000004403),
-                contentDescription = null,
-                modifier = Modifier.size(40.dp).clickable { onClick() },
-            )
+            Box (
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(darkerColor)
+                    .size(40.dp)
+                    .clickable{onClick()},
+                contentAlignment = Alignment.Center
+            ){
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "button",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     }
 }

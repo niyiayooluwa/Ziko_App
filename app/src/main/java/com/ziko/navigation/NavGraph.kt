@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -18,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.ziko.presentation.assessment.AssessmentCompletionScreen
+import com.ziko.presentation.assessment.AssessmentCompletionViewModel
 import com.ziko.presentation.assessment.AssessmentContent
 import com.ziko.presentation.assessment.AssessmentLoadingScreen
 import com.ziko.presentation.assessment.AssessmentViewModel
@@ -373,7 +376,6 @@ fun NavGraph(
             }
         }
 
-        //Assessment Completion
         composable(
             route = Screen.AssessmentCompletion.BASE_ROUTE,
             arguments = listOf(
@@ -390,7 +392,10 @@ fun NavGraph(
             val totalQuestions = backStackEntry.arguments!!.getInt("totalQuestions")
             val timeSpent = backStackEntry.arguments!!.getString("timeSpent")!!
 
-            val viewModel: AssessmentViewModel = hiltViewModel()
+            val completionViewModel: AssessmentCompletionViewModel = hiltViewModel()
+            val scoreImprovement by completionViewModel.scoreImprovement.collectAsState()
+            val previousScore by completionViewModel.previousScore.collectAsState()
+            val submissionStatus by completionViewModel.submissionStatus.collectAsState()
 
             AssessmentCompletionScreen(
                 onRetakeAssessment = {
@@ -400,10 +405,13 @@ fun NavGraph(
                     navController.navigate(Screen.Assessment.route)
                 },
                 percentage = score.toFloat(),
-                onSubmitResults = { viewModel.submitResults(score) },
-                scoreImprovement = 4, // still placeholder
+                scoreImprovement = scoreImprovement,
                 correctAnswers = "$correctAnswers/$totalQuestions",
-                timeSpent = timeSpent
+                timeSpent = timeSpent,
+                previousScore = previousScore,
+                submissionStatus = submissionStatus,
+                onSubmitResults = { completionViewModel.submitResults() },
+                onRetrySubmission = { completionViewModel.retry() }
             )
         }
     }

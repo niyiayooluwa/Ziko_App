@@ -28,7 +28,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.outlined.AddPhotoAlternate
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -256,10 +255,10 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
+                        .clickable{navController.navigate(Screen.SecurityScreen.route)}
                         .fillMaxWidth()
                         .border(1.dp, Color(0xFFe5e5e5), RoundedCornerShape(12.dp))
                         .padding(24.dp)
-
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -289,7 +288,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                     }
 
                     IconButton(
-                        onClick = {navController.navigate(Screen.SecurityScreen.route) }
+                        onClick = {}
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
@@ -477,7 +476,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         OutlinedTextField(
                             value = firstName,
                             onValueChange = { firstName = it },
-                            placeholder = { Text("John") },
+                            placeholder = { Text("${user?.first_name}") },
                             singleLine = true,
                             textStyle = TextStyle(color = Color.DarkGray),
                             shape = RoundedCornerShape(16.dp),
@@ -506,7 +505,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         OutlinedTextField(
                             value = lastName,
                             onValueChange = { lastName = it },
-                            placeholder = { Text("Doe") },
+                            placeholder = { Text("${user?.last_name}") },
                             singleLine = true,
                             textStyle = TextStyle(color = Color.DarkGray),
                             shape = RoundedCornerShape(16.dp),
@@ -564,7 +563,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                                 .clickable {
                                     scope.launch{
                                         userViewModel.updateUserName(firstName, lastName)
-                                        !showEditProfileSheet
+                                        showEditProfileSheet = false
                                     }
                                 }
                         ) {

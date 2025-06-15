@@ -41,7 +41,8 @@ fun getPractice6Content(): List<PracticeScreenContent> {
             """ to "lessons/lesson6/it_was_a_bright_morning.mp3",
             """
             It was a bright morning, and Sarah was getting ready for school. She asked her mother, "Where is my backpack?" Her mother replied, "It's on the table." Sarah picked up her backpack and said, "Oh no! I forgot my homework!" Her brother laughed and asked, "Again?" She sighed and said, "Yes, I left it in my room." She ran upstairs, grabbed her homework, and hurried out the door. On the way to school, her friend Emma asked, "Did you study for the test?" Sarah shook her head and said, "Not really... I hope it's easy." When they arrived at school, the teacher greeted them warmly, "Good morning. class!" The students responded, "Good morning, ma'am!"
-            """
+            """,
+            true
         ),
     )
 }

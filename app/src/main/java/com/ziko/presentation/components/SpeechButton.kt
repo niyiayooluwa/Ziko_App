@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.ziko.util.SpeechManager
+import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 val color = Color(0xFF5b7bfe)
@@ -94,6 +96,7 @@ fun SpeechButton(
     val speechManager = remember { mutableStateOf<SpeechManager?>(null) }
     val initializationError = remember { mutableStateOf<String?>(null) }
     val showSettingsPrompt = remember { mutableStateOf(false) }
+    val showNoSpeechError = remember { mutableStateOf(false) }
 
     val permissionGranted = remember {
         mutableStateOf(
@@ -121,6 +124,14 @@ fun SpeechButton(
         }
     }
 
+    // Clear the no speech error after a delay
+    LaunchedEffect(showNoSpeechError.value) {
+        if (showNoSpeechError.value) {
+            delay(3000) // Show error for 3 seconds
+            showNoSpeechError.value = false
+        }
+    }
+
     LaunchedEffect(Unit) {
         if (!permissionGranted.value) {
             permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
@@ -137,10 +148,17 @@ fun SpeechButton(
                     },
                     onResultCallback = { result ->
                         isListening.value = false
+                        if (result == null) {
+                            showNoSpeechError.value = true
+                        }
                         onSpeechResult(result)
                     },
                     onListeningStateChangedCallback = { state ->
                         isListening.value = state
+                        if (state) {
+                            // Clear any previous error when starting to listen
+                            showNoSpeechError.value = false
+                        }
                     }
                 )
             } catch (e: Exception) {
@@ -158,13 +176,18 @@ fun SpeechButton(
     }
 
     val color = Color(0xFF5b7bfe)
+    val errorColor = Color(0xFFFF6B6B)
 
     Column(modifier = modifier) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(76.dp)
-                .border(1.dp, color, RoundedCornerShape(12.dp))
+                .border(
+                    1.dp,
+                    if (showNoSpeechError.value) errorColor else color,
+                    RoundedCornerShape(12.dp)
+                )
                 .clickable(
                     enabled = controller.isEnabled &&
                             permissionGranted.value &&
@@ -223,6 +246,24 @@ fun SpeechButton(
                         repeat(21) { index ->
                             BarShape(rms = rmsValue.floatValue, index = index)
                         }
+                    }
+                }
+
+                showNoSpeechError.value -> {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.MicOff,
+                            contentDescription = "Mic Off",
+                            tint = errorColor,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Oops, didn't catch that",
+                            color = errorColor,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.W500
+                        )
                     }
                 }
 

@@ -87,13 +87,6 @@ object LessonIntroContentProvider {
             definitionTextOne = "",
             definitionTextTwo = " English is a stress-timed language, meaning syllables occur at regular intervals, while unstressed syllables are shortened.",
             definitionAudio = "lessons/lesson8/rhythm_definition.mp3",
-            points = listOf(
-                "Types of Monophthongs",
-                "  • Short vowels",
-                "    /ɪ/, /e/, /æ/, /ʌ/, /ɒ/, /ʊ/, /ə/",
-                "  • Long vowels",
-                "    /iː/, /ɑː/, /ɔː/, /uː/, /ɜː/"
-            )
         )
 
             else -> LessonIntroContent(

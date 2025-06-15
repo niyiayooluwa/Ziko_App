@@ -51,21 +51,20 @@ fun SignUpScreenOne(
     )
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
         topBar = {
             CustomBiggerTopAppBar(
                 title = "Sign Up",
                 onNavigationClick = { navController.popBackStack() } // Go back to the previous screen (e.g., Login)
             )
         }
-    ) { padding ->
+    ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .verticalScroll(scrollState)
-                .padding(padding)
-                .background(Color.White),
+                .padding(paddingValues)
         ) {
             Spacer(modifier = Modifier.height(48.dp))
 

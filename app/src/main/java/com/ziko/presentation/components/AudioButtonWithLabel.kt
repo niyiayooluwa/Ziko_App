@@ -108,10 +108,7 @@ fun AudioButtonWithLabelForLesson8(text: String, assetPath: String, size: Size) 
         Size.BIG -> Modifier.size(48.dp)
     }
 
-    val fontSize = when (size) {
-        Size.SMALL -> 20.sp
-        Size.BIG -> 28.sp
-    }
+    val fontSize = 20.sp
 
     val fontWeight = when (size) {
         Size.SMALL -> FontWeight.Medium

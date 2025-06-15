@@ -36,7 +36,7 @@ class UserViewModel @Inject constructor(
     private val _isUserCheckComplete = MutableStateFlow(false)
     val isUserCheckComplete = _isUserCheckComplete.asStateFlow()
 
-    // NEW STATEFLOWS
+    // NEW STATE FLOWS
     private val _userUpdateResult = MutableStateFlow<Result<Unit>?>(null)
     val userUpdateResult = _userUpdateResult.asStateFlow()
 
@@ -53,9 +53,9 @@ class UserViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val token = dataStoreManager.getToken.firstOrNull()
+            _profilePicUri.value = dataStoreManager.getProfilePicUri()
             if (!token.isNullOrEmpty()) {
                 fetchUser(forceRefresh = false)
-                _profilePicUri.value = dataStoreManager.getProfilePicUri()
             } else {
                 markUserCheckComplete()
             }

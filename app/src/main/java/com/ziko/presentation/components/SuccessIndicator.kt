@@ -72,7 +72,7 @@ fun SuccessIndicator(
                 top = 24.dp,
                 bottom = 40.dp,
                 start = 24.dp,
-                end = 24.dp,
+                end = 8.dp,
             ),
     ) {
         Row (
@@ -146,29 +146,4 @@ fun SuccessIndicator(
             )
         }
     }
-}
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun Preview() {
-   Column {
-       SuccessIndicator(
-        condition = false,
-        hasRecorded = true,
-        attemptCount = 1,
-        maxAttempts = 3,
-        onClick = {},
-        modifier = Modifier
-       )
-       SuccessIndicator(
-           condition = false,
-           hasRecorded = true,
-           attemptCount = 1,
-           maxAttempts = 3,
-           onClick = {},
-           modifier = Modifier,
-       )
-   }
-
-
 }

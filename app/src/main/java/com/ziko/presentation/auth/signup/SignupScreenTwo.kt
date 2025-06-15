@@ -61,7 +61,8 @@ fun SignUpScreenTwo(
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
-    val signUpState by viewModel.signUpState.collectAsState()
+    //val signUpState by viewModel.signUpState.collectAsState()
+    val signUpState = viewModel.signUpState.value
     val scrollState = rememberScrollState()
 
     var localErrorMessage by remember { mutableStateOf<String?>(null) }
@@ -103,21 +104,20 @@ fun SignUpScreenTwo(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
         topBar = {
             CustomBiggerTopAppBar(
                 title = "Sign Up",
                 onNavigationClick = { navController.popBackStack() }
             )
         }
-    ) { padding ->
+    ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .verticalScroll(scrollState)
-                .padding(padding)
-                .background(Color.White),
+                .padding(paddingValues)
         ) {
             Spacer(modifier = Modifier.height(48.dp))
 
@@ -254,7 +254,7 @@ fun SignUpScreenTwo(
 
                 if (signUpState is SignUpState.Error) {
                     Text(
-                        text = (signUpState as SignUpState.Error).message,
+                        text = signUpState.message,
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(top = 8.dp)
                     )

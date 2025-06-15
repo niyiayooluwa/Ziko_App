@@ -52,7 +52,10 @@ import com.ziko.presentation.profile.UserViewModel
 import com.ziko.util.UpdateSystemBarsColors
 
 @Composable
-fun LoginScreen(navController: NavController, userViewModel: UserViewModel) {
+fun LoginScreen(
+    navController: NavController,
+    userViewModel: UserViewModel
+) {
     val loginViewModel: LoginViewModel = hiltViewModel()
 
     val loginState = loginViewModel.loginState.value
@@ -74,22 +77,20 @@ fun LoginScreen(navController: NavController, userViewModel: UserViewModel) {
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
         topBar = {
             CustomBiggerTopAppBar(
                 title = "Login",
                 onNavigationClick = { navController.navigate(Screen.Onboarding.route) }
             )
         }
-    ) { padding ->
-
+    ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .verticalScroll(scrollState)
-                .padding(padding)
-                .background(Color.White),
+                .padding(paddingValues)
         ) {
             Spacer(modifier = Modifier.height(48.dp))
 

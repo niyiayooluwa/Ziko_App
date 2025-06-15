@@ -1,5 +1,6 @@
 package com.ziko.presentation.auth.signup
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,8 +22,8 @@ class SignUpViewModel @Inject constructor(
     val signUpData = mutableStateOf(SignUpData())
     val emailError = mutableStateOf<String?>(null)
     val passwordMismatchError = mutableStateOf(false)
-    private val _signUpState = MutableStateFlow<SignUpState>(SignUpState.Idle)
-    val signUpState: StateFlow<SignUpState> = _signUpState
+    private val _signUpState = mutableStateOf<SignUpState>(SignUpState.Idle)
+    val signUpState: State<SignUpState> = _signUpState
 
     private val authMethod = "password"
 

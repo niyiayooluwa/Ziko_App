@@ -140,7 +140,7 @@ fun PracticeContent(
 
                     // Audio playback button if sound is available
                     if (content.sound != null) {
-                        if (lessonId != "lesson8") {
+                        if (content.alignment != true) {
                             AudioButtonWithLabel(
                                 text = content.sound.first,
                                 assetPath = content.sound.second,
@@ -156,115 +156,223 @@ fun PracticeContent(
                     }
                 }
 
-                // Speech input section
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    // Permission denied message
-                    if (permissionDenied) {
-                        Text(
-                            text = "Please enable microphone permission in settings",
-                            color = Color.Red,
-                            fontSize = 14.sp
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
+                if (!content.alignment) {// Speech input section
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        // Permission denied message
+                        if (permissionDenied) {
+                            Text(
+                                text = "Please enable microphone permission in settings",
+                                color = Color.Red,
+                                fontSize = 14.sp
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
 
-                    // Show attempt counter
-                    if (attemptCount.intValue > 0) {
+                        // Show attempt counter
+                        if (attemptCount.intValue > 0) {
+                            Text(
+                                text = "Attempt ${attemptCount.intValue} of $maxAttempts",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.W400,
+                                color = Color(0xFF656872)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Speech input button
+                        SpeechButton(
+                            modifier = Modifier,
+                            onSpeechResult = { result ->
+                                Log.d("PracticeContent", "Speech result received: $result")
+                                spokenText.value = result ?: ""
+                                hasRecordedSpeech.value = !result.isNullOrBlank() // Mark as recorded if we got text
+                                speechCondition.value = null // Reset evaluation state
+
+                                if (!result.isNullOrBlank()) {
+                                    speechButtonController.setCompleted()
+                                }
+                            },
+                            onPermissionDenied = {
+                                Log.d("PracticeContent", "Permission denied")
+                                permissionDenied = true
+                            },
+                            controller = speechButtonController
+                        )
+
+                        Spacer(modifier = Modifier.height(11.dp))
+
+                        // Helper text
                         Text(
-                            text = "Attempt ${attemptCount.intValue} of $maxAttempts",
-                            fontSize = 14.sp,
+                            text = "Can't speak now",
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.W400,
                             color = Color(0xFF656872)
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Speech input button
-                    SpeechButton(
-                        modifier = Modifier,
-                        onSpeechResult = { result ->
-                            Log.d("PracticeContent", "Speech result received: $result")
-                            spokenText.value = result ?: ""
-                            hasRecordedSpeech.value = !result.isNullOrBlank() // Mark as recorded if we got text
-                            speechCondition.value = null // Reset evaluation state
-
-                            if (!result.isNullOrBlank()) {
-                                speechButtonController.setCompleted()
-                            }
-                        },
-                        onPermissionDenied = {
-                            Log.d("PracticeContent", "Permission denied")
-                            permissionDenied = true
-                        },
-                        controller = speechButtonController
-                    )
-
-                    Spacer(modifier = Modifier.height(11.dp))
-
-                    // Helper text
-                    Text(
-                        text = "Can't speak now",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF656872)
-                    )
                 }
-
-                // Bottom spacing to avoid UI overlap
-                Spacer(modifier = Modifier.height(80.dp))
             }
 
-            // Bottom evaluation bar
-            SuccessIndicator(
-                modifier = Modifier
-                    //.align(Alignment.BottomCenter)
-                    .fillMaxWidth(),
-                condition = speechCondition.value,
-                hasRecorded = hasRecordedSpeech.value,
-                attemptCount = attemptCount.intValue,
-                maxAttempts = maxAttempts,
-                onClick = {
-                    Log.d("PracticeContent", "SuccessIndicator clicked")
+            //Bottom Conditional Evaluation Bar
+            if (!content.alignment) {// Bottom evaluation bar
+                SuccessIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    condition = speechCondition.value,
+                    hasRecorded = hasRecordedSpeech.value,
+                    attemptCount = attemptCount.intValue,
+                    maxAttempts = maxAttempts,
+                    onClick = {
+                        Log.d("PracticeContent", "SuccessIndicator clicked")
 
-                    when (speechCondition.value) {
-                        null -> {
-                            // Only evaluate if user has recorded speech
-                            if (hasRecordedSpeech.value) {
-                                Log.d("PracticeContent", "Evaluating speech: '${spokenText.value}' vs '$expectedText'")
+                        when (speechCondition.value) {
+                            null -> {
+                                // Only evaluate if user has recorded speech
+                                if (hasRecordedSpeech.value) {
+                                    Log.d("PracticeContent", "Evaluating speech: '${spokenText.value}' vs '$expectedText'")
 
-                                val normalizedSpoken = normalizeText(spokenText.value)
-                                val normalizedExpected = normalizeText(expectedText)
-                                val isCorrect = normalizedSpoken == normalizedExpected
+                                    val normalizedSpoken = normalizeText(spokenText.value)
+                                    val normalizedExpected = normalizeText(expectedText)
+                                    val isCorrect = normalizedSpoken == normalizedExpected
 
-                                attemptCount.intValue += 1
-                                Log.d("PracticeContent", "Speech evaluation result: $isCorrect, Attempt: ${attemptCount.intValue}")
-                                speechCondition.value = isCorrect
+                                    attemptCount.intValue += 1
+                                    Log.d("PracticeContent", "Speech evaluation result: $isCorrect, Attempt: ${attemptCount.intValue}")
+                                    speechCondition.value = isCorrect
+                                }
                             }
-                        }
-                        true -> {
-                            Log.d("PracticeContent", "Continuing to next screen")
-                            onContinue()
-                        }
-                        false -> {
-                            if (attemptCount.intValue >= maxAttempts) {
-                                Log.d("PracticeContent", "Max attempts reached, skipping to next screen")
+                            true -> {
+                                Log.d("PracticeContent", "Continuing to next screen")
                                 onContinue()
-                            } else {
-                                Log.d("PracticeContent", "Resetting for retry")
-                                spokenText.value = ""
-                                speechCondition.value = null
-                                hasRecordedSpeech.value = false
-                                speechButtonController.enable()
+                            }
+                            false -> {
+                                if (attemptCount.intValue >= maxAttempts) {
+                                    Log.d("PracticeContent", "Max attempts reached, skipping to next screen")
+                                    onContinue()
+                                } else {
+                                    Log.d("PracticeContent", "Resetting for retry")
+                                    spokenText.value = ""
+                                    speechCondition.value = null
+                                    hasRecordedSpeech.value = false
+                                    speechButtonController.enable()
+                                }
                             }
                         }
                     }
-                }
+                )
+            } else {
+                // Bottom evaluation bar
+                Column (
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    // Speech input section
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp)
+                    ) {
+                        // Permission denied message
+                        if (permissionDenied) {
+                            Text(
+                                text = "Please enable microphone permission in settings",
+                                color = Color.Red,
+                                fontSize = 14.sp
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
 
-            )
+                        if (attemptCount.intValue > 0) {
+                            Text(
+                                text = "Attempt ${attemptCount.intValue} of $maxAttempts",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.W400,
+                                color = Color(0xFF656872)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Helper text
+                        Text(
+                            text = "Can't speak now",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF656872)
+                        )
+
+                        Spacer(modifier = Modifier.height(11.dp))
+
+                        // Speech input button
+                        SpeechButton(
+                            modifier = Modifier,
+                            onSpeechResult = { result ->
+                                spokenText.value = result ?: ""
+                                hasRecordedSpeech.value = !result.isNullOrBlank()
+                                speechCondition.value = null // Reset evaluation state
+
+                                // ✅ Show static waveform immediately after recording
+                                if (!result.isNullOrBlank()) {
+                                    speechButtonController.setCompleted()
+                                }
+                            },
+                            onPermissionDenied = {
+                                permissionDenied = true
+                            },
+                            controller = speechButtonController
+                        )
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    SuccessIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        condition = speechCondition.value,
+                        hasRecorded = hasRecordedSpeech.value,
+                        attemptCount = attemptCount.intValue,
+                        maxAttempts = maxAttempts,
+                        onClick = {
+                            Log.d("PracticeContent", "SuccessIndicator clicked")
+
+                            when (speechCondition.value) {
+                                null -> {
+                                    // Only evaluate if user has recorded speech
+                                    if (hasRecordedSpeech.value) {
+                                        Log.d("PracticeContent", "Evaluating speech: '${spokenText.value}' vs '$expectedText'")
+
+                                        val normalizedSpoken = normalizeText(spokenText.value)
+                                        val normalizedExpected = normalizeText(expectedText)
+                                        val isCorrect = normalizedSpoken == normalizedExpected
+
+                                        attemptCount.intValue += 1
+                                        Log.d("PracticeContent", "Speech evaluation result: $isCorrect, Attempt: ${attemptCount.intValue}")
+                                        speechCondition.value = isCorrect
+                                    }
+                                }
+                                true -> {
+                                    Log.d("PracticeContent", "Continuing to next screen")
+                                    onContinue()
+                                }
+                                false -> {
+                                    if (attemptCount.intValue >= maxAttempts) {
+                                        Log.d("PracticeContent", "Max attempts reached, skipping to next screen")
+                                        onContinue()
+                                    } else {
+                                        Log.d("PracticeContent", "Resetting for retry")
+                                        spokenText.value = ""
+                                        speechCondition.value = null
+                                        hasRecordedSpeech.value = false
+                                        speechButtonController.enable()
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 }

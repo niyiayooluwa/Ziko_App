@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,25 +25,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomBiggerTopAppBar(
     title: String,
     onNavigationClick: (() -> Unit)? = null
 ) {
-    Box(
-        contentAlignment = Alignment.BottomCenter,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFF410FA3))
-            .height(100.dp)
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // Navigation Icon (if provided)
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = title,
+                fontSize = 20.sp,
+                color = Color.White,
+                textAlign = TextAlign.Center // Center the text within the Box
+            )
+        },
+        navigationIcon = {
             if (onNavigationClick != null) {
                 IconButton(onClick = onNavigationClick) {
                     Icon(
@@ -53,23 +53,10 @@ fun CustomBiggerTopAppBar(
             }   else {
                 Box(modifier = Modifier.size(24.dp)) // Spacer if no navigation icon
             }
-
-            // Title
-            Box(
-                modifier = Modifier.weight(1f), // Allow it to take available space
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = title,
-                    fontSize = 20.sp,
-                    color = Color.White,
-                    textAlign = TextAlign.Center // Center the text within the Box
-                )
-            }
-
-            //Spacer for consistency
-            Box(modifier = Modifier.size(24.dp).clickable {  })
-        }
-    }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = Color(0xFF410FA3)
+        )
+    )
 }
 
