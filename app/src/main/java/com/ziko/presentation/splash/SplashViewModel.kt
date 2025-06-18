@@ -5,14 +5,19 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for the Splash screen.
+ * Delays for 2 seconds before triggering navigation.
+ */
 class SplashViewModel : ViewModel() {
-
-
-    // Function to simulate background work (e.g., checking if user is logged in)
+    /**
+     * Simulates a splash screen delay, then calls [onTimerFinished].
+     */
     fun startSplashTimer(onTimerFinished: () -> Unit) {
         viewModelScope.launch {
-            delay(2000) // Wait 2 seconds
-            onTimerFinished() // Call this function when done
+            delay(2000)
+            onTimerFinished()
         }
     }
 }
+

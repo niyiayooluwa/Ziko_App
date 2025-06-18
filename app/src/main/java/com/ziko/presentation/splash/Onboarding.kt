@@ -32,22 +32,37 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.navigation.Screen
-import com.ziko.util.UpdateSystemBarsColors
+import com.ziko.core.util.UpdateSystemBarsColors
 
+/**
+ * OnboardingScreen is the first visual interaction screen for new users.
+ * It features:
+ * - A prominent onboarding image background
+ * - A foreground logo or visual element
+ * - A concise title and description
+ * - A "Start Learning" CTA button that navigates to the Login screen
+ *
+ * @param navController The NavController used for navigation to the Login screen
+ */
 @Composable
-fun OnboardingScreen (
-    navController: NavController
-) {
+fun OnboardingScreen(navController: NavController) {
+
+    // Set system bar colors to visually align with the onboarding screen's theme
     UpdateSystemBarsColors(
         topColor = Color(0xFF410FA3),
         bottomColor = Color.White
     )
 
-    Column (
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().background(Color.White)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White) // White background ensures visual separation below the image
     ) {
+
+        // SECTION 1: Image container (top 70% of the screen)
         Box {
+            // Background image fills width and 70% of height, with rounded bottom corners
             Image(
                 painter = painterResource(R.drawable.onboarding_image_1),
                 contentDescription = "Background",
@@ -60,26 +75,31 @@ fun OnboardingScreen (
                             bottomEnd = 32.dp
                         )
                     ),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop // Ensures the image fills space proportionally
             )
 
-            Image (
+            // Foreground image (e.g., mascot or app icon), centered within the box
+            Image(
                 painter = painterResource(R.drawable.onboarding_image_2),
-                contentDescription = "fore image",
+                contentDescription = "Foreground image",
                 modifier = Modifier
                     .size(240.dp)
                     .align(Alignment.Center)
             )
         }
 
+        // Spacer creates vertical breathing room between image and text section
         Spacer(modifier = Modifier.height(32.dp))
 
-        Column (
+        // SECTION 2: Text + Button
+        Column(
             verticalArrangement = Arrangement.spacedBy(40.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column (
+
+            // Text block (title + subtitle)
+            Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -95,16 +115,19 @@ fun OnboardingScreen (
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     textAlign = TextAlign.Center,
-                    color = Color(0x99080E1E)
+                    color = Color(0x99080E1E) // Slightly transparent dark text for subtext
                 )
             }
 
+            // CTA Button: "Start Learning" → navigates to Login screen
             Button(
-                onClick = {navController.navigate(Screen.Login.route)},
+                onClick = {
+                    navController.navigate(Screen.Login.route)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp), // Add some horizontal padding around the button
-                shape = RoundedCornerShape(percent = 50), // Make the ends fully rounded
+                    .padding(horizontal = 16.dp), // Adds padding around button edges
+                shape = RoundedCornerShape(percent = 50), // Makes the button fully pill-shaped
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF5B7BFE),
                     contentColor = Color.White

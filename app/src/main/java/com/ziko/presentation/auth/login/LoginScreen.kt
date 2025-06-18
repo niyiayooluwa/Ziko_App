@@ -34,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -45,32 +44,69 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ziko.R
+import com.ziko.core.util.UpdateSystemBarsColors
 import com.ziko.navigation.Screen
 import com.ziko.presentation.components.CustomBiggerTopAppBar
 import com.ziko.presentation.components.LineUI
 import com.ziko.presentation.profile.UserViewModel
-import com.ziko.util.UpdateSystemBarsColors
 
+/**
+ * LoginScreen.kt
+ *
+ * This file defines the Login screen UI for the application using Jetpack Compose.
+ * It handles user input for email and password, login validation, error handling,
+ * navigation on successful login, and offers social login options (Google, Facebook).
+ *
+ * Components:
+ * - Email and password input fields with validation
+ * - Login button with loading state
+ * - Error feedback
+ * - Social login buttons
+ * - Navigation to sign-up screen
+ *
+ * Role in App:
+ * Part of the authentication flow; interacts with LoginViewModel for state management
+ * and UserViewModel for post-login user data retrieval. Navigates to Home on success.
+ */
+
+/**
+ * Login screen composable that manages user login input, validation, state feedback,
+ * and navigation to the main screen after authentication.
+ *
+ * This composable uses state hoisting from [LoginViewModel] and [UserViewModel] to manage
+ * UI state reactively and performs a navigation side effect upon login success.
+ *
+ * @param navController NavController used for navigating between screens
+ * @param userViewModel Shared UserViewModel for fetching user data after login
+ *
+ * @see LoginViewModel
+ * @see Screen.Home
+ * @see Screen.SignOne
+ * @see CustomBiggerTopAppBar
+ * @see LineUI
+ */
 @Composable
 fun LoginScreen(
     navController: NavController,
     userViewModel: UserViewModel
 ) {
     val loginViewModel: LoginViewModel = hiltViewModel()
-
     val loginState = loginViewModel.loginState.value
     val scrollState = rememberScrollState()
 
+    // Change status bar and navigation bar colors to fit the Login theme
     UpdateSystemBarsColors(
         topColor = Color(0xFF410FA3),
         bottomColor = Color.White
     )
 
+    // Side effect: Watch for successful login and navigate to Home screen
     LaunchedEffect(loginState) {
         val token = (loginState as? LoginState.Success)?.data
         if (token != null) {
             userViewModel.fetchUser(forceRefresh = true, token = token)
             navController.navigate(Screen.Home.route) {
+                // Remove login from back stack to prevent back navigation
                 popUpTo(Screen.Login.route) { inclusive = true }
             }
         }
@@ -110,7 +146,7 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Email
+                // --- Email Field ---
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -142,7 +178,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Password
+                // --- Password Field with Visibility Toggle ---
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -160,11 +196,13 @@ fun LoginScreen(
                         placeholder = { Text("••••••••") },
                         singleLine = true,
                         textStyle = TextStyle(color = Color.DarkGray),
-                        visualTransformation = if (loginViewModel.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        visualTransformation = if (loginViewModel.passwordVisible)
+                            VisualTransformation.None else PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         isError = loginState is LoginState.Error,
                         trailingIcon = {
+                            // Icon toggle for showing/hiding password
                             val image = if (loginViewModel.passwordVisible)
                                 Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                             val description = if (loginViewModel.passwordVisible)
@@ -186,18 +224,9 @@ fun LoginScreen(
                             unfocusedBorderColor = Color.Transparent
                         )
                     )
-
-                    /*Text(
-                        text = "Forgot Password",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFFD6185D),
-                        modifier = Modifier.clickable {
-                            // TODO: Add forgot password navigation/logic
-                        }
-                    )*/
                 }
 
+                // Error message when login fails
                 if (loginState is LoginState.Error) {
                     Text(
                         text = loginState.message,
@@ -208,10 +237,9 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // --- Login Button or Loading Indicator ---
                 Button(
-                    onClick = {
-                        loginViewModel.login()
-                    },
+                    onClick = { loginViewModel.login() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -231,10 +259,12 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // --- Social Login Section ---
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Divider with "Or"
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
@@ -245,9 +275,10 @@ fun LoginScreen(
                     LineUI(true, 150.dp)
                 }
 
+                // Social login buttons
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.Center,
@@ -280,9 +311,8 @@ fun LoginScreen(
                     }
                 }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                // Navigation to Sign Up screen
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "Not a member?", fontSize = 17.sp, color = Color(0xFF656872))
                     Text(
                         text = " Signup",
@@ -297,3 +327,5 @@ fun LoginScreen(
         }
     }
 }
+
+

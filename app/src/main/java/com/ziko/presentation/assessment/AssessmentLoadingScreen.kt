@@ -32,33 +32,47 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ziko.R
 import kotlinx.coroutines.delay
-import com.ziko.util.UpdateSystemBarsColors
+import com.ziko.core.util.UpdateSystemBarsColors
 
 
+/**
+ * This screen shows:
+ * - A top app bar with system bar color sync
+ * - A lesson illustration
+ * - Progress bar animated over 3 seconds
+ * - Confirmation text that the user is ready for assessment
+ *
+ * After the animation completes (roughly 3 seconds + 40ms delay), [onProgress] is triggered.
+ *
+ * @param lessonId The lesson identifier, e.g. "math5", used to generate "Math 5".
+ * @param onProgress Callback invoked when the animation completes and navigation can proceed.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AssessmentLoadingScreen(
     lessonId: String,
     onProgress: () -> Unit
 ) {
+    // Set system bar colors
     UpdateSystemBarsColors(
         topColor = Color(0xFF410FA3),
         bottomColor = Color.White
     )
 
+    // Format lesson name from ID (e.g., "math5" -> "Math 5")
     val textPart = lessonId.takeWhile { it.isLetter() }.replaceFirstChar { it.uppercase() }
     val numPart = lessonId.takeLastWhile { it.isDigit() }
     val lessonIdentifier = "$textPart $numPart"
 
+    // Initialize progress bar animation
     val progress = remember { Animatable(0.02f) }
 
     LaunchedEffect(Unit) {
-        // Animate progress from 0 to 1 over 3 seconds
         progress.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 3000) // 3 seconds
+            animationSpec = tween(durationMillis = 3000)
         )
-        delay(40) // wait 1 more second
+        delay(40)
         onProgress()
     }
 
@@ -68,7 +82,7 @@ fun AssessmentLoadingScreen(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color(0xFF410fa3),
                 ),
-                title = { Text(text = "") },
+                title = { Text(text = "") }
             )
         }
     ) { paddingValues ->
@@ -83,25 +97,23 @@ fun AssessmentLoadingScreen(
             Column(
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.align(Alignment.Center).padding(bottom = 50.dp)
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(bottom = 50.dp)
             ) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.practice_loading_illustration),
-                        contentDescription = "Lesson Illustration",
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .height(278.dp)
-                            .width(240.dp)
-                    )
-                }
+                // Illustration
+                Image(
+                    painter = painterResource(id = R.drawable.practice_loading_illustration),
+                    contentDescription = "Lesson Illustration",
+                    modifier = Modifier
+                        .height(278.dp)
+                        .width(240.dp)
+                )
 
+                // Loading text and progress bar
                 Column(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "Loading...",
@@ -111,13 +123,13 @@ fun AssessmentLoadingScreen(
                     )
 
                     LinearProgressIndicator(
-                        progress = progress.value,
+                        progress = { progress.value },
+                        modifier = Modifier
+                            .height(11.dp)
+                            .fillMaxWidth(),
                         color = Color(0xFF5B7BFE),
                         trackColor = Color(0xFFe5e5e5),
                         strokeCap = StrokeCap.Round,
-                        modifier = Modifier
-                            .height(11.dp)
-                            .fillMaxWidth()
                     )
 
                     Text(

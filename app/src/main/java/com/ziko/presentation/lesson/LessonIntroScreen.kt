@@ -29,9 +29,25 @@ import com.ziko.navigation.Screen
 import com.ziko.presentation.components.ProgressTopAppBar
 import com.ziko.ui.model.LessonIntroContent
 import com.ziko.presentation.components.AudioButtonWithLabelForIntro
-import com.ziko.util.AudioManager
-import com.ziko.util.UpdateSystemBarsColors
+import com.ziko.core.util.AudioManager
+import com.ziko.core.util.UpdateSystemBarsColors
 
+/**
+ * Composable screen that represents the introductory page for a lesson.
+ *
+ * This screen is the first step in the lesson flow and typically includes:
+ * - A pronunciation/audio definition segment.
+ * - One or more key takeaway points (if available).
+ * - A "Continue" button to begin the actual lesson content.
+ *
+ * It also sets up system UI theming, lifecycle binding for audio playback, and a progress app bar.
+ *
+ * @param navController Used to navigate to the first actual content screen of the lesson.
+ * @param lessonId The ID of the lesson being started. Used to fetch relevant intro content.
+ * @param onCancel Callback when the user cancels the lesson flow entirely.
+ * @param onNavigateBack Callback when the user navigates back using the back arrow.
+ * @param isFirstScreen Whether this is the first screen in the lesson flow (used to toggle back icon visibility).
+ */
 @Composable
 fun LessonIntroScreen(
     navController: NavController,
@@ -40,19 +56,26 @@ fun LessonIntroScreen(
     onNavigateBack: () -> Unit,
     isFirstScreen: Boolean
 ) {
+    // Apply consistent system bar colors for lesson screens
     UpdateSystemBarsColors(
         topColor = Color(0xFF410FA3),
         bottomColor = Color.White
     )
 
+    // --- Fetch content & progress tracking ---
+    // Get lesson intro content (definition audio and texts)
     val introContent: LessonIntroContent =
         LessonIntroContentProvider.getIntroContent(lessonId)
+
+    // Total lesson screens = 1 intro screen + content screens
     val totalScreens = 1 + LessonDataProvider.getLessonContent(lessonId).size
+
+    // Progress for intro screen is always 1/totalScreens
     val progress = 1f / totalScreens
     val currentScreen = 1
 
+    // Bind AudioManager to lifecycle (auto stop/resume playback)
     val lifecycleOwner = LocalLifecycleOwner.current
-
     DisposableEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.addObserver(AudioManager)
         onDispose {
@@ -60,9 +83,9 @@ fun LessonIntroScreen(
         }
     }
 
+    // Scaffold with a custom top app bar showing progress and cancel/back actions
     Scaffold(
         topBar = {
-            // Using the custom progress top app bar with the cancel button
             ProgressTopAppBar(
                 progress = progress,
                 currentScreen = currentScreen,
@@ -74,24 +97,22 @@ fun LessonIntroScreen(
         }
     ) { paddingValues ->
 
+        // Main content column
         Column(
             modifier = Modifier
                 .background(Color.White)
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 24.dp
-                ),
+                .padding(start = 16.dp, end = 16.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Spacer(Modifier.height(16.dp))
 
-            Column (
+            // --- Audio definition section ---
+            Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
                 horizontalAlignment = Alignment.Start
-            ){
+            ) {
                 AudioButtonWithLabelForIntro(
                     textOne = introContent.definitionTextOne,
                     textTwo = introContent.definitionTextTwo,
@@ -99,6 +120,7 @@ fun LessonIntroScreen(
                 )
             }
 
+            // --- Optional bullet points or learning objectives ---
             introContent.points?.forEach { point ->
                 if (point != null) {
                     Text(
@@ -110,18 +132,10 @@ fun LessonIntroScreen(
                 }
             }
 
+            // Push continue button to bottom
             Spacer(Modifier.weight(1f))
 
-            // --- Start Lesson Button ---
-            /*{Button(
-                onClick = { navController.navigate(Screen.LessonContent(lessonId).route) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            ) {
-                Text("Continue")
-            }}*/
-
+            // --- Continue to Lesson Content Button ---
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -130,10 +144,13 @@ fun LessonIntroScreen(
                     .height(56.dp)
                     .clip(RoundedCornerShape(30.dp))
                     .background(Color(0xFF5B7BFE))
-                    .clickable{ navController.navigate(Screen.LessonContent(lessonId).route) }
+                    .clickable {
+                        // Navigate to the actual lesson content screen
+                        navController.navigate(Screen.LessonContent(lessonId).route)
+                    }
             ) {
                 Text(
-                    text ="Continue",
+                    text = "Continue",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.W500

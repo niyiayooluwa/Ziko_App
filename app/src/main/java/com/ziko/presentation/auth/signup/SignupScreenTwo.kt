@@ -27,7 +27,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,31 +41,46 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ziko.core.util.UpdateSystemBarsColors
 import com.ziko.navigation.Screen
 import com.ziko.presentation.auth.login.LoginState
 import com.ziko.presentation.auth.login.LoginViewModel
 import com.ziko.presentation.components.CustomBiggerTopAppBar
 import com.ziko.presentation.profile.UserViewModel
-import com.ziko.util.UpdateSystemBarsColors
 
+/**
+ * Composable screen for the second step of user sign-up,
+ * where the user creates and confirms their password.
+ *
+ * @param navController Used to navigate between screens.
+ * @param viewModel ViewModel holding sign-up state and logic.
+ * @param userViewModel ViewModel used to fetch user data after auto-login.
+ */
 @Composable
 fun SignUpScreenTwo(
     navController: NavController,
     viewModel: SignUpViewModel,
     userViewModel: UserViewModel
-) { // Receive ViewModel
+) {
+    // LoginViewModel is used to auto-login after successful sign-up
     val loginViewModel: LoginViewModel = hiltViewModel()
 
+    // Local password state
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+
+    // Visibility toggles
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
-    //val signUpState by viewModel.signUpState.collectAsState()
+
+    // Collect sign-up state from ViewModel
     val signUpState = viewModel.signUpState.value
     val scrollState = rememberScrollState()
 
+    // Local error state to show relevant messages
     var localErrorMessage by remember { mutableStateOf<String?>(null) }
 
+    // Auto-login after successful sign-up
     LaunchedEffect(signUpState) {
         when (signUpState) {
             is SignUpState.Success -> {
@@ -77,7 +91,7 @@ fun SignUpScreenTwo(
                 }
             }
             is SignUpState.Error -> {
-                localErrorMessage = (signUpState as SignUpState.Error).message
+                localErrorMessage = signUpState.message
             }
             else -> Unit
         }
@@ -88,8 +102,10 @@ fun SignUpScreenTwo(
         bottomColor = Color.White
     )
 
+    // Collect login state from ViewModel
     val loginState by loginViewModel.loginState
 
+    // Navigate to home if login succeeds, otherwise show error
     LaunchedEffect(loginState) {
         when (loginState) {
             is LoginState.Success -> {
@@ -137,7 +153,7 @@ fun SignUpScreenTwo(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Password
+                // ---------------- Password Field ----------------
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -157,9 +173,7 @@ fun SignUpScreenTwo(
                         placeholder = { Text("••••••••") },
                         singleLine = true,
                         shape = RoundedCornerShape(16.dp),
-                        textStyle = TextStyle(
-                            color = Color.DarkGray,
-                        ),
+                        textStyle = TextStyle(color = Color.DarkGray),
                         modifier = Modifier.fillMaxWidth(),
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
@@ -181,7 +195,7 @@ fun SignUpScreenTwo(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Confirm Password
+                // ---------------- Confirm Password Field ----------------
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -200,9 +214,7 @@ fun SignUpScreenTwo(
                         },
                         placeholder = { Text("••••••••") },
                         singleLine = true,
-                        textStyle = TextStyle(
-                            color = Color.DarkGray,
-                        ),
+                        textStyle = TextStyle(color = Color.DarkGray),
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
                         visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -232,14 +244,17 @@ fun SignUpScreenTwo(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // ---------------- Submit Button ----------------
                 Button(
                     onClick = {
                         viewModel.signup(
                             onSuccess = {},
-                            onError = { /* Error handling via SignUpState */ }
+                            onError = {}
                         )
                     },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF5B7BFE)
                     ),
@@ -252,6 +267,7 @@ fun SignUpScreenTwo(
                     }
                 }
 
+                // ---------------- Error Message Display ----------------
                 if (signUpState is SignUpState.Error) {
                     Text(
                         text = signUpState.message,
@@ -263,3 +279,4 @@ fun SignUpScreenTwo(
         }
     }
 }
+

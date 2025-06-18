@@ -33,10 +33,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ziko.R
-import com.ziko.util.UpdateSystemBarsColors
+import com.ziko.core.util.UpdateSystemBarsColors
 import me.nikhilchaudhari.library.neumorphic
 import me.nikhilchaudhari.library.shapes.Pressed
 
+/**
+ * A screen displayed after a practice session is completed.
+ *
+ * Shows a congratulatory message and two CTAs:
+ * - Continue to the next lesson (if not the last lesson)
+ * - Return to the home screen
+ *
+ * @param onPopBackStack Callback to pop the navigation stack (used by the back arrow).
+ * @param onContinueLesson Callback to navigate to the next lesson in the sequence.
+ * @param onBackToHome Callback to navigate back to the home screen.
+ * @param lessonId ID of the current lesson (e.g., "lesson1", "lesson8")
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PracticeCompletionScreen(
@@ -45,31 +57,36 @@ fun PracticeCompletionScreen(
     onBackToHome: () -> Unit,
     lessonId: String
 ) {
-    val numPart = lessonId.takeLastWhile {it.isDigit()}
+    // Extract numeric part of lessonId (e.g., "lesson3" → "3")
+    val numPart = lessonId.takeLastWhile { it.isDigit() }
     val nextLesson = numPart.toInt() + 1
 
+    // Update system UI colors for status/navigation bars
     UpdateSystemBarsColors(
         topColor = Color(0xFF410FA3),
         bottomColor = Color.White
     )
 
-    Scaffold (
-        topBar = { CenterAlignedTopAppBar(
-            title = { Text(" ") },
-            navigationIcon = {
-                IconButton(onClick = onPopBackStack) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBackIosNew,
-                        contentDescription = "Back",
-                        tint = Color.White
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = Color(0xFF410FA3)
+    Scaffold(
+        topBar = {
+            // Top bar with back arrow (no title text shown)
+            CenterAlignedTopAppBar(
+                title = { Text(" ") },
+                navigationIcon = {
+                    IconButton(onClick = onPopBackStack) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFF410FA3)
+                )
             )
-        ) }
-    ){ paddingValues ->
+        }
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .background(Color.White)
@@ -77,11 +94,12 @@ fun PracticeCompletionScreen(
                 .padding(paddingValues)
                 .padding(24.dp),
         ) {
-            Column (
+            // --- Centered Congratulatory Message + Illustration ---
+            Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.align(Alignment.Center)
-            ){
+            ) {
                 Image(
                     painter = painterResource(
                         if (lessonId != "lesson8") R.drawable.congratulations
@@ -93,7 +111,6 @@ fun PracticeCompletionScreen(
                         .padding(bottom = 30.dp)
                 )
 
-                // Title
                 Text(
                     text = "Congratulations!",
                     fontSize = 28.sp,
@@ -103,7 +120,6 @@ fun PracticeCompletionScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Congratulations message
                 Text(
                     text = if (lessonId != "lesson8") {
                         "You are moving on to great things."
@@ -116,15 +132,15 @@ fun PracticeCompletionScreen(
                 )
             }
 
-            //Buttons
-            Column (
+            // --- Bottom Button Section ---
+            Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-            ){
-                // Continue button
+            ) {
+                // Continue to next lesson (if not last lesson)
                 if (lessonId != "lesson8") {
                     Column(
                         verticalArrangement = Arrangement.Center,
@@ -134,10 +150,10 @@ fun PracticeCompletionScreen(
                             .height(56.dp)
                             .clip(RoundedCornerShape(30.dp))
                             .background(Color(0xFF5b7bfe))
-                            .clickable{onContinueLesson()}
+                            .clickable { onContinueLesson() }
                     ) {
                         Text(
-                            text ="Continue to lesson $nextLesson",
+                            text = "Continue to lesson $nextLesson",
                             color = Color.White,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.W500
@@ -145,7 +161,7 @@ fun PracticeCompletionScreen(
                     }
                 }
 
-                //Go back home button
+                // Back to home button with neumorphic design
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -161,10 +177,10 @@ fun PracticeCompletionScreen(
                             strokeWidth = 4.dp,
                             elevation = 4.dp
                         )
-                        .clickable{onBackToHome()}
+                        .clickable { onBackToHome() }
                 ) {
                     Text(
-                        text ="Back to home",
+                        text = "Back to home",
                         color = Color(0xFF5b7bfe),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W500

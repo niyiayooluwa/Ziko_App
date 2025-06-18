@@ -2,13 +2,7 @@ package com.ziko.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
@@ -21,51 +15,67 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+/**
+ * A composable UI component that indicates the user's attempt success/failure and displays
+ * a contextual action button ("Check", "Try again", "Next", or "Skip to Next").
+ *
+ * This is often used after speech or form-based interactions to give visual feedback and
+ * prompt the next logical step.
+ *
+ * @param condition Determines the result of the attempt:
+ * - `true` → success
+ * - `false` → failure
+ * - `null` → awaiting evaluation
+ * @param hasRecorded Whether the user has made an attempt (e.g., recorded speech) — only relevant when [condition] is null.
+ * @param attemptCount Number of current attempts made.
+ * @param maxAttempts Maximum allowed attempts before the user is prompted to skip.
+ * @param onClick Callback for when the bottom button is clicked (e.g., proceed, retry, check).
+ * @param modifier Modifier to be applied to the whole component.
+ */
 @Composable
 fun SuccessIndicator(
     condition: Boolean?,
-    hasRecorded: Boolean, // To track if user has recorded
-    attemptCount: Int,    // Current attempt number
-    maxAttempts: Int,     // Maximum attempts allowed
+    hasRecorded: Boolean,
+    attemptCount: Int,
+    maxAttempts: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Determine if button should be enabled
+    // Whether the action button should be clickable
     val isButtonEnabled = when (condition) {
-        null -> hasRecorded // Only enabled if user has recorded something
-        true -> true        // Always enabled when correct
-        false -> true       // Always enabled when incorrect (for retry or skip)
+        null -> hasRecorded       // Only enable "Check" if recording exists
+        true, false -> true       // Always enable "Next", "Try again", or "Skip"
     }
 
-    // Determine button colors based on state
+    // Background color of the action button based on status
     val buttonBackgroundColor = when {
-        !isButtonEnabled -> Color(0xFFE0E0E0) // Grey when disabled
-        condition == true -> Color.White
-        condition == false -> Color.White
-        else -> Color(0xFF5b7bfe) // Blue when ready to check
+        !isButtonEnabled -> Color(0xFFE0E0E0)       // Disabled = grey
+        condition != null -> Color.White            // Success or failure = white
+        else -> Color(0xFF5b7bfe)                   // Active check = primary blue
     }
 
+    // Text color of the action button
     val buttonTextColor = when {
-        !isButtonEnabled -> Color(0xFF9E9E9E) // Grey text when disabled
-        condition == true -> Color(0xFF12D18E)
-        condition == false -> Color(0xFFf75555)
-        else -> Color.White
+        !isButtonEnabled -> Color(0xFF9E9E9E)       // Disabled text = grey
+        condition == true -> Color(0xFF12D18E)       // Success = green
+        condition == false -> Color(0xFFf75555)      // Error = red
+        else -> Color.White                          // Default = white
     }
 
-    Column (
+    Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.Start,
         modifier = modifier
             .fillMaxWidth()
             .background(
+                // Card background color changes based on result
                 when (condition) {
-                    true -> Color(0xFF12D18E)
-                    false -> Color(0xFFf75555)
-                    null -> Color.White
+                    true -> Color(0xFF12D18E)    // Green for success
+                    false -> Color(0xFFf75555)   // Red for failure
+                    null -> Color.White          // Default white for neutral
                 }
             )
             .padding(
@@ -75,12 +85,13 @@ fun SuccessIndicator(
                 end = 8.dp,
             ),
     ) {
-        Row (
-            modifier = Modifier
-                .fillMaxWidth(),
+        // Top row: icon + status message
+        Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Conditionally show success/fail icon
             when (condition) {
                 true -> Icons.Filled.CheckCircle
                 false -> Icons.Filled.Cancel
@@ -94,16 +105,18 @@ fun SuccessIndicator(
                 )
             }
 
+            // Conditionally show corresponding message
             when (condition) {
-                true -> "You nailed it!"
+                true -> "You nailed it!" // Success
                 false -> {
+                    // If max attempts reached, show fallback message
                     if (attemptCount >= maxAttempts) {
                         "Don't worry, let's move on."
                     } else {
-                        "Whoops! Not quite yet."
+                        "Whoops! Not quite yet." // Retry available
                     }
                 }
-                null -> null
+                null -> null // No message until user attempts
             }?.let {
                 Text(
                     text = it,
@@ -114,6 +127,7 @@ fun SuccessIndicator(
             }
         }
 
+        // Bottom action button
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -128,12 +142,12 @@ fun SuccessIndicator(
         ) {
             Text(
                 text = when (condition) {
-                    true -> "Next"
+                    true -> "Next" // Successful, proceed
                     false -> {
                         if (attemptCount >= maxAttempts) {
-                            "Skip to Next"
+                            "Skip to Next" // Failed too many times
                         } else {
-                            "Try again"
+                            "Try again" // Failed, can retry
                         }
                     }
                     null -> {

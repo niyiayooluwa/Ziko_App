@@ -1,13 +1,13 @@
 package com.ziko.data.model
 
-import com.ziko.data.practice.getPractice1Content
-import com.ziko.data.practice.getPractice2Content
-import com.ziko.data.practice.getPractice3Content
-import com.ziko.data.practice.getPractice4Content
-import com.ziko.data.practice.getPractice5Content
-import com.ziko.data.practice.getPractice6Content
-import com.ziko.data.practice.getPractice7Content
-import com.ziko.data.practice.getPractice8Content
+import com.ziko.data.local.practice.getPractice1Content
+import com.ziko.data.local.practice.getPractice2Content
+import com.ziko.data.local.practice.getPractice3Content
+import com.ziko.data.local.practice.getPractice4Content
+import com.ziko.data.local.practice.getPractice5Content
+import com.ziko.data.local.practice.getPractice6Content
+import com.ziko.data.local.practice.getPractice7Content
+import com.ziko.data.local.practice.getPractice8Content
 import com.ziko.ui.model.PracticeScreenContent
 
 object PracticeDataProvider {

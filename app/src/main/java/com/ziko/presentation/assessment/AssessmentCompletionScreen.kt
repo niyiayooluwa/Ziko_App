@@ -17,11 +17,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,15 +29,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ziko.R
-import com.ziko.util.UpdateSystemBarsColors
+import com.ziko.core.util.UpdateSystemBarsColors
 import me.nikhilchaudhari.library.neumorphic
 import me.nikhilchaudhari.library.shapes.Pressed
 
+/**
+ * Composable screen shown upon completing an assessment.
+ *
+ * Displays the user's score, accuracy, performance commentary, and a summary of key stats.
+ * Automatically attempts to submit results upon load, and provides options to retake the assessment
+ * or return to the home screen.
+ *
+ * @param onRetakeAssessment Callback triggered when the user opts to retake the assessment.
+ * @param onBackToHome Callback triggered when the user opts to return to the home screen.
+ * @param percentage The user's score percentage (0f–100f).
+ * @param scoreImprovement Difference in percentage score compared to previous attempts.
+ * @param correctAnswers A string summary of how many answers were correct.
+ * @param timeSpent A formatted string of how long the assessment took.
+ * @param submissionStatus The current submission state (IDLE, SUBMITTING, SUCCESS, ERROR).
+ * @param onSubmitResults Called once when the screen loads if submissionStatus is IDLE.
+ */
 @Composable
 fun AssessmentCompletionScreen(
     onRetakeAssessment: () -> Unit,
@@ -50,17 +60,18 @@ fun AssessmentCompletionScreen(
     scoreImprovement: Int,
     correctAnswers: String,
     timeSpent: String,
-    previousScore: Int?,
     submissionStatus: SubmissionStatus,
     onSubmitResults: () -> Unit,
-    onRetrySubmission: () -> Unit
 ) {
+    // Set status bar and navigation bar colors
     UpdateSystemBarsColors(
         topColor = Color.White,
         bottomColor = Color.White
     )
 
     val accuracyOfAssessment = percentage.toInt()
+
+    // Determine visual feedback colors based on score
     val colorPrimary = when (accuracyOfAssessment) {
         in 70..100 -> Color(0xFF5BA890)
         in 50..69 -> Color(0xFFF76400)
@@ -72,7 +83,7 @@ fun AssessmentCompletionScreen(
         else -> Color(0xFFDeeee9)
     }
 
-    // Auto-submit results when screen loads
+    // Auto-submit results on screen load
     LaunchedEffect(Unit) {
         if (submissionStatus == SubmissionStatus.IDLE) {
             onSubmitResults()
@@ -80,6 +91,7 @@ fun AssessmentCompletionScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        // Illustration at the top
         Image(
             painter = painterResource(id = R.drawable.assessment_complete),
             contentDescription = null,
@@ -99,6 +111,7 @@ fun AssessmentCompletionScreen(
         ) {
             Spacer(modifier = Modifier.height(48.dp))
 
+            // Circular progress showing percentage score
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -106,6 +119,8 @@ fun AssessmentCompletionScreen(
                     .align(Alignment.CenterHorizontally)
             ) {
                 val animatedProgress = remember { Animatable(0f) }
+
+                // Animate the progress bar to the actual percentage
                 LaunchedEffect(accuracyOfAssessment) {
                     val targetValue = (accuracyOfAssessment / 100f).coerceIn(0f, 1f)
                     animatedProgress.animateTo(
@@ -122,9 +137,8 @@ fun AssessmentCompletionScreen(
                     trackColor = colorSecondary,
                     strokeCap = StrokeCap.Round,
                 )
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "$accuracyOfAssessment%",
                         fontSize = 28.sp,
@@ -141,12 +155,10 @@ fun AssessmentCompletionScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Commentary with submission status
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            // Performance commentary
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = getPerformanceMessage(accuracyOfAssessment, scoreImprovement),
+                    text = getPerformanceMessage(accuracyOfAssessment),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = Color.Black
@@ -154,37 +166,17 @@ fun AssessmentCompletionScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                /*// Show score improvement if available
-                if (previousScore != null && scoreImprovement != 0) {
-                    Text(
-                        text = getImprovementMessage(scoreImprovement),
-                        fontSize = 14.sp,
-                        color = if (scoreImprovement > 0) Color(0xFF5BA890) else Color(0xFFF76400),
-                        fontWeight = FontWeight.Medium
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }*/
-
                 Text(
                     text = "You've completed the assessment.",
                     fontSize = 16.sp,
                     color = Color.Gray
                 )
-
-                /*// Submission status indicator
-                SubmissionStatusIndicator(
-                    status = submissionStatus,
-                    onRetry = onRetrySubmission
-                )*/
             }
 
             Spacer(Modifier.height(24.dp))
 
-            // Stats and Buttons
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Stats
+            // Stats and Action buttons
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -206,13 +198,13 @@ fun AssessmentCompletionScreen(
 
                 Spacer(Modifier.height(38.dp))
 
-                // Buttons
+                // Retake and Back buttons
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Retake Assessment button
+                    // Retake Assessment Button
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -231,7 +223,7 @@ fun AssessmentCompletionScreen(
                         )
                     }
 
-                    // Back to Home button
+                    // Back to Home Button
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -262,89 +254,12 @@ fun AssessmentCompletionScreen(
     }
 }
 
-@Composable
-private fun SubmissionStatusIndicator(
-    status: SubmissionStatus,
-    onRetry: () -> Unit
-) {
-    when (status) {
-        SubmissionStatus.SUBMITTING -> {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    strokeWidth = 2.dp,
-                    color = Color(0xFF5b7bfe)
-                )
-                Text(
-                    text = "Saving your score...",
-                    fontSize = 12.sp,
-                    color = Color(0xFF5b7bfe)
-                )
-            }
-        }
-        SubmissionStatus.SUCCESS -> {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = Color(0xFF5BA890)
-                )
-                Text(
-                    text = "Score saved successfully!",
-                    fontSize = 12.sp,
-                    color = Color(0xFF5BA890)
-                )
-            }
-        }
-        SubmissionStatus.ERROR -> {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Warning,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = Color(0xFFF76400)
-                    )
-                    Text(
-                        text = "Failed to save score",
-                        fontSize = 12.sp,
-                        color = Color(0xFFF76400)
-                    )
-                }
-
-                Text(
-                    text = "Tap to retry",
-                    fontSize = 10.sp,
-                    color = Color(0xFF5b7bfe),
-                    modifier = Modifier
-                        .clickable { onRetry() }
-                        .padding(4.dp),
-                    textDecoration = TextDecoration.Underline
-                )
-            }
-        }
-        SubmissionStatus.IDLE -> {
-            // Show nothing when idle
-        }
-    }
-}
-
-private fun getPerformanceMessage(accuracy: Int, improvement: Int): String {
+/**
+ * Returns a performance message string based on accuracy.
+ *
+ * @param accuracy The percentage accuracy of the user's assessment.
+ */
+private fun getPerformanceMessage(accuracy: Int): String {
     return when {
         accuracy >= 90 -> "Outstanding!"
         accuracy >= 80 -> "Excellent Work!"
@@ -355,6 +270,12 @@ private fun getPerformanceMessage(accuracy: Int, improvement: Int): String {
     }
 }
 
+/**
+ * Returns a properly formatted improvement percentage string.
+ *
+ * @param improvement The score difference since the previous attempt.
+ * @return A formatted string like "+12%", "-5%", or "No change".
+ */
 private fun formatImprovementStat(improvement: Int): String {
     return when {
         improvement > 0 -> "+$improvement%"
@@ -363,6 +284,12 @@ private fun formatImprovementStat(improvement: Int): String {
     }
 }
 
+/**
+ * A row widget used to display a statistic in key-value format.
+ *
+ * @param description The name of the stat (e.g. "Correct Answers").
+ * @param value The corresponding value of the stat.
+ */
 @Composable
 fun StatRow(description: String, value: String) {
     Row(
@@ -382,9 +309,9 @@ fun StatRow(description: String, value: String) {
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = if (description == "Score Improvement" && value.startsWith("+")) {
-                Color(0xFF5BA890) // Green for positive improvement
+                Color(0xFF5BA890) // Positive
             } else if (description == "Score Improvement" && value.startsWith("-")) {
-                Color(0xFFD6185D) // Red for negative improvement
+                Color(0xFFD6185D) // Negative
             } else {
                 Color.Black
             }

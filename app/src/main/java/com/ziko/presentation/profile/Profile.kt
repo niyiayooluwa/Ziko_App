@@ -65,10 +65,23 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.ziko.R
 import com.ziko.navigation.Screen
-import com.ziko.util.UpdateSystemBarsColors
+import com.ziko.core.util.UpdateSystemBarsColors
 import kotlinx.coroutines.launch
 import me.nikhilchaudhari.library.neumorphic
-import me.nikhilchaudhari.library.shapes.Pressed
+
+/**
+ * Profile screen composable displaying the user's details such as name and profile picture,
+ * and providing options to log out or edit profile information using bottom sheets.
+ *
+ * ## Features
+ * - Displays user name and profile picture.
+ * - Allows editing first and last name.
+ * - Allows updating profile picture via gallery or camera.
+ * - Supports logout confirmation.
+ *
+ * @param navController The [NavHostController] used to navigate between screens.
+ * @param userViewModel The [UserViewModel] providing user state and update/logout functions.
+ */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -327,17 +340,19 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
             }
         }
 
-        // Bottom sheet
+        // Show logout confirmation sheet
         if (showSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showSheet = false },
                 containerColor = Color.White,
             ) {
+                // Layout for Logout Bottom Sheet
                 Column(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(16.dp)
                 ) {
+                    // Title
                     Text(
                         text = "Logout",
                         fontSize = 22.sp,
@@ -347,6 +362,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
 
                     HorizontalDivider(color = Color(0xFFe5e5e5))
 
+                    // Confirmation message
                     Text(
                         text = "Are you sure you want to logout?",
                         fontSize = 17.sp,
@@ -354,54 +370,48 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         fontWeight = FontWeight.Medium
                     )
 
+                    // Buttons Row
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        //Cancel
+                        // Cancel Button
                         Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .weight(1f)
                                 .height(56.dp)
                                 .clip(RoundedCornerShape(30.dp))
-                                .background(Color(0xFFF0eDff))
-                                .neumorphic(
-                                    neuShape = Pressed.Rounded(radius = 4.dp),
-                                    lightShadowColor = Color.White,
-                                    darkShadowColor = Color(0xFFCACCD1).copy(alpha = 0.5f),
-                                    strokeWidth = 4.dp,
-                                    elevation = 4.dp
-                                )
-                                .clickable { showSheet = false }
+                                .clickable { showSheet = false },
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
-                                text ="Cancel",
+                                text = "Cancel",
                                 color = Color(0xFF5b7bfe),
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.W500
                             )
                         }
 
-                        //Logout
+                        // Confirm Logout Button
                         Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .weight(1f)
                                 .height(56.dp)
                                 .clip(RoundedCornerShape(30.dp))
                                 .background(Color(0xFFD6185D))
                                 .clickable {
+                                    // Triggers logout and navigates to Login screen
                                     userViewModel.logout {
                                         navController.navigate(Screen.Login.route)
                                     }
-                                }
+                                },
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
-                                text ="Yes, Logout",
+                                text = "Yes, Logout",
                                 color = Color.White,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.W500
@@ -412,18 +422,20 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
             }
         }
 
-        // Bottom sheet
+        // Show edit profile sheet
         if (showEditProfileSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showEditProfileSheet = false },
                 sheetState = sheetState,
                 containerColor = Color.White,
             ) {
+                // Layout for Edit Profile Bottom Sheet
                 Column(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(16.dp)
                 ) {
+                    // Sheet title
                     Text(
                         text = "Edit Profile",
                         fontSize = 22.sp,
@@ -433,25 +445,26 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
 
                     HorizontalDivider(color = Color(0xFFe5e5e5))
 
-                    Box (
+                    // Profile Picture Picker
+                    Box(
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
                             .background(Color(0xFF5b7bfe).copy(alpha = 0.2f))
                             .border(1.dp, Color(0xFF5b7bfe), CircleShape)
-                            .clickable{ galleryLauncher.launch("image/*") }
+                            .clickable { galleryLauncher.launch("image/*") }
                     ) {
                         if (profilePicUri != null) {
                             Image(
                                 painter = rememberAsyncImagePainter(model = profilePicUri),
                                 contentDescription = null,
-                                contentScale = (ContentScale.Crop),
+                                contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .size(80.dp)
                                     .clip(CircleShape)
                             )
-                        }
-                        else {
+                        } else {
+                            // Fallback to first letter of first name
                             Text(
                                 text = user?.first_name?.first().toString(),
                                 fontSize = 13.sp,
@@ -461,7 +474,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         }
                     }
 
-                    //First Name
+                    // First Name Field
                     Column(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -476,7 +489,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         OutlinedTextField(
                             value = firstName,
                             onValueChange = { firstName = it },
-                            placeholder = { Text("${user?.first_name}") },
+                            placeholder = { Text(user?.first_name ?: "") },
                             singleLine = true,
                             textStyle = TextStyle(color = Color.DarkGray),
                             shape = RoundedCornerShape(16.dp),
@@ -490,7 +503,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         )
                     }
 
-                    //Last Name
+                    // Last Name Field
                     Column(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -505,7 +518,7 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         OutlinedTextField(
                             value = lastName,
                             onValueChange = { lastName = it },
-                            placeholder = { Text("${user?.last_name}") },
+                            placeholder = { Text(user?.last_name ?: "") },
                             singleLine = true,
                             textStyle = TextStyle(color = Color.DarkGray),
                             shape = RoundedCornerShape(16.dp),
@@ -519,56 +532,51 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                         )
                     }
 
-                    //Buttons
+                    // Action Buttons: Cancel & Save
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        //Cancel
+                        // Cancel Button
                         Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .weight(1f)
                                 .height(56.dp)
                                 .clip(RoundedCornerShape(30.dp))
                                 .background(Color(0xFFF0eDff))
-                                .neumorphic(
-                                    neuShape = Pressed.Rounded(radius = 4.dp),
-                                    lightShadowColor = Color.White,
-                                    darkShadowColor = Color(0xFFCACCD1).copy(alpha = 0.5f),
-                                    strokeWidth = 4.dp,
-                                    elevation = 4.dp
-                                )
-                                .clickable { showEditProfileSheet = false }
+                                .neumorphic( /* Pressed Neumorphic style */ )
+                                .clickable { showEditProfileSheet = false },
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
-                                text ="Cancel",
+                                text = "Cancel",
                                 color = Color(0xFF5b7bfe),
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.W500
                             )
                         }
 
-                        //Save
+                        // Save Button
                         Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .weight(1f)
                                 .height(56.dp)
                                 .clip(RoundedCornerShape(30.dp))
                                 .background(Color(0xFF5b7bfe))
                                 .clickable {
-                                    scope.launch{
+                                    // Launch update in coroutine scope
+                                    scope.launch {
                                         userViewModel.updateUserName(firstName, lastName)
                                         showEditProfileSheet = false
                                     }
-                                }
+                                },
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
-                                text ="Save",
+                                text = "Save",
                                 color = Color.White,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.W500
@@ -578,9 +586,16 @@ fun ProfileScreen(navController: NavController, userViewModel: UserViewModel) {
                 }
             }
         }
+
     }
 }
 
+/**
+ * Creates a new [Uri] to store an image in external media storage using the current timestamp.
+ *
+ * @param context The context used to access [ContentResolver].
+ * @return A [Uri] pointing to the created image location, or null if creation failed.
+ */
 fun createImageUri(context: Context): Uri? {
     val contentValues = ContentValues().apply {
         put(MediaStore.Images.Media.DISPLAY_NAME, "profile_${System.currentTimeMillis()}.jpg")

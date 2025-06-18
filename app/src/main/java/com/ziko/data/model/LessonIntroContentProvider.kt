@@ -1,6 +1,5 @@
 package com.ziko.data.model
 
-import com.ziko.R
 import com.ziko.ui.model.LessonIntroContent
 
 object LessonIntroContentProvider {

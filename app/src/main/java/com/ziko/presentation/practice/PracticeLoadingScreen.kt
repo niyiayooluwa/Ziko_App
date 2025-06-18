@@ -31,34 +31,47 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ziko.R
-import com.ziko.util.UpdateSystemBarsColors
+import com.ziko.core.util.UpdateSystemBarsColors
 import kotlinx.coroutines.delay
 
 
+/**
+ * Composable function that displays an animated loading screen after a lesson is completed,
+ * before transitioning to the next phase (e.g., assessment or summary).
+ *
+ * This screen features a top app bar, a progress bar that animates over 3 seconds,
+ * a congratulatory message, and a lesson-specific illustration.
+ *
+ * @param lessonId The ID of the completed lesson (e.g., "lesson8" or "L8") used for display.
+ * @param onProgress Callback triggered after the progress animation finishes (approx. 3s + 40ms).
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PracticeLoadingScreen(
     lessonId: String,
     onProgress: () -> Unit
 ) {
+    // Set system status and navigation bar colors
     UpdateSystemBarsColors(
         topColor = Color(0xFF410FA3),
         bottomColor = Color.White
     )
 
+    // Extract lesson display format: "Lesson 8", "L 8", etc.
     val textPart = lessonId.takeWhile { it.isLetter() }.replaceFirstChar { it.uppercase() }
     val numPart = lessonId.takeLastWhile { it.isDigit() }
     val lessonIdentifier = "$textPart $numPart"
 
+    // Progress bar animation controller
     val progress = remember { Animatable(0.02f) }
 
+    // Launch once on entering screen: animate progress and trigger next phase
     LaunchedEffect(Unit) {
-        // Animate progress from 0 to 1 over 3 seconds
         progress.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 3000) // 3 seconds
+            animationSpec = tween(durationMillis = 3000) // Smooth progress for 3s
         )
-        delay(40) // wait 1 more second
+        delay(40) // Give small buffer after animation
         onProgress()
     }
 
@@ -68,7 +81,7 @@ fun PracticeLoadingScreen(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color(0xFF410fa3),
                 ),
-                title = { Text(text = "") },
+                title = { Text(text = "") } // No title text, purely visual
             )
         }
     ) { paddingValues ->
@@ -83,8 +96,11 @@ fun PracticeLoadingScreen(
             Column(
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.align(Alignment.Center).padding(bottom = 50.dp)
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(bottom = 50.dp)
             ) {
+                // ---- Illustration ----
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -99,6 +115,7 @@ fun PracticeLoadingScreen(
                     )
                 }
 
+                // ---- Progress Indicator + Message ----
                 Column(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -111,17 +128,17 @@ fun PracticeLoadingScreen(
                     )
 
                     LinearProgressIndicator(
-                        progress = { progress.value },
+                        progress = { progress.value }, // Animated progress state
                         modifier = Modifier
                             .height(11.dp)
                             .fillMaxWidth(),
-                        color = Color(0xFF5B7BFE),
-                        trackColor = Color(0xFFe5e5e5),
-                        strokeCap = StrokeCap.Round,
+                        color = Color(0xFF5B7BFE),     // Blue fill
+                        trackColor = Color(0xFFe5e5e5), // Gray background
+                        strokeCap = StrokeCap.Round
                     )
 
                     Text(
-                        text = "You have completed $lessonIdentifier.You are ready\nfor a bigger challenge.",
+                        text = "You have completed $lessonIdentifier. You are ready\nfor a bigger challenge.",
                         textAlign = TextAlign.Center,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.W400,

@@ -30,21 +30,43 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ziko.core.util.UpdateSystemBarsColors
 import com.ziko.navigation.Screen
 import com.ziko.presentation.components.CustomBiggerTopAppBar
-import com.ziko.util.UpdateSystemBarsColors
 
+/**
+ * First screen of the sign-up process. Collects user's first name, last name, and email.
+ *
+ * This screen validates the email and enables progression only when all input fields are filled.
+ * It relies on [SignUpViewModel] for email validation logic.
+ *
+ * ## State:
+ * - [firstName], [lastName], [email] are hoisted inside the screen using `remember`.
+ * - [emailError] is observed from the ViewModel and shown below the email input field.
+ *
+ * ## Navigation:
+ * - Navigates to [Screen.SignTwo] when inputs are valid and the button is pressed.
+ *
+ * @param navController Used to handle navigation between screens.
+ * @param viewModel ViewModel used for validating inputs and storing temporary form data.
+ */
 @Composable
 fun SignUpScreenOne(
     navController: NavController,
-    viewModel : SignUpViewModel
+    viewModel: SignUpViewModel
 ) {
+    // Local state for user input
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+
+    // Error message for email validation (from ViewModel)
     val emailError = viewModel.emailError.value
+
+    // Scroll state for screen scrollability
     val scrollState = rememberScrollState()
 
+    // System bar colors (purple top, white bottom)
     UpdateSystemBarsColors(
         topColor = Color(0xFF410FA3),
         bottomColor = Color.White
@@ -54,7 +76,7 @@ fun SignUpScreenOne(
         topBar = {
             CustomBiggerTopAppBar(
                 title = "Sign Up",
-                onNavigationClick = { navController.popBackStack() } // Go back to the previous screen (e.g., Login)
+                onNavigationClick = { navController.popBackStack() } // Navigate back
             )
         }
     ) { paddingValues ->
@@ -68,6 +90,7 @@ fun SignUpScreenOne(
         ) {
             Spacer(modifier = Modifier.height(48.dp))
 
+            // Header text
             Text(
                 text = "Create Account",
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
@@ -84,7 +107,7 @@ fun SignUpScreenOne(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // First Name
+                // FIRST NAME INPUT
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -100,9 +123,7 @@ fun SignUpScreenOne(
                         onValueChange = { firstName = it },
                         placeholder = { Text("John") },
                         singleLine = true,
-                        textStyle = TextStyle(
-                            color = Color.DarkGray,
-                        ),
+                        textStyle = TextStyle(color = Color.DarkGray),
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -116,7 +137,7 @@ fun SignUpScreenOne(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Last Name
+                // LAST NAME INPUT
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -132,9 +153,7 @@ fun SignUpScreenOne(
                         onValueChange = { lastName = it },
                         placeholder = { Text("Doe") },
                         singleLine = true,
-                        textStyle = TextStyle(
-                            color = Color.DarkGray,
-                        ),
+                        textStyle = TextStyle(color = Color.DarkGray),
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -148,7 +167,7 @@ fun SignUpScreenOne(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Email
+                // EMAIL INPUT
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -163,15 +182,13 @@ fun SignUpScreenOne(
                         value = email,
                         onValueChange = {
                             email = it
-                            viewModel.updateEmail(it) // Update ViewModel for validation
+                            viewModel.updateEmail(it) // Triggers validation
                         },
                         placeholder = { Text("username@domain.com") },
                         singleLine = true,
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
-                        textStyle = TextStyle(
-                            color = Color.DarkGray,
-                        ),
+                        textStyle = TextStyle(color = Color.DarkGray),
                         isError = emailError != null,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = Color(0xFFF2F3F3),
@@ -191,15 +208,21 @@ fun SignUpScreenOne(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // NEXT BUTTON
                 Button(
                     onClick = {
+                        // Save form data to ViewModel
                         viewModel.updateFirstName(firstName)
                         viewModel.updateLastName(lastName)
+
+                        // Proceed only if email is valid
                         if (viewModel.isEmailValid()) {
                             navController.navigate(Screen.SignTwo.route)
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF5B7BFE)
                     ),

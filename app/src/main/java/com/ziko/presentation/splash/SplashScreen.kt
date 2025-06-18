@@ -23,61 +23,80 @@ import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.navigation.Screen
 import com.ziko.presentation.profile.UserViewModel
-import com.ziko.util.UpdateSystemBarsColors
+import com.ziko.core.util.UpdateSystemBarsColors
 
-// Shows the logo, waits 2 seconds, then moves to the Login screen
+/**
+ * Splash screen composable that:
+ * 1. Displays a splash logo for a fixed duration.
+ * 2. Triggers user authentication check after splash.
+ * 3. Navigates to the appropriate screen based on token validity and user data presence.
+ *
+ * This is the first screen shown on app launch.
+ *
+ * @param navController Used to navigate between screens after splash logic is complete.
+ */
 @Composable
-fun SplashScreen(navController: NavController) { // Correct: Only one top-level Composable function
-    val splashViewModel: SplashViewModel = viewModel() // Assuming SplashViewModel is not Hilt-injected
-    val userViewModel: UserViewModel = hiltViewModel() // Assuming UserViewModel is Hilt-injected
+fun SplashScreen(navController: NavController) {
+    // SplashViewModel controls only the splash delay timer
+    val splashViewModel: SplashViewModel = viewModel() // No Hilt
+    // UserViewModel handles token, user state, and authentication checks
+    val userViewModel: UserViewModel = hiltViewModel()
 
-    // Collect states from ViewModels
+    // State collection from UserViewModel
     val user by userViewModel.user.collectAsState()
     val tokenExpired by userViewModel.tokenExpired.collectAsState()
-    val isUserCheckComplete by userViewModel.isUserCheckComplete.collectAsState() // New state from UserViewModel
+    val isUserCheckComplete by userViewModel.isUserCheckComplete.collectAsState()
 
-    // State to track if the initial splash timer has finished
+    // Local state for splash screen timing
     var splashTimerFinished by remember { mutableStateOf(false) }
 
+    // Set system bar colors to match splash branding
     UpdateSystemBarsColors(
         topColor = Color(0xFF410FA3),
         bottomColor = Color(0xFF410FA3)
     )
 
-    // Step 1: Start the initial splash screen timer
+    /**
+     * STEP 1: Start a timer on first composition.
+     * After 2 seconds, splashTimerFinished becomes true.
+     */
     LaunchedEffect(Unit) {
         splashViewModel.startSplashTimer {
             splashTimerFinished = true
         }
     }
 
-    // Step 2: Once the splash timer is done, start the token/user check
-    // This LaunchedEffect will trigger ONLY when splashTimerFinished becomes true
+    /**
+     * STEP 2: When the timer finishes, trigger user info fetch.
+     * This ensures the splash always shows for 2 seconds *before* any navigation.
+     */
     LaunchedEffect(splashTimerFinished) {
         if (splashTimerFinished) {
-            userViewModel.fetchUser() // Start fetching user, which will set isUserCheckComplete eventually
+            userViewModel.fetchUser()
         }
     }
 
-    // Step 3: Navigate based on all conditions being met
-    // Navigation will only occur when both the splash timer is finished AND the user check is complete
+    /**
+     * STEP 3: Wait for both splash timer and user fetch to complete.
+     * Then navigate based on app state:
+     * - Token expired → Login
+     * - User loaded → Home
+     * - No token or failed fetch → Onboarding
+     */
     LaunchedEffect(splashTimerFinished, isUserCheckComplete, tokenExpired, user) {
         if (splashTimerFinished && isUserCheckComplete) {
             when {
                 tokenExpired -> {
-                    // Token expired, navigate to Login
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 }
                 user != null -> {
-                    // User data successfully fetched, navigate to Home
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 }
                 else -> {
-                    // No user data (either no token, or fetch failed and token not expired), navigate to Onboarding
                     navController.navigate(Screen.Onboarding.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
@@ -86,7 +105,9 @@ fun SplashScreen(navController: NavController) { // Correct: Only one top-level 
         }
     }
 
-    // Your actual splash screen UI
+    /**
+     * STEP 4: UI layer — splash logo and background.
+     */
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -100,3 +121,4 @@ fun SplashScreen(navController: NavController) { // Correct: Only one top-level 
         )
     }
 }
+

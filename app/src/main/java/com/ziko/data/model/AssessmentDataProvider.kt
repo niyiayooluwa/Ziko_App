@@ -1,20 +1,13 @@
 package com.ziko.data.model
 
-import com.ziko.data.assessment.getAssessment1Content
-import com.ziko.data.assessment.getAssessment2Content
-import com.ziko.data.assessment.getAssessment3Content
-import com.ziko.data.assessment.getAssessment4Content
-import com.ziko.data.assessment.getAssessment5Content
-import com.ziko.data.assessment.getAssessment6Content
-import com.ziko.data.assessment.getAssessment7Content
-import com.ziko.data.assessment.getAssessment8Content
-/*{
-import com.ziko.data.assessment.getAssessment3Content
-import com.ziko.data.assessment.getAssessment4Content
-import com.ziko.data.assessment.getAssessment5Content
-import com.ziko.data.assessment.getAssessment6Content
-import com.ziko.data.assessment.getAssessment7Content
-import com.ziko.data.assessment.getAssessment8Content}*/
+import com.ziko.data.local.assessment.getAssessment1Content
+import com.ziko.data.local.assessment.getAssessment2Content
+import com.ziko.data.local.assessment.getAssessment3Content
+import com.ziko.data.local.assessment.getAssessment4Content
+import com.ziko.data.local.assessment.getAssessment5Content
+import com.ziko.data.local.assessment.getAssessment6Content
+import com.ziko.data.local.assessment.getAssessment7Content
+import com.ziko.data.local.assessment.getAssessment8Content
 import com.ziko.ui.model.AssessmentScreenContent
 
 object AssessmentDataProvider {

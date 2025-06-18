@@ -3,8 +3,8 @@ package com.ziko.presentation.components
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ziko.presentation.home.AssessmentDataStatus
-
-// For NetworkStatusIndicator
+import com.ziko.presentation.home.getStatusColor
+import com.ziko.presentation.home.getStatusMessage
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Refresh
@@ -12,24 +12,28 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material3.*
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ziko.presentation.home.getStatusColor
-import com.ziko.presentation.home.getStatusMessage
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * A composable status bar that shows the current network/data sync status
+ * for the Assessment feature (e.g., loading, updated, cached, error, etc.).
+ *
+ * This bar slides into view only when the data is not in an UPDATED state
+ * or when a cached timestamp should be shown.
+ *
+ * @param status The current data sync status represented by [AssessmentDataStatus].
+ * @param lastUpdated Timestamp of the last successful data fetch (in millis).
+ * @param onRefreshClick Callback triggered when user taps to retry in ERROR or OFFLINE state.
+ * @param modifier Optional [Modifier] for styling or layout customization.
+ */
 @Composable
 fun NetworkStatusIndicator(
     status: AssessmentDataStatus,
@@ -40,7 +44,6 @@ fun NetworkStatusIndicator(
     val statusColor = status.getStatusColor()
     val statusMessage = status.getStatusMessage()
 
-    // Format last updated time
     val timeFormatter = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
     val lastUpdatedText = if (lastUpdated > 0) {
         "Updated ${timeFormatter.format(Date(lastUpdated))}"
@@ -72,7 +75,7 @@ fun NetworkStatusIndicator(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Status indicator dot
+                    // Colored dot representing current status
                     Box(
                         modifier = Modifier
                             .size(8.dp)
@@ -80,6 +83,7 @@ fun NetworkStatusIndicator(
                     )
 
                     Column {
+                        // Status message (e.g., "Cached", "Offline", "Updating...")
                         Text(
                             text = statusMessage,
                             fontSize = 12.sp,
@@ -87,6 +91,7 @@ fun NetworkStatusIndicator(
                             color = statusColor
                         )
 
+                        // Timestamp for last update (shown only in cached state)
                         if (lastUpdatedText.isNotEmpty() && status == AssessmentDataStatus.CACHED) {
                             Text(
                                 text = lastUpdatedText,
@@ -97,7 +102,7 @@ fun NetworkStatusIndicator(
                     }
                 }
 
-                // Show loading indicator or refresh icon
+                // Right-side indicator: loader, refresh button, or checkmark
                 when (status) {
                     AssessmentDataStatus.LOADING, AssessmentDataStatus.UPDATING -> {
                         CircularProgressIndicator(
@@ -122,7 +127,9 @@ fun NetworkStatusIndicator(
                             tint = statusColor
                         )
                     }
-                    AssessmentDataStatus.CACHED -> {}
+                    AssessmentDataStatus.CACHED -> {
+                        // No right icon for cached state
+                    }
                 }
             }
         }

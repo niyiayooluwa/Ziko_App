@@ -64,7 +64,7 @@ dependencies {
     implementation(libs.accompanist.placeholder.material)
 
     //Coil
-    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation(libs.coil.compose)
 
     // Hilt
     implementation(libs.hilt.android)

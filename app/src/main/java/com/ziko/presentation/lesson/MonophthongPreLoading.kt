@@ -37,25 +37,41 @@ import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.data.model.LessonDataProvider
 import com.ziko.navigation.Screen
-import com.ziko.util.UpdateSystemBarsColors
+import com.ziko.core.util.UpdateSystemBarsColors
 
+/**
+ * A composable screen shown before the monophthongs lesson begins.
+ *
+ * Acts as a soft onboarding prompt with a learning tip and motivational image,
+ * helping users prepare their environment (e.g., volume/headphones).
+ *
+ * Navigation Flow:
+ * - Returns to Home if back button is pressed.
+ * - Proceeds to the actual lesson loading screen when the "Got it!" button is clicked.
+ *
+ * @param navController Used for navigating between screens.
+ * @param lessonId ID of the current lesson used to retrieve lesson-specific info.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreLoadingScreen(
     navController: NavController,
     lessonId: String,
 ) {
+    // Update system bars (status and navigation) to match lesson theme
     UpdateSystemBarsColors(
         topColor = Color(0xFF410FA3),
         bottomColor = Color.White
     )
 
+    // Retrieve the lesson info once using the lessonId
     val lesson = remember(lessonId) {
         LessonDataProvider.getLessonInfo(lessonId)
     }
 
     Scaffold(
         topBar = {
+            // Centered Top App Bar with back navigation
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color(0xFF410fa3),
@@ -63,14 +79,17 @@ fun PreLoadingScreen(
                 title = {
                     if (lesson != null) {
                         Text(
-                            text = "",
+                            text = "", // Intentionally empty for this screen
                             fontSize = 22.sp,
                             color = Color.White
                         )
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigate(Screen.Home.route) }) {
+                    IconButton(onClick = {
+                        // Navigate to home on back press
+                        navController.navigate(Screen.Home.route)
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
@@ -92,10 +111,12 @@ fun PreLoadingScreen(
                     bottom = 24.dp
                 ),
         ) {
-            // Top Section (Image + Text)
+            // --- Center Section (Image + Learning Tip Text) ---
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth().align(Alignment.Center)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
             ) {
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -124,7 +145,7 @@ fun PreLoadingScreen(
                 )
             }
 
-            // Bottom Button
+            // --- Bottom CTA Button ---
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -133,6 +154,7 @@ fun PreLoadingScreen(
                     .clip(RoundedCornerShape(30.dp))
                     .background(Color(0xFF5B7BFE))
                     .clickable {
+                        // Navigate to the next screen in the lesson flow
                         navController.navigate(Screen.LessonLoading(lessonId).route)
                     },
                 verticalArrangement = Arrangement.Center,

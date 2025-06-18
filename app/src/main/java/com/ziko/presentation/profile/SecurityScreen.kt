@@ -44,28 +44,51 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ziko.util.UpdateSystemBarsColors
+import com.ziko.core.util.UpdateSystemBarsColors
 import me.nikhilchaudhari.library.neumorphic
 import me.nikhilchaudhari.library.shapes.Pressed
 
+/**
+ * Composable screen that allows a user to securely change their password.
+ *
+ * This screen includes:
+ * - Fields for entering the old password, new password, and confirmation.
+ * - Password visibility toggles for all fields.
+ * - Validation before submitting:
+ *   - Old and new passwords must differ.
+ *   - New and confirm passwords must match.
+ *   - Minimum password length of 6 characters.
+ * - Toasts to show the result of the password change.
+ * - System bar colors are set to white for visual consistency.
+ *
+ * @param navController Used for navigating back to the previous screen.
+ * @param userViewModel ViewModel providing access to user data and password change logic.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
+    // Collect password change result from ViewModel state
     val changeResult by userViewModel.passwordChangeResult.collectAsState()
+
     val context = LocalContext.current
+
+    // Local state for password fields
     var oldPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
+    // Toggles for showing/hiding password values
     var oldPasswordVisible by remember { mutableStateOf(false) }
     var newPasswordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
+    // Updates system UI bar colors for visual consistency
     UpdateSystemBarsColors(
         topColor = Color.White,
         bottomColor = Color.White
     )
 
+    // Show result toast when password change is attempted
     LaunchedEffect(changeResult) {
         changeResult?.let {
             if (it.isSuccess) {
@@ -73,20 +96,17 @@ fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
             } else {
                 Toast.makeText(context, "Error: ${it.exceptionOrNull()?.message}", Toast.LENGTH_SHORT).show()
             }
-            //userViewModel.passwordChangeResult.value = null
+            // Optional: clear the result if needed
+            // userViewModel.passwordChangeResult.value = null
         }
     }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text("")
-                },
+                title = { Text("") },
                 navigationIcon = {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                    ) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBackIosNew,
                             contentDescription = "Back",
@@ -101,7 +121,6 @@ fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
         },
         containerColor = Color.White
     ) { paddingValues ->
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -109,28 +128,22 @@ fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(top = 48.dp, bottom = 24.dp, start = 16.dp, end = 16.dp)
-        ){
-            Column (
+        ) {
+            Column(
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(1.dp, Color(0xFFe5e5e5), RoundedCornerShape(12.dp))
                     .padding(24.dp)
-
             ) {
-                // Old Password
+                // --- Old Password ---
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "Old Password",
-                        fontSize = 15.sp,
-                        color = Color(0xFF363B44)
-                    )
-
+                    Text("Old Password", fontSize = 15.sp, color = Color(0xFF363B44))
                     OutlinedTextField(
                         value = oldPassword,
                         onValueChange = { oldPassword = it },
@@ -141,15 +154,10 @@ fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         trailingIcon = {
-                            val image = if (oldPasswordVisible)
-                                Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                            val description = if (oldPasswordVisible)
-                                "Hide password" else "Show password"
-
                             IconButton(onClick = { oldPasswordVisible = !oldPasswordVisible }) {
                                 Icon(
-                                    imageVector = image,
-                                    contentDescription = description,
+                                    imageVector = if (oldPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                    contentDescription = if (oldPasswordVisible) "Hide password" else "Show password",
                                     tint = Color(0xFF080E1E),
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -164,18 +172,13 @@ fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
                     )
                 }
 
-                // new Password
+                // --- New Password ---
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "New Password",
-                        fontSize = 15.sp,
-                        color = Color(0xFF363B44)
-                    )
-
+                    Text("New Password", fontSize = 15.sp, color = Color(0xFF363B44))
                     OutlinedTextField(
                         value = newPassword,
                         onValueChange = { newPassword = it },
@@ -186,15 +189,10 @@ fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         trailingIcon = {
-                            val image = if (newPasswordVisible)
-                                Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                            val description = if (newPasswordVisible)
-                                "Hide password" else "Show password"
-
                             IconButton(onClick = { newPasswordVisible = !newPasswordVisible }) {
                                 Icon(
-                                    imageVector = image,
-                                    contentDescription = description,
+                                    imageVector = if (newPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                    contentDescription = if (newPasswordVisible) "Hide password" else "Show password",
                                     tint = Color(0xFF080E1E),
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -209,18 +207,13 @@ fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
                     )
                 }
 
-                // Confirm Password
+                // --- Confirm Password ---
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "Confirm Password",
-                        fontSize = 15.sp,
-                        color = Color(0xFF363B44)
-                    )
-
+                    Text("Confirm Password", fontSize = 15.sp, color = Color(0xFF363B44))
                     OutlinedTextField(
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
@@ -231,15 +224,10 @@ fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         trailingIcon = {
-                            val image = if (confirmPasswordVisible)
-                                Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                            val description = if (confirmPasswordVisible)
-                                "Hide password" else "Show password"
-
                             IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                                 Icon(
-                                    imageVector = image,
-                                    contentDescription = description,
+                                    imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                    contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password",
                                     tint = Color(0xFF080E1E),
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -254,7 +242,7 @@ fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
                     )
                 }
 
-                //Button
+                // --- Submit Button ---
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -288,7 +276,7 @@ fun SecurityScreen(navController: NavController, userViewModel: UserViewModel) {
                         }
                 ) {
                     Text(
-                        text ="Change Password",
+                        text = "Change Password",
                         color = Color(0xFF5b7bfe),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W500

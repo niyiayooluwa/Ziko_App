@@ -33,10 +33,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ziko.R
-import com.ziko.util.UpdateSystemBarsColors
+import com.ziko.core.util.UpdateSystemBarsColors
 import me.nikhilchaudhari.library.neumorphic
 import me.nikhilchaudhari.library.shapes.Pressed
 
+/**
+ * Displays the completion screen shown after a user finishes a lesson.
+ *
+ * This screen acknowledges the user's progress and offers two choices:
+ * - Continue to the practice exercises related to the completed lesson.
+ * - Return to the home screen.
+ *
+ * It also displays a dynamic message based on the lesson ID, such as "You have completed Lesson 2."
+ *
+ * The layout consists of:
+ * - A top app bar with a back button.
+ * - A centered congratulatory image and message.
+ * - Two action buttons fixed to the bottom of the screen.
+ *
+ * @param onPopBackStack Callback triggered when the user presses the back button.
+ * @param onContinuePractice Callback triggered when the user selects to continue to practice.
+ * @param onBackToHome Callback triggered when the user selects to go back to the home screen.
+ * @param lessonId A string representing the lesson's identifier (e.g., "lesson2").
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LessonCompletionScreen(
@@ -45,40 +64,45 @@ fun LessonCompletionScreen(
     onBackToHome: () -> Unit,
     lessonId: String
 ) {
+    // Set system UI colors for top and bottom system bars
     UpdateSystemBarsColors(
         topColor = Color(0xFF410FA3),
         bottomColor = Color.White
     )
 
-    Scaffold (
-        topBar = { CenterAlignedTopAppBar(
-            title = { Text(" ") },
-            navigationIcon = {
-                IconButton(onClick = onPopBackStack) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBackIosNew,
-                        contentDescription = "Back",
-                        tint = Color.White
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = Color(0xFF410FA3)
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(" ") }, // Empty title for a minimal header
+                navigationIcon = {
+                    IconButton(onClick = onPopBackStack) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFF410FA3)
+                )
             )
-        ) }
-    ){ paddingValues ->
+        }
+    ) { paddingValues ->
+
         Box(
             modifier = Modifier
                 .background(Color.White)
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(24.dp),
+                .padding(24.dp)
         ) {
-            Column (
+            // Centered message section
+            Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.align(Alignment.Center)
-            ){
+            ) {
                 Image(
                     painter = painterResource(R.drawable.congratulations),
                     contentDescription = "Congratulations",
@@ -87,19 +111,20 @@ fun LessonCompletionScreen(
                         .padding(bottom = 30.dp)
                 )
 
-                // Title
                 Text(
                     text = "Lesson Completed",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF080e1e),
+                    color = Color(0xFF080e1e)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                val textPart = lessonId.takeWhile {it.isLetter()}.replaceFirstChar { it.uppercase() }
-                val numPart = lessonId.takeLastWhile {it.isDigit()}
-                // Congratulations message
+                // Parse lessonId into readable lesson label
+                val textPart = lessonId.takeWhile { it.isLetter() }
+                    .replaceFirstChar { it.uppercase() }
+                val numPart = lessonId.takeLastWhile { it.isDigit() }
+
                 Text(
                     text = "You have completed $textPart $numPart. You \nare ready for a bigger challenge.",
                     fontSize = 17.sp,
@@ -108,15 +133,15 @@ fun LessonCompletionScreen(
                 )
             }
 
-            //Buttons
-            Column (
+            // Bottom buttons
+            Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-            ){
-                // Continue button
+            ) {
+                // Primary action: Continue practice
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -125,17 +150,17 @@ fun LessonCompletionScreen(
                         .height(56.dp)
                         .clip(RoundedCornerShape(30.dp))
                         .background(Color(0xFF5b7bfe))
-                        .clickable{onContinuePractice()}
+                        .clickable { onContinuePractice() }
                 ) {
                     Text(
-                        text ="Continue to practice exercise",
+                        text = "Continue to practice exercise",
                         color = Color.White,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W500
                     )
                 }
 
-                //Go back home button
+                // Secondary action: Back to home with neumorphic styling
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -151,10 +176,10 @@ fun LessonCompletionScreen(
                             strokeWidth = 4.dp,
                             elevation = 4.dp
                         )
-                        .clickable{onBackToHome()}
+                        .clickable { onBackToHome() }
                 ) {
                     Text(
-                        text ="Back to home",
+                        text = "Back to home",
                         color = Color(0xFF5b7bfe),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W500

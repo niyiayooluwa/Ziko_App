@@ -1,21 +1,8 @@
 package com.ziko.presentation.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -33,25 +20,30 @@ import androidx.navigation.NavController
 import com.ziko.R
 import com.ziko.navigation.Screen
 
+/**
+ * A floating bottom navigation bar for the main screen with two tabs: Lessons and Assessment.
+ *
+ * This component is visible on primary screens and adapts icon states based on the current route.
+ *
+ * @param navController Navigation controller for performing navigation actions.
+ * @param currentRoute The current screen route to highlight the active tab.
+ */
 @Composable
 fun FloatingNavBar(navController: NavController, currentRoute: String) {
-    // Simplified structure with exact specifications
     Surface(
         modifier = Modifier
             .animateContentSize()
             .height(80.dp)
             .padding(horizontal = 20.dp, vertical = 12.dp)
-            .shadow(4.dp, RoundedCornerShape(40.dp), spotColor = Color(0xFFE5E5E5)), // Shadow color from Figma
-        shape = RoundedCornerShape(40.dp),  // Fully rounded corners
+            .shadow(4.dp, RoundedCornerShape(40.dp), spotColor = Color(0xFFE5E5E5)),
+        shape = RoundedCornerShape(40.dp),
         color = Color.White
     ) {
         Row(
-            modifier = Modifier
-                .height(80.dp),
+            modifier = Modifier.height(80.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Lessons tab
             val isLessonsActive = currentRoute == Screen.Home.route
             NavItem(
                 activeIcon = R.drawable.book,
@@ -61,15 +53,13 @@ fun FloatingNavBar(navController: NavController, currentRoute: String) {
                 onClick = {
                     if (!isLessonsActive) {
                         navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Home.route) {
-                                inclusive = false
-                            }
+                            popUpTo(Screen.Home.route) { inclusive = false }
                             launchSingleTop = true
                         }
                     }
                 }
             )
-            // Assessment tab
+
             val isAssessmentActive = currentRoute == Screen.Assessment.route
             NavItem(
                 activeIcon = R.drawable.task_1,
@@ -79,9 +69,7 @@ fun FloatingNavBar(navController: NavController, currentRoute: String) {
                 onClick = {
                     if (!isAssessmentActive) {
                         navController.navigate(Screen.Assessment.route) {
-                            popUpTo(Screen.Home.route) {
-                                inclusive = false
-                            }
+                            popUpTo(Screen.Home.route) { inclusive = false }
                             launchSingleTop = true
                         }
                     }
@@ -91,6 +79,19 @@ fun FloatingNavBar(navController: NavController, currentRoute: String) {
     }
 }
 
+/**
+ * A single item in the floating navigation bar.
+ *
+ * Shows an icon and label when active; only the icon when inactive.
+ * Entire row is clickable and uses transparent background for seamless layout.
+ *
+ * @param activeIcon Drawable resource ID for the active icon.
+ * @param inactiveIcon Drawable resource ID for the inactive icon.
+ * @param label Text label to show when active.
+ * @param isActive Whether this tab is currently selected.
+ * @param activeColor Optional color used when the tab is active.
+ * @param onClick Callback for when this nav item is tapped.
+ */
 @Composable
 fun NavItem(
     activeIcon: Int,
@@ -100,32 +101,24 @@ fun NavItem(
     activeColor: Color = Color(0xFF5E5AEC),
     onClick: () -> Unit
 ) {
-    // Make the entire surface clickable for better touch area
     Surface(
-        modifier = Modifier
-            .clickable(onClick = onClick),
-        color = Color.Transparent // Transparent to not show background
+        modifier = Modifier.clickable(onClick = onClick),
+        color = Color.Transparent
     ) {
         Row(
             modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon with larger touch target
             Icon(
-                painter = painterResource(if (isActive) activeIcon else inactiveIcon),
+                painter = painterResource(id = if (isActive) activeIcon else inactiveIcon),
                 contentDescription = label,
-                tint = when (isActive) {
-                    true -> activeColor
-                    false -> Color.Gray
-                },
-                modifier = Modifier
-                    .size(24.dp) // Larger icon for better visibility
+                tint = if (isActive) activeColor else Color.Gray,
+                modifier = Modifier.size(24.dp)
             )
 
             Spacer(Modifier.width(4.dp))
 
-            // Label (only shown when active)
             if (isActive) {
                 Text(
                     text = label,
